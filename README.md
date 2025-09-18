@@ -6,8 +6,9 @@ Campus Events &amp; Ticketing Web App for SOEN 341 Project
 ## Project
 
 ## Team Members
+| Name                  | Student ID | GitHub Username | Role |
 |-----------------------|------------|----------------|------|
-| Jana Abuhamed         |  40317183  |                |      |
+| Jana Abuhamed         | 40317183   |                |      |
 | Yasmine Albouchi      |            |                |      |
 | Jana Alnoman          |            |                |      |
 | Lyne Seddaoui         |            |                |      |
