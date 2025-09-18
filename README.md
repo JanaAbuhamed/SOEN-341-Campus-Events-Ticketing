@@ -10,7 +10,7 @@ Campus Events &amp; Ticketing Web App for SOEN 341 Project
 |-----------------------|------------|----------------|------|
 | Jana Abuhamed         | 40317183   |                |      |
 | Yasmine Albouchi      |            |                |      |
-| Jana Alnoman          |            |                |      |
+| Jana Alnoman          | 40272288   |   Jnom453      |      |
 | Lyne Seddaoui         |            |                |      |
 | Christopher Liang     |            |                |      |
 | Kerollos Kerollos     |            |                |      |
