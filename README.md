@@ -6,13 +6,14 @@ Campus Events &amp; Ticketing Web App for SOEN 341 Project
 ## Project
 
 ## Team Members
-- Jana Abuhamed
-- Yasmine Albouchi
-- Jana Alnoman
-- Lyne Seddaoui
-- Christopher Liang
-- Kerollos Kerollos
-- Mohammad Alhaji
+|-----------------------|------------|----------------|------|
+| Jana Abuhamed         |  40317183  |                |      |
+| Yasmine Albouchi      |            |                |      |
+| Jana Alnoman          |            |                |      |
+| Lyne Seddaoui         |            |                |      |
+| Christopher Liang     |            |                |      |
+| Kerollos Kerollos     |            |                |      |
+| Mohammad Alhaji       |            |                |      |
   
 ## Technologies
 
