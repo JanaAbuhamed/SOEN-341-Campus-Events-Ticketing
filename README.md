@@ -16,12 +16,13 @@ Campus Events &amp; Ticketing Web App for SOEN 341 Project
 | Kerollos Kerollos     |            |                |      
 | Mohammad Alhaji       |            |                |      
   
-## Technologies
+## Techniques and Languages
+TBD
 
 ## Setup Instructions
 
 ## Usage
-TBD
+
 
 
 
