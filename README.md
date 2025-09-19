@@ -6,15 +6,15 @@ Campus Events &amp; Ticketing Web App for SOEN 341 Project
 ## Project
 
 ## Team Members
-| Name                  | Student ID | GitHub Username |  |
-|-----------------------|------------|----------------|-
-| Jana Abuhamed         | 40317183   |                | 
-| Yasmine Albouchi      | 40312832   | yasminealb     |    
-| Jana Alnoman          | 40272288   |   Jnom453      | 
-| Lyne Seddaoui         |            |                |   
-| Christopher Liang     |            |                |      
-| Kerollos Kerollos     |            |                |      
-| Mohammad Alhaji       |            |                |      
+| Name                  | Student ID | GitHub Username |  
+|-----------------------|------------|-----------------|
+| Jana Abuhamed         | 40317183   |                 | 
+| Yasmine Albouchi      | 40312832   | yasminealb      |    
+| Jana Alnoman          | 40272288   |   Jnom453       | 
+| Lyne Seddaoui         |            |                 |   
+| Christopher Liang     |            |                 |      
+| Kerollos Kerollos     |            |                 |      
+| Mohammad Alhaji       |            |                 |      
   
 ## Techniques and Languages
 TBD
