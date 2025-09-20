@@ -15,6 +15,8 @@ Students: **browse events**, **save them**, **claim tickets** (free or paid), **
 Organizers: **create** and **manage events**, **track attendance**, **access analytics through dashboards**.
 
 Administrators: **moderate content**, **oversee organizations**.
+
++1 TBD feature...
        
 
 ## Team Members
