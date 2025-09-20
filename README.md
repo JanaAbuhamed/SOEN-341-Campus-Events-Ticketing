@@ -4,9 +4,9 @@ Campus Events &amp; Ticketing Web App for SOEN 341 Project
 ## Objective
 
 ## About
-This project is Campus Events & Ticketing Web Application
+This project is a Campus Events & Ticketing Web Application
 
-This application allows the users to look for and register to campus events.
+The application allows the users to look for and register to campus events.
 
 **FEATURES**
 
