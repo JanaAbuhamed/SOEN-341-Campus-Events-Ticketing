@@ -3,6 +3,8 @@ Campus Events &amp; Ticketing Web App for SOEN 341 Project
 
 ## Objective
 
+The objective of the Campus Events & Ticketing Web Application is to provide a user-friendly platform that allows for student engagement by streamlining the discovery, organization, and participation in campus events. The system is made is way that students can easily browse, save, and attend events, simplifies the check-in processes through QR codes, and gives organizers tools to create, manage, and analyze their events. It also enables administrators to ensure smooth operations through content moderation and organizational oversight. Finally, the application aims to foster better involvement in the community, improve operational efficiency, and create a larger support system to on-campus events.
+
 ## About
 
 This project is a Campus Events & Ticketing Web Application
