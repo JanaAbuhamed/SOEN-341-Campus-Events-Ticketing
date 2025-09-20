@@ -5,6 +5,19 @@ Campus Events &amp; Ticketing Web App for SOEN 341 Project
 
 ## About
 
+This project is a Campus Events & Ticketing Web Application
+
+The application allows the users to look for and register to campus events.
+
+**FEATURES**
+
+Students: **browse events**, **save them**, **claim tickets** (free or paid), **check in using QR codes**.
+
+Organizers: **create** and **manage events**, **track attendance**, **access analytics through dashboards**.
+
+Administrators: **moderate content**, **oversee organizations**.
+
++1 TBD feature...
        
 
 ## Team Members
