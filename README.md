@@ -29,7 +29,7 @@ Administrators: **moderate content**, **oversee organizations**.
 | Yasmine Albouchi      | 40312832   | yasminealb      |    
 | Jana Alnoman          | 40272288   |   Jnom453       | 
 | Lyne Seddaoui         | 40252125   |  lynesdd        |   
-| Christopher Liang     |            |                 |      
+| Christopher Liang     | 40174418   |   chrix1234     |      
 | Kerollos Kerollos     |            |                 |      
 | Mohammad Alhaji       |            |                 |      
   
