@@ -30,7 +30,7 @@ Administrators: **moderate content**, **oversee organizations**.
 | Jana Alnoman          | 40272288   |   Jnom453       | 
 | Lyne Seddaoui         | 40252125   |  lynesdd        |   
 | Christopher Liang     | 40174418   |   chrix1234     |      
-| Kerollos Kerollos     |            |                 |      
+| Kerollos Kerollos     | 40316125   |  kerollos-ke    |      
 | Mohammad Alhaji       |            |                 |      
   
 ## Techniques and Languages
