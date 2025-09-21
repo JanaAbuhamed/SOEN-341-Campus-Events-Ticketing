@@ -17,7 +17,7 @@ Students: **browse events**, **save them**, **claim tickets** (free or paid), **
 
 Organizers: **create** and **manage events**, **track attendance**, **access analytics through dashboards**.
 
-Administrators: **moderate content**, **oversee organizations**.
+Administrators: **moderate content**, **oversee organizations**, **track analytics**.
 
 +1 TBD feature...
        
@@ -25,17 +25,19 @@ Administrators: **moderate content**, **oversee organizations**.
 ## Team Members
 | Name                  | Student ID | GitHub Username |  
 |-----------------------|------------|-----------------|
-| Jana Abuhamed         | 40317183   |                 | 
+| Jana Abuhamed         | 40317183   | JanaAbuhamed    | 
 | Yasmine Albouchi      | 40312832   | yasminealb      |    
-| Jana Alnoman          | 40272288   |   Jnom453       | 
-| Lyne Seddaoui         | 40252125   |  lynesdd        |   
-| Christopher Liang     | 40174418   |   chrix1234     |      
-| Kerollos Kerollos     | 40316125   |                 |      
+| Jana Alnoman          | 40272288   | Jnom453         | 
+| Lyne Seddaoui         | 40252125   | lynesdd         |   
+| Christopher Liang     | 40174418   | chrix1234       |      
+| Kerollos Kerollos     | 40316125   | kerollos-ke     |      
 | Mohammad Alhaji       |            |                 |      
   
 ## Techniques and Languages
 Frontend: HTML, CSS, React.js
+
 Backend: Python (or Java)
+
 Database: SQL
 
 ## Setup Instructions
