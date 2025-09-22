@@ -31,7 +31,7 @@ Administrators: **moderate content**, **oversee organizations**, **track analyti
 | Lyne Seddaoui         | 40252125   | lynesdd         |   
 | Christopher Liang     | 40174418   | chrix1234       |      
 | Kerollos Kerollos     | 40316125   | kerollos-ke     |      
-| Mohammad Alhaji       |    40264810  mohammadalhaji  |                 |      
+| Mohammad Alhaji       | 40264810   | mohammadalhaji  |      
   
 ## Techniques and Languages
 Frontend: HTML, CSS, React.js
