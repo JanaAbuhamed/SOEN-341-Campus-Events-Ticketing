@@ -7,37 +7,38 @@
 </head>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
-<!-- The Search Input Field -->
-<div class="search-container">
-    <label for="tableSearchInput">Search Event:</label>
-    <input type="text" id="tableSearchInput" placeholder="Type to search by Name, Category, Organization, or Date...">
-</div>
+<div class="table-card">
+    <!-- The Search Input Field -->
+    <div class="search-container">
+        <label for="tableSearchInput">Search Event:</label>
+        <input type="text" id="tableSearchInput" placeholder="Type to search by Name, Category, Organization, or Date...">
+    </div>
 
-<!-- Event Table with filtering -->
-<div class="table-container"> 
-<table class="filterable-table" id="EventTable">
-    <thead>
-        <tr>
-            <th scope="col">Event Name</th>
-            <th scope="col">Category</th>
-            <th scope="col">Organization</th>
-            <th scope="col">Date</th>
-        </tr>
-    </thead>
-    <tbody>
-        <!-- Rows will be populated by JavaScript // placeholder for database -->
-    </tbody>
-</table>
-</div>
+    <!-- Event Table with filtering -->
+    <div class="table-container"> 
+    <table class="filterable-table" id="EventTable">
+        <thead>
+            <tr>
+                <th scope="col">Event Name</th>
+                <th scope="col">Category</th>
+                <th scope="col">Organization</th>
+                <th scope="col">Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Rows will be populated by JavaScript // placeholder for database -->
+        </tbody>
+    </table>
+    </div>
 
-<!-- Overlay container -->
-<div id="contentOverlay">
-    <div id="contentPanel">
-        <button class="close-btn">&times;</button>
-        <div id="contentArea"></div>
+    <!-- Overlay container -->
+    <div id="contentOverlay">
+        <div id="contentPanel">
+            <button class="close-btn">&times;</button>
+            <div id="contentArea"></div>
+        </div>
     </div>
 </div>
-
 
 
 </body>
