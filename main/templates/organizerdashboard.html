@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Organizer Dashboard</title>
+  <link rel="stylesheet" href="login.css"> <!-- consistent style -->
+  <link rel="stylesheet" href="organizerdashboard.css">
+</head>
+<body>
+
+  <header>
+    <h1>Organizer Dashboard</h1>
+  </header>
+
+  <main class="dashboard-container">
+
+    <!-- Organizer Events Section -->
+    <section class="dashboard-section">
+      <h2>My Events</h2>
+      <div class="table-container">
+        <table id="eventsTable">
+          <thead>
+            <tr>
+              <th>Event ID</th>
+              <th>Event Name</th>
+              <th>Date</th>
+              <th>Location</th>
+              <th>Attendees</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Placeholder events -->
+            <tr>
+              <td>201</td>
+              <td>Campus Hackathon</td>
+              <td>2025-11-15</td>
+              <td>Main Hall</td>
+              <td>120</td>
+            </tr>
+            <tr>
+              <td>202</td>
+              <td>Music Festival</td>
+              <td>2025-12-05</td>
+              <td>Outdoor Stage</td>
+              <td>300</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Placeholder for future sections -->
+    <section class="dashboard-section">
+      <h2>Pending Approvals / Tasks</h2>
+      <div class="table-container">
+        <table id="tasksTable">
+          <thead>
+            <tr>
+              <th>Task ID</th>
+              <th>Description</th>
+              <th>Deadline</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Placeholder tasks -->
+            <tr>
+              <td>301</td>
+              <td>Approve Event Flyers</td>
+              <td>2025-10-10</td>
+              <td>Pending</td>
+            </tr>
+            <tr>
+              <td>302</td>
+              <td>Confirm Catering</td>
+              <td>2025-11-01</td>
+              <td>Pending</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+  </main>
+
+  <script src="organizerdashboard.js"></script>
+</body>
+</html>
