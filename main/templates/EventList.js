@@ -134,6 +134,7 @@ document.addEventListener("DOMContentLoaded", function () {
             if (selectedRow) selectedRow.classList.remove('selected');
             selectedRow = null;
         });
+        
         row.style.cursor = "pointer";
 
         // Close when clicking outside the panel
