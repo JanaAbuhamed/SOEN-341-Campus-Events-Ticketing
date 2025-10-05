@@ -78,7 +78,7 @@ DATABASES = {
         'USER': 'campus_event',
         'PASSWORD': 'campus_event',
         'HOST': 'localhost',
-        'PORT': '3307',
+        'PORT': '3306', #truing to debug
     }
 }
 

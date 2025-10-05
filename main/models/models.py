@@ -53,3 +53,62 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def __str__(self):
         return f"{self.name} ({self.get_role_display()})"
+
+# EVENT MODEL
+
+class Event(models.Model):
+    TICKET_TYPES = [
+        ('free', 'Free'),
+        ('general', 'General Admission'),
+        ('vip', 'VIP'),
+    ]
+
+    EVENT_STATUS = [
+        ('draft', 'Draft'),
+        ('pending', 'Pending Admin Review'),
+        ('approved', 'Approved'),
+        ('rejected', 'Rejected'),
+    ]
+    
+
+    title = models.CharField(max_length=200)
+    description = models.TextField()
+    date = models.DateField()
+    time = models.TimeField()
+    location = models.CharField(max_length=200)
+    capacity = models.PositiveIntegerField()
+
+    ticket_type = models.CharField(
+        max_length = 20, 
+        choices = TICKET_TYPES, 
+        default = 'free'
+    )
+    
+    status = models.CharField(
+        max_length = 20,
+        choices = EVENT_STATUS,
+        default = 'draft'
+    )
+
+    attendees = models.ManyToManyField(
+        User, 
+        related_name = "events_attending",
+        blank = True  
+    )
+    
+    organizer = models.ForeignKey(
+        User,
+        on_delete = models.CASCADE,
+        related_name = "organized_events",
+        limit_choices_to={'role': 1}
+    )
+    
+    created_at = models.DateTimeField(default = timezone.now)
+    updated_at = models.DateTimeField(auto_now = True)
+
+    def available_spots(self):
+        return self.capacity - self.attendees.count()
+
+    def __str__(self):
+        return self.title
+    
