@@ -1,0 +1,127 @@
+body {
+  display: flex;
+  height: 100vh;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg,#7006cd, #d80cc3); /* purple to blue gradient */
+  font-family: "Segoe UI", sans-serif;
+}
+
+.container {
+  width: 850px;
+  max-width: 95%;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+  display: flex;
+  overflow: hidden;
+}
+
+.left {
+  flex: 1;
+  background: #f9f9f9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+}
+
+.left img {
+  width: 220px;
+  height: auto;
+  border-radius: 50%;
+}
+
+.right {
+  flex: 1;
+  padding: 50px 40px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.right h2 {
+  margin-bottom: 25px;
+  color: #333;
+  text-align: center;
+  font-size: 22px;
+  font-weight: 600;
+}
+
+.form-group {
+  margin-bottom: 18px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 6px;
+  color: #444;
+  font-size: 14px;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid #ddd;
+  border-radius: 30px;
+  font-size: 14px;
+  outline: none;
+  transition: 0.3s;
+}
+
+.form-group input:focus {
+  border-color: #6a11cb;
+  box-shadow: 0 0 5px rgba(106,17,203,0.2);
+}
+
+.btn {
+  width: 100%;
+  padding: 12px;
+  background: #6a11cb;
+  border: none;
+  color: #fff;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: 500;
+  transition: 0.3s;
+}
+
+.btn:hover {
+  background: #2575fc;
+}
+
+.toggle-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.toggle-buttons button {
+  padding: 8px 20px;
+  border: 1px solid #6a11cb;
+  background: #fff;
+  color: #6a11cb;
+  cursor: pointer;
+  border-radius: 6px;
+  font-size: 14px;
+  transition: 0.3s;
+}
+
+.toggle-buttons button.active {
+  background: #6a11cb;
+  color: #fff;
+}
+
+.hidden {
+  display: none;
+}
+
+.note {
+  font-size: 12px;
+  color: #888;
+  margin-top: -5px;
+  margin-bottom: 15px;
+  text-align: center;
+}

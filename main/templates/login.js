@@ -51,7 +51,7 @@ if(loginBtn) {
     } else {
       
       if(window.location.href.includes('studentlogin')) {
-        window.location.href = 'events.html'; // student events page
+        window.location.href = 'EventList.html'; // student events page
       } else if(window.location.href.includes('organizerlogin')) {
         window.location.href = 'organizerdashboard.html'; // organizer dashboard
       } else if(window.location.href.includes('adminlogin')) {
