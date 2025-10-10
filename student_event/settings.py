@@ -73,10 +73,10 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'student_event',  # phpMyAdmin DB name
-        'USER': 'root',
-        'PASSWORD': '',
+        'USER': 'campus_event',
+        'PASSWORD': 'campus_event',
         'HOST': 'localhost',
-        'PORT': '3307', #truing to debug
+        'PORT': '3306', #truing to debug
     }
 }
 
