@@ -1,6 +1,6 @@
 /* Home Page */
 body.home-page {
-  background: linear-gradient(135deg, #7b2ff7, #f107a3);
+  background: linear-gradient(135deg, #005c23, #005c23);
   height: 100vh;
   display: flex;
   justify-content: center;
@@ -45,7 +45,7 @@ body.home-page {
   text-decoration: none;
   padding: 15px 40px;
   border-radius: 25px;
-  background: #7b2ff7;
+  background: #005c23;
   color: #fff;
   font-weight: bold;
   font-size: 16px;
@@ -53,7 +53,7 @@ body.home-page {
 }
 
 .home-link:hover {
-  background: #f107a3;
+  background: #005c23;
 }
 
 /* Contact tab */
@@ -66,7 +66,7 @@ body.home-page {
 
 .contact-tab a {
   text-decoration: none;
-  color: #7b2ff7;
+  color: #005c23;
   font-weight: bold;
   background: rgba(123,47,247,0.1);
   padding: 10px 20px;
@@ -75,6 +75,19 @@ body.home-page {
 }
 
 .contact-tab a:hover {
-  background: #7b2ff7;
+  background: #005c23;
   color: #fff;
+}
+
+
+/* Logo */
+.logo-container {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.logo {
+  width: 120px; /* adjust size */
+  height: auto;
+  display: inline-block;
 }
