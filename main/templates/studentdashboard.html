@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>My Tickets</title>
+  <link rel="stylesheet" href="studentdashboard.css"/>
+</head>
+<body>
+  <header>
+    <h1 style="color:#fff; text-align:center; margin: 40px 0;">My Tickets</h1>
+  </header>
+
+  <main class="tickets-wrap">
+    <div class="toolbar">
+      <a class="btn" href="upcomingevents.html">Browse Events</a>
+      <button id="clearBtn" class="btn secondary">Clear All (dev)</button>
+    </div>
+
+    <div id="ticketsGrid" class="grid"></div>
+
+    <div id="emptyState" class="empty hidden">
+      <img src="https://cdn-icons-png.flaticon.com/512/748/748113.png" alt="" />
+      <h3>No tickets yet</h3>
+      <p>Claim an event from Upcoming Events to see your QR here.</p>
+      <a class="btn" href="upcomingevents.html">Find Events</a>
+    </div>
+  </main>
+
+  <!-- Native dialog for large QR -->
+  <dialog id="qrDialog">
+    <div class="dialog-body">
+      <button type="button" id="dlgClose" class="close" aria-label="Close">&times;</button>
+      <h3 id="dlgTitle"></h3>
+      <div id="dlgQR" class="qr-large"></div>
+      <div class="modal-actions">
+        <button id="dlgDownload" class="btn" type="button">Download PNG</button>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- QR lib then our JS -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <script src="studentdashboard.js"></script>
+</body>
+</html>
