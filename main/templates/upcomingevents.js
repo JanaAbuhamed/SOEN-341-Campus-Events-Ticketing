@@ -75,7 +75,7 @@ document.addEventListener("DOMContentLoaded", () => {
       list.push(current);
       localStorage.setItem(key, JSON.stringify(list));
     }
-    alert('Event saved.');
+    alert('Event saved. See it under My Saved Events.');
   }, { passive: true });
 
   // close modal
