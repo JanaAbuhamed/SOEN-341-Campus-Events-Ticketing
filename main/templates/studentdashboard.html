@@ -16,6 +16,16 @@
       <a class="btn" href="upcomingevents.html">Browse Events</a>
       <button id="clearBtn" class="btn secondary">Clear All (dev)</button>
     </div>
+    
+  <!-- Profile update form -->
+    <section class="profile-update">
+      <h2>Update Your Profile</h2>
+      <form method="POST">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn">Save Changes</button>
+      </form>
+    </section>
 
     <div id="ticketsGrid" class="grid"></div>
 
