@@ -72,13 +72,19 @@ TEMPLATES = [
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
+
         'NAME': 'student_event',  # phpMyAdmin DB name
         'USER': 'campus_event',
         'PASSWORD': 'campus_event',
         'HOST': 'localhost',
         'PORT': '3306', #truing to debug
+
+        # 'HOST': '127.0.0.1',  # <-- change this
+
+
     }
 }
+
 
 WSGI_APPLICATION = 'student_event.wsgi.application'
 
