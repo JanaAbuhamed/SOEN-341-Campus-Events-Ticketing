@@ -1,3 +1,4 @@
+<!-- main/templates/studentdashboard.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -14,18 +15,22 @@
   <main class="tickets-wrap">
     <div class="toolbar">
       <a class="btn" href="upcomingevents.html">Browse Events</a>
+      <a class="btn secondary" href="{% url 'update_profile' %}">Edit Profile</a>
+      <a class="btn secondary" href="{% url 'update_password' %}">Change Password</a>
       <button id="clearBtn" class="btn secondary">Clear All (dev)</button>
     </div>
-    
+
+
   <!-- Profile update form -->
-    <section class="profile-update">
+    <!-- <section class="profile-update">
       <h2>Update Your Profile</h2>
-      <form method="POST">
+      <form method="POST" action="{% url 'update_profile' %}">
         {% csrf_token %}
         {{ form.as_p }}
         <button type="submit" class="btn">Save Changes</button>
       </form>
-    </section>
+      <a class="btn secondary" href="{% url 'update_profile' %}" style="margin-top:10px;">Edit Profile</a>
+    </section> -->
 
     <div id="ticketsGrid" class="grid"></div>
 
