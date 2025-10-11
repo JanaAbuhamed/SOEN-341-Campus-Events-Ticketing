@@ -53,73 +53,131 @@ const eventData = [
 ];
 
 // Detail box
-document.addEventListener("DOMContentLoaded", function () {
+document.addEventListener("DOMContentLoaded", async function () {
     // const rows = document.querySelectorAll("#EventTable tbody tr");
     const contentArea = document.getElementById("contentArea");
     const tableBody = document.querySelector("#EventTable tbody");
     const overlay = document.getElementById("contentOverlay");
     const closeBtn = document.querySelector("#contentPanel .close-btn");
 
+    let events = [];
+    try {
+        const response = await fetch("http://localhost:8000/api/events/");
+        if (!response.ok) throw new Error("Failed to fetch events");
+        events = await response.json();
+    } catch (error) {
+        console.error("Error fetching events:", error);
+    }
+    // 1️⃣ Fetch data from your Django API
+    async function fetchEvents() {
+        try {
+            const response = await fetch("http://127.0.0.1:8000/api/events/"); // Adjust URL if needed
+            if (!response.ok) throw new Error("Failed to fetch events");
+            const events = await response.json();
+            populateTable(events);
+        } catch (error) {
+            console.error("Error loading events:", error);
+            tableBody.innerHTML = `<tr><td colspan="4">Failed to load events</td></tr>`;
+        }
+    }
     // Generate table rows from reference data
-    eventData.forEach(event => {
+    tableBody.innerHTML = ""; // clear previous rows
+    events.forEach(event => {
         const tr = document.createElement("tr");
-        tr.dataset.name = event.name;
-        tr.dataset.category = event.category;
-        tr.dataset.organization = event.organization;
+        tr.dataset.id = event.id;
+        tr.dataset.title = event.title;
         tr.dataset.date = event.date;
+        tr.dataset.time = event.time;
+        tr.dataset.location = event.location;
+        tr.dataset.capacity = event.capacity;
+        tr.dataset.ticket_type = event.ticket_type;
+        tr.dataset.status = event.status;
+        tr.dataset.organizer = event.organizer.name || "Unknown";
 
         tr.innerHTML = `
-            <td>${event.name}</td>
-            <td>${event.category}</td>
-            <td>${event.organization}</td>
+            <td>${event.title}</td>
+            <td>${event.organizer.name || "Unknown"}</td>
             <td>${event.date}</td>
+            <td>${event.time}</td>
+            <td>${event.ticket_type}</td>
         `;
 
         tableBody.appendChild(tr);
     });
 
     const rows = tableBody.querySelectorAll("tr");
-    let selectedRow = null; // track currently selected row
-    // Row features
+    let selectedRow = null;
+
     rows.forEach(row => {
-        row.addEventListener("click", function (e) {
-            // Toggle off if clicking the same row
+        row.addEventListener("click", function () {
             if (selectedRow === this) {
-                this.classList.remove('selected');
-                contentArea.style.display = "none";
+                this.classList.remove("selected");
+                overlay.style.display = "none";
                 selectedRow = null;
                 return;
             }
 
-            // Highlight row
-            rows.forEach(r => r.classList.remove('selected'));
-            this.classList.add('selected');
+            rows.forEach(r => r.classList.remove("selected"));
+            this.classList.add("selected");
             selectedRow = this;
 
-            // Show details panel
-            contentArea.style.display = "block";
-
-            // Populate content from data attributes
-            const name = this.dataset.name;
-            const category = this.dataset.category;
-            const organization = this.dataset.organization;
-            const date = this.dataset.date;
+            const {
+                id, title, date, time, location,
+                capacity, ticket_type, status, organizer
+            } = this.dataset;
 
             contentArea.innerHTML = `
-                <h2><strong>Event Name:</strong> ${name}</h2>
-                <p><strong>Category:</strong> ${category}</p>
-                <p><strong>Organization:</strong> ${organization}</p>
-                <p><strong>Date:</strong> ${date}</p>
+                <h2><strong>${title}</strong></h2>
+                <p><strong>Date:</strong> ${date} ${time}</p>
+                <p><strong>Location:</strong> ${location}</p>
+                <p><strong>Organizer:</strong> ${organizer}</p>
+                <p><strong>Ticket Type:</strong> ${ticket_type}</p>
+                <p><strong>Capacity:</strong> ${capacity}</p>
                 <div class="action-buttons" style="margin-top:10px;">
-                    <button class="save-btn">Save</button>
-                    <button class="claim-btn">Claim</button>
+                    <button class="register-btn">Register</button>
+                    <button class="unregister-btn">Unregister</button>
                 </div>
             `;
             // Show overlay
             overlay.style.display = "flex";
 
-            // Add action button functionality
-            const saveBtn = contentArea.querySelector(".save-btn");
+            const registerBtn = contentArea.querySelector(".register-btn");
+            const unregisterBtn = contentArea.querySelector(".unregister-btn");
+            registerBtn.addEventListener("click", async () => {
+                try {
+                    const res = await fetch(`http://localhost:8000/api/events/${id}/register/`, {
+                        method: "POST",
+                        credentials: "include" // include cookies if auth needed
+                    });
+                    const data = await res.json();
+                    alert(data.message || "Registered successfully");
+                } catch (err) {
+                    alert("Error registering for event");
+                }
+            });
+
+            unregisterBtn.addEventListener("click", async () => {
+                try {
+                    const res = await fetch(`http://localhost:8000/api/events/${id}/unregister/`, {
+                        method: "POST",
+                        credentials: "include"
+                    });
+                    const data = await res.json();
+                    alert(data.message || "Unregistered successfully");
+                } catch (err) {
+                    alert("Error unregistering from event");
+                }
+            });
+        });
+    });
+    closeBtn.addEventListener("click", () => {
+        overlay.style.display = "none";
+        if (selectedRow) selectedRow.classList.remove("selected");
+        selectedRow = null;
+    });
+    
+        // Add action button functionality
+        const saveBtn = contentArea.querySelector(".save-btn");
             saveBtn.addEventListener("click", function () {
                 alert("Saving ticket for: " + name);
             });
@@ -145,5 +203,5 @@ document.addEventListener("DOMContentLoaded", function () {
         selectedRow = null;
         }
         });
-    });
-});
+//     });
+// });
