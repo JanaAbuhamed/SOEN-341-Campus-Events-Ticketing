@@ -5,19 +5,19 @@ const adminBtn = document.getElementById('adminBtn');
 
 if(studentBtn) {
   studentBtn.addEventListener('click', () => {
-    window.location.href = 'studentlogin.html';
+    window.location.href = "/api/student-login/";
   });
 }
 
 if(organizerBtn) {
   organizerBtn.addEventListener('click', () => {
-    window.location.href = 'organizerlogin.html';
+    window.location.href = "/api/organizer-login/";
   });
 }
 
 if(adminBtn) {
   adminBtn.addEventListener('click', () => {
-    window.location.href = 'adminlogin.html';
+    window.location.href = "/api/admin-login/";
   });
 }
 
@@ -60,5 +60,3 @@ if(loginBtn) {
     }
   });
 }
-
-

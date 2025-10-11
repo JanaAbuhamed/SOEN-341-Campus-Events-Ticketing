@@ -12,9 +12,9 @@
     <div class="landing-box">
       <h2>Welcome to the Campus Events & <br> Ticketing Web Application</h2>
       <div class="landing-buttons">
-        <button id="studentBtn">Log in as Student</button>
-        <button id="organizerBtn">Log in as Organizer</button>
-        <button id="adminBtn">Log in as Admin</button>
+        <button id="studentBtn" data-url="{% url 'studentlogin' %}">Log in as Student</button>
+        <button id="organizerBtn" data-url="{% url 'organizerlogin' %}">Log in as Organizer</button>
+        <button id="adminBtn" data-url="{% url 'adminlogin' %}">Log in as Admin</button>
       </div>
     </div>
     <a href="{% url 'signup' %}" class="signup-link">Sign Up →</a>
@@ -22,32 +22,31 @@
 </div>
 
   <script>
-    // Landing page button redirects
+    // Get URLs from data attributes
     const studentBtn = document.getElementById('studentBtn');
     const organizerBtn = document.getElementById('organizerBtn');
     const adminBtn = document.getElementById('adminBtn');
 
     if(studentBtn) {
       studentBtn.addEventListener('click', () => {
-        window.location.href = "{% url 'studentlogin' %}";
+        window.location.href = studentBtn.getAttribute('data-url');
       });
     }
 
     if(organizerBtn) {
       organizerBtn.addEventListener('click', () => {
-        window.location.href = "{% url 'organizerlogin' %}";
+        window.location.href = organizerBtn.getAttribute('data-url');
       });
     }
 
     if(adminBtn) {
       adminBtn.addEventListener('click', () => {
-        window.location.href = "{% url 'adminlogin' %}";
+        window.location.href = adminBtn.getAttribute('data-url');
       });
     }
 
-    // Login page image follow effect
+    // Keep the rest of your JavaScript for image effects and login
     const img = document.querySelector('.login-left img');
-
     if(img) {
       img.addEventListener('mousemove', (e) => {
         const rect = img.getBoundingClientRect();
@@ -55,33 +54,11 @@
         const y = e.clientY - rect.top;
         const moveX = (x - rect.width / 2) / 10;
         const moveY = (y - rect.height / 2) / 10;
-
         img.style.transform = `translate(${moveX}px, ${moveY}px)`;
       });
 
       img.addEventListener('mouseleave', () => {
         img.style.transform = 'translate(0, 0)';
-      });
-    }
-
-    // Simple login alert for student/organizer/admin pages
-    const loginBtn = document.getElementById('loginBtn');
-    if(loginBtn) {
-      loginBtn.addEventListener('click', () => {
-        const email = document.getElementById('email').value;
-        const password = document.getElementById('password').value;
-        if(email === "" || password === "") {
-          alert("Please enter both email and password.");
-        } else {
-          
-          if(window.location.href.includes('studentlogin')) {
-            window.location.href = "{% url 'EventList' %}"; // student events page
-          } else if(window.location.href.includes('organizerlogin')) {
-            window.location.href = "{% url 'organizerdashboard' %}"; // organizer dashboard
-          } else if(window.location.href.includes('adminlogin')) {
-            window.location.href = "{% url 'admindashboard' %}"; // admin dashboard
-          }
-        }
       });
     }
   </script>

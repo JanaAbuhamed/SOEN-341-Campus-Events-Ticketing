@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
+import os
 
 # main/student_event/settings.py
 LOGIN_URL = 'login'  # this should match the name of your login view
@@ -65,6 +66,11 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'student_event.urls'
+
+STATIC_URL = '/static/'
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'main/static'),
+]
 
 TEMPLATES = [
     {
