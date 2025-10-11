@@ -1,5 +1,5 @@
 // ---------- CONFIG ----------
-const EVENTS_PAGE = 'EventList.html';       // change if your events file name is different
+const EVENTS_PAGE = 'student_profile.html';       // change if your events file name is different
 const ORG_PENDING_PAGE = 'organizer-pending.html';
 
 // ---------- UI: toggle between Student / Organizer forms ----------
