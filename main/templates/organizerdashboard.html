@@ -1,209 +1,98 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Campus Event Tickets - Organizer Dashboard</title>
-  <link rel="stylesheet" href="organizerdashboard.css">
+  <title>Organizer Dashboard</title>
+  <link rel="stylesheet" href="{% static 'login.css' %}">
+  <link rel="stylesheet" href="{% static 'organizerdashboard.css' %}">
 </head>
 <body>
 
-  <!-- Main Header -->
-  <header class="main-header">
-    <div class="header-content">
-      <h1>Campus Event Tickets</h1>
-      <div class="user-welcome">Welcome, Organizer!</div>
-    </div>
+  <header>
+    <h1>Organizer Dashboard</h1>
   </header>
 
-  <div class="dashboard-layout">
-    <!-- Sidebar Navigation -->
-    <nav class="sidebar">
-      <div class="sidebar-header">
-        <h2>Organizer Dashboard</h2>
+  <main class="dashboard-container">
+
+    <!-- Create Event Box -->
+    <section class="dashboard-section">
+      <h2>Create New Event</h2>
+      <form method="POST" action="">
+        {% csrf_token %}
+        <label>Title: <input type="text" name="title" required></label><br>
+        <label>Description: <textarea name="description" required></textarea></label><br>
+        <label>Date: <input type="date" name="date" required></label><br>
+        <label>Time: <input type="time" name="time" required></label><br>
+        <label>Location: <input type="text" name="location" required></label><br>
+        <label>Capacity: <input type="number" name="capacity" required></label><br>
+        <button type="submit">Create Event</button>
+      </form>
+    </section>
+
+    <!-- My Events Box -->
+    <section class="dashboard-section">
+      <h2>My Events</h2>
+      <div class="table-container">
+        <table id="eventsTable">
+          <thead>
+            <tr>
+              <th>Event ID</th>
+              <th>Event Name</th>
+              <th>Date</th>
+              <th>Location</th>
+              <th>Attendees</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for event in approved_events %}
+            <tr>
+              <td>{{ event.id }}</td>
+              <td>{{ event.title }}</td>
+              <td>{{ event.date }}</td>
+              <td>{{ event.location }}</td>
+              <td>{{ event.attendees.count }}</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="5">No approved events yet.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
       </div>
-      <div class="sidebar-logo">
-      <img src="images/logo.jpg" alt="EventHub Logo">
-      <h2>Event Hub</h2>
+    </section>
+
+    <!-- Pending Approvals Box -->
+    <section class="dashboard-section">
+      <h2>Pending Approvals</h2>
+      <div class="table-container">
+        <table id="tasksTable">
+          <thead>
+            <tr>
+              <th>Event ID</th>
+              <th>Title</th>
+              <th>Date</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for event in pending_events %}
+            <tr>
+              <td>{{ event.id }}</td>
+              <td>{{ event.title }}</td>
+              <td>{{ event.date }}</td>
+              <td>{{ event.get_status_display }}</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="4">No pending events.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
       </div>
-      <ul class="sidebar-menu">
-        <li><a href="#profile" class="nav-link" data-section="profile">👤 My Profile</a></li>
-        <li><a href="#events" class="nav-link active" data-section="events">📅 My Events</a></li>
-        <li><a href="#analytics" class="nav-link" data-section="analytics">📊 Analytics</a></li>
-        <li><a href="#create-event" class="nav-link" data-section="create-event">➕ Create Event</a></li>
-        <li><a href="#tasks" class="nav-link" data-section="tasks">✅ Pending Tasks</a></li>
-        <li><a href="loginindex.html" class="logout">🚪 Log Out</a></li>
-      </ul>
-    </nav>
+    </section>
 
-    <!-- Main Content -->
-    <main class="main-content">
-      <div class="content-header">
-        <h1>Event Management Dashboard</h1>
-      </div>
+  </main>
 
-      <!-- Events Section -->
-      <section id="events" class="dashboard-section active">
-        <div class="section-header">
-          <h2>My Events</h2>
-          <button class="btn-primary" onclick="showSection('create-event')">Create New Event</button>
-        </div>
-        <div class="table-container">
-          <table id="eventsTable">
-            <thead>
-              <tr>
-                <th>Event Name</th>
-                <th>Date</th>
-                <th>Location</th>
-                <th>Attendees</th>
-                <th>Status</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>Campus Hackathon</td>
-                <td>2025-11-15</td>
-                <td>Main Hall</td>
-                <td>120/200</td>
-                <td><span class="status-approved">Approved</span></td>
-                <td>
-                  <button class="btn-edit">Edit</button>
-                  <button class="btn-view">View</button>
-                  <button class="btn-export">Export</button>
-                </td>
-              </tr>
-              <tr>
-                <td>Music Festival</td>
-                <td>2025-12-05</td>
-                <td>Outdoor Stage</td>
-                <td>300/500</td>
-                <td><span class="status-pending">Pending</span></td>
-                <td>
-                  <button class="btn-edit">Edit</button>
-                  <button class="btn-view">View</button>
-                  <button class="btn-export">Export</button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </section>
-
-      <!-- Analytics Section -->
-      <section id="analytics" class="dashboard-section">
-        <h2>Event Analytics</h2>
-        <div class="analytics-cards">
-          <div class="stat-card">
-            <h3>Total Events</h3>
-            <p class="stat-number">12</p>
-          </div>
-          <div class="stat-card">
-            <h3>Total Attendees</h3>
-            <p class="stat-number">1,240</p>
-          </div>
-          <div class="stat-card">
-            <h3>Approval Rate</h3>
-            <p class="stat-number">85%</p>
-          </div>
-        </div>
-        <div class="chart-placeholder">
-          <p>📈 Attendance charts will be displayed here</p>
-        </div>
-      </section>
-
-      <!-- Profile Section -->
-      <section id="profile" class="dashboard-section">
-        <h2>My Profile</h2>
-        <div class="profile-form">
-          <div class="form-group">
-            <label>Organization Name</label>
-            <input type="text" value="Campus Events Org" class="form-input">
-          </div>
-          <div class="form-group">
-            <label>Email</label>
-            <input type="email" value="org@campus.edu" class="form-input">
-          </div>
-          <div class="form-group">
-            <label>Contact Number</label>
-            <input type="tel" value="+1 (555) 123-4567" class="form-input">
-          </div>
-          <button class="btn-primary">Update Profile</button>
-        </div>
-      </section>
-
-      <!-- Create Event Section -->
-      <section id="create-event" class="dashboard-section">
-        <h2>Create New Event</h2>
-        <form class="event-form">
-          <div class="form-group">
-            <label>Event Title</label>
-            <input type="text" class="form-input" placeholder="Enter event title">
-          </div>
-          <div class="form-group">
-            <label>Description</label>
-            <textarea class="form-input" rows="4" placeholder="Event description"></textarea>
-          </div>
-          <div class="form-row">
-            <div class="form-group">
-              <label>Date</label>
-              <input type="date" class="form-input">
-            </div>
-            <div class="form-group">
-              <label>Time</label>
-              <input type="time" class="form-input">
-            </div>
-          </div>
-          <div class="form-group">
-            <label>Location</label>
-            <input type="text" class="form-input" placeholder="Event location">
-          </div>
-          <div class="form-group">
-            <label>Capacity</label>
-            <input type="number" class="form-input" placeholder="Maximum attendees">
-          </div>
-          <button type="submit" class="btn-primary">Create Event</button>
-        </form>
-      </section>
-
-      <!-- Pending Tasks Section -->
-      <section id="tasks" class="dashboard-section">
-        <h2>Pending Tasks</h2>
-        <div class="table-container">
-          <table id="tasksTable">
-            <thead>
-              <tr>
-                <th>Task</th>
-                <th>Description</th>
-                <th>Deadline</th>
-                <th>Status</th>
-                <th>Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>Approve Event Flyers</td>
-                <td>Review and approve marketing materials</td>
-                <td>2025-10-10</td>
-                <td><span class="status-pending">Pending</span></td>
-                <td><button class="btn-primary">Review</button></td>
-              </tr>
-              <tr>
-                <td>Confirm Catering</td>
-                <td>Finalize catering order for Music Festival</td>
-                <td>2025-11-01</td>
-                <td><span class="status-pending">Pending</span></td>
-                <td><button class="btn-primary">Confirm</button></td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </section>
-
-    </main>
-  </div>
-
-  <script src="organizerdashboard.js"></script>
+  <script src="{% static 'organizerdashboard.js' %}"></script>
 </body>
 </html>
-

@@ -1,5 +1,6 @@
 from django.urls import path
 from .views import UserViewSet, EventViewSet
+from .views import UserViewSet, EventViewSet
 
 
 user_list = UserViewSet.as_view({
