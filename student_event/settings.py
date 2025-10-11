@@ -49,6 +49,11 @@ INSTALLED_APPS = [
     
 ]
 
+CSRF_TRUSTED_ORIGINS = [
+    'http://localhost:8000',
+    'http://127.0.0.1:8000',
+]
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -102,20 +107,26 @@ WSGI_APPLICATION = 'student_event.wsgi.application'
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
 
-AUTH_PASSWORD_VALIDATORS = [
-    {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
-    },
-]
+
+#SWITCHED TO COMMENTS FOR TESTING PURPOSES 
+
+# AUTH_PASSWORD_VALIDATORS = [
+# {
+ #       'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+ #   },
+#    {
+ #       'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+ #   },
+ #   {
+ #       'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+ #   },
+#    {
+ #       'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+ #   },
+#]
+
+
+#SWITCHED TO COMMENTS FOR TESTING PURPOSES 
 
 
 # Internationalization
