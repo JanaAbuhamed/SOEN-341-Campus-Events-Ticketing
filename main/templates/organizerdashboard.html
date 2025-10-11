@@ -1,11 +1,12 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Organizer Dashboard</title>
-  <link rel="stylesheet" href="login.css"> <!-- consistent style -->
-  <link rel="stylesheet" href="organizerdashboard.css">
+  <link rel="stylesheet" href="{% static 'login.css' %}">
+  <link rel="stylesheet" href="{% static 'organizerdashboard.css' %}">
 </head>
 <body>
 
@@ -15,7 +16,22 @@
 
   <main class="dashboard-container">
 
-    <!-- Organizer Events Section -->
+    <!-- Create Event Box -->
+    <section class="dashboard-section">
+      <h2>Create New Event</h2>
+      <form method="POST" action="">
+        {% csrf_token %}
+        <label>Title: <input type="text" name="title" required></label><br>
+        <label>Description: <textarea name="description" required></textarea></label><br>
+        <label>Date: <input type="date" name="date" required></label><br>
+        <label>Time: <input type="time" name="time" required></label><br>
+        <label>Location: <input type="text" name="location" required></label><br>
+        <label>Capacity: <input type="number" name="capacity" required></label><br>
+        <button type="submit">Create Event</button>
+      </form>
+    </section>
+
+    <!-- My Events Box -->
     <section class="dashboard-section">
       <h2>My Events</h2>
       <div class="table-container">
@@ -30,53 +46,46 @@
             </tr>
           </thead>
           <tbody>
-            <!-- Placeholder events -->
+            {% for event in approved_events %}
             <tr>
-              <td>201</td>
-              <td>Campus Hackathon</td>
-              <td>2025-11-15</td>
-              <td>Main Hall</td>
-              <td>120</td>
+              <td>{{ event.id }}</td>
+              <td>{{ event.title }}</td>
+              <td>{{ event.date }}</td>
+              <td>{{ event.location }}</td>
+              <td>{{ event.attendees.count }}</td>
             </tr>
-            <tr>
-              <td>202</td>
-              <td>Music Festival</td>
-              <td>2025-12-05</td>
-              <td>Outdoor Stage</td>
-              <td>300</td>
-            </tr>
+            {% empty %}
+            <tr><td colspan="5">No approved events yet.</td></tr>
+            {% endfor %}
           </tbody>
         </table>
       </div>
     </section>
 
-    <!-- Placeholder for future sections -->
+    <!-- Pending Approvals Box -->
     <section class="dashboard-section">
-      <h2>Pending Approvals / Tasks</h2>
+      <h2>Pending Approvals</h2>
       <div class="table-container">
         <table id="tasksTable">
           <thead>
             <tr>
-              <th>Task ID</th>
-              <th>Description</th>
-              <th>Deadline</th>
+              <th>Event ID</th>
+              <th>Title</th>
+              <th>Date</th>
               <th>Status</th>
             </tr>
           </thead>
           <tbody>
-            <!-- Placeholder tasks -->
+            {% for event in pending_events %}
             <tr>
-              <td>301</td>
-              <td>Approve Event Flyers</td>
-              <td>2025-10-10</td>
-              <td>Pending</td>
+              <td>{{ event.id }}</td>
+              <td>{{ event.title }}</td>
+              <td>{{ event.date }}</td>
+              <td>{{ event.get_status_display }}</td>
             </tr>
-            <tr>
-              <td>302</td>
-              <td>Confirm Catering</td>
-              <td>2025-11-01</td>
-              <td>Pending</td>
-            </tr>
+            {% empty %}
+            <tr><td colspan="4">No pending events.</td></tr>
+            {% endfor %}
           </tbody>
         </table>
       </div>
@@ -84,6 +93,6 @@
 
   </main>
 
-  <script src="organizerdashboard.js"></script>
+  <script src="{% static 'organizerdashboard.js' %}"></script>
 </body>
 </html>

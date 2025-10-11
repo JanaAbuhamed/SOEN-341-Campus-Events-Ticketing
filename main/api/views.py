@@ -4,6 +4,7 @@ from rest_framework.decorators import api_view, action
 from ..models import Event, User
 from .serializers import EventSerializer, EventCreateSerializer
 
+
 class UserViewSet(viewsets.ViewSet):
     DUMMY_USERS = [
         {"user_id": 1, "name": "Jana", "email": "jana@example.com", "role": 0, "status": 1},
@@ -106,3 +107,4 @@ class EventViewSet(viewsets.ViewSet):
         
         event.attendees.remove(request.user)
         return Response({"message": "Successfully unregistered from event"})
+    
