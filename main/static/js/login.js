@@ -1,27 +1,27 @@
-// Landing page button redirects
+// Landing page button redirects - FIXED
 const studentBtn = document.getElementById('studentBtn');
 const organizerBtn = document.getElementById('organizerBtn');
 const adminBtn = document.getElementById('adminBtn');
 
 if(studentBtn) {
   studentBtn.addEventListener('click', () => {
-    window.location.href = 'studentlogin.html';
+    window.location.href = "/studentlogin/";  // CHANGED
   });
 }
 
 if(organizerBtn) {
   organizerBtn.addEventListener('click', () => {
-    window.location.href = 'organizerlogin.html';
+    window.location.href = "/organizerlogin/";  // CHANGED
   });
 }
 
 if(adminBtn) {
   adminBtn.addEventListener('click', () => {
-    window.location.href = 'adminlogin.html';
+    window.location.href = "/adminlogin/";  // CHANGED
   });
 }
 
-// Login page image follow effect
+// Login page image follow effect (this part is fine)
 const img = document.querySelector('.login-left img');
 
 if(img) {
@@ -40,7 +40,7 @@ if(img) {
   });
 }
 
-// Simple login alert for student/organizer/admin pages
+// Simple login alert for student/organizer/admin pages - FIXED
 const loginBtn = document.getElementById('loginBtn');
 if(loginBtn) {
   loginBtn.addEventListener('click', () => {
@@ -49,16 +49,14 @@ if(loginBtn) {
     if(email === "" || password === "") {
       alert("Please enter both email and password.");
     } else {
-      
+      // CHANGED ALL THESE REDIRECTS:
       if(window.location.href.includes('studentlogin')) {
-        window.location.href = 'student_profile.html'; // student events page
+        window.location.href = "/studentdashboard/";  // CHANGED
       } else if(window.location.href.includes('organizerlogin')) {
-        window.location.href = 'organizerdashboard.html'; // organizer dashboard
+        window.location.href = "/organizerdashboard/";  // CHANGED
       } else if(window.location.href.includes('adminlogin')) {
-        window.location.href = 'admindashboard.html'; // admin dashboard
+        window.location.href = "/admindashboard/";  // CHANGED
       }
     }
   });
 }
-
-

@@ -1,7 +1,7 @@
 # main/views.py
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
-from .forms import UserUpdateForm
+from .forms import UserUpdateForm, EventForm
 from django.contrib import messages
 from django.contrib.auth import update_session_auth_hash
 from .forms import PasswordUpdateForm
@@ -10,6 +10,8 @@ from django.contrib.auth import login, authenticate
 from django.contrib.auth.forms import AuthenticationForm
 
 from django.contrib.auth import authenticate, login
+
+from main.models import User, Event
 
 # from django.contrib.auth.models import User
 
@@ -182,3 +184,51 @@ def update_password(request):
     else:
         form = PasswordUpdateForm(request.user)
     return render(request, "update_password.html", {"form": form})
+
+from django.shortcuts import render, redirect, get_object_or_404
+from .models import Event, User
+from .forms import EventForm
+
+def edit_event(request, event_id):
+    event = get_object_or_404(Event, id=event_id)
+    form = EventForm(request.POST or None, instance=event)
+
+    if request.method == 'POST' and form.is_valid():
+        form.save()
+        return redirect('organizerdashboard')
+
+    return render(request, 'edit_event.html', {'form': form, 'event': event})
+
+def delete_event(request, event_id):
+    event = get_object_or_404(Event, id=event_id)
+    event.delete()
+    return redirect('organizerdashboard')
+
+def organizer_dashboard(request):
+    organizer = User.objects.get(email="org1@mail.com")
+
+    if request.method == 'POST':
+        print("📩 POST received:", request.POST)  # ✅ Add this line
+        form = EventForm(request.POST)
+        if form.is_valid():
+            event = form.save(commit=False)
+            event.organizer = organizer
+            event.status = 'pending'
+            event.save()
+            print("✅ Event created:", event)
+            return redirect('organizerdashboard')
+        else:
+            print("❌ Form errors:", form.errors)
+    else:
+        form = EventForm()
+
+    approved_events = Event.objects.filter(organizer=organizer, status='approved')
+    pending_events = Event.objects.filter(organizer=organizer, status='pending')
+    rejected_events = Event.objects.filter(organizer=organizer, status='rejected')
+
+    return render(request, 'organizerdashboard.html', {
+        'form': form,
+        'approved_events': approved_events,
+        'pending_events': pending_events,
+        'rejected_events': rejected_events
+    })

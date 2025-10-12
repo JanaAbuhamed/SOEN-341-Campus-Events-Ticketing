@@ -1,17 +1,11 @@
-<!-- main/templates/studentdashboard.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>My Tickets</title>
-
-  <!-- {% load static %} -->
-  <!-- <link rel="stylesheet" href="{% static 'studentdashboard.css' %}"> -->
-  <!-- <script src="{% static 'studentdashboard.js' %}"></script> -->
-
-  <link rel="stylesheet" href="studentdashboard.css"/>
-   
+  {% load static %}
+  <link rel="stylesheet" href="{% static 'css/studentdashboard.css' %}">
 </head>
 <body>
   <header>
@@ -20,29 +14,12 @@
 
   <main class="tickets-wrap">
     <div class="toolbar">
-      <a class="btn" href="upcomingevents.html">Browse Events</a>
+      <!-- FIX: Use Django URL instead of direct HTML -->
+      <a class="btn" href="{% url 'EventList' %}">Browse Events</a>
       <a class="btn secondary" href="{% url 'update_profile' %}">Edit Profile</a>
       <a class="btn secondary" href="{% url 'update_password' %}">Change Password</a>
-      
-      <!-- <a class="btn secondary" href="update_profile.html">Edit Profile</a>
-      <a class="btn secondary" href="update_password.html">Change Password</a> -->
-
       <button id="clearBtn" class="btn secondary">Clear All (dev)</button>
     </div>
-   
-
-
-
-  <!-- Profile update form -->
-    <!-- <section class="profile-update">
-      <h2>Update Your Profile</h2>
-      <form method="POST" action="{% url 'update_profile' %}">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit" class="btn">Save Changes</button>
-      </form>
-      <a class="btn secondary" href="{% url 'update_profile' %}" style="margin-top:10px;">Edit Profile</a>
-    </section> -->
 
     <div id="ticketsGrid" class="grid"></div>
 
@@ -50,13 +27,11 @@
       <img src="https://cdn-icons-png.flaticon.com/512/748/748113.png" alt="" />
       <h3>No tickets yet</h3>
       <p>Claim an event from Upcoming Events to see your QR here.</p>
-      <a class="btn" href="upcomingevents.html">Find Events</a>
+      <!-- FIX: Use Django URL -->
+      <a class="btn" href="{% url 'EventList' %}">Find Events</a>
     </div>
-    
-
   </main>
 
-  <!-- Native dialog for large QR -->
   <dialog id="qrDialog">
     <div class="dialog-body">
       <button type="button" id="dlgClose" class="close" aria-label="Close">&times;</button>
@@ -68,9 +43,8 @@
     </div>
   </dialog>
 
-  <!-- QR lib then our JS -->
+  <!-- FIX: Use static tag for JavaScript -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-  <script src="studentdashboard.js"></script>
-  
+  <script src="{% static 'js/studentdashboard.js' %}"></script>
 </body>
 </html>

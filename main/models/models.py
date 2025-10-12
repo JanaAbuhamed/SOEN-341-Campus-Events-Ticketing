@@ -1,6 +1,6 @@
 # main/models/models.py
 from django.db import models
-from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
+from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin, Group
 from django.utils import timezone
 
 class UserManager(BaseUserManager):
@@ -11,6 +11,14 @@ class UserManager(BaseUserManager):
         user = self.model(email=email, name=name, role=role, status=status)
         user.set_password(password)  # hashes password properly
         user.save(using=self._db)
+
+        if role == 0:  # Student
+            group = Group.objects.get(name='Student')
+        elif role == 1:  # Organizer
+            group = Group.objects.get(name='Organizer') 
+        elif role == 2:  # Admin
+            group = Group.objects.get(name='Administrator')
+
         return user
 
     def create_superuser(self, email, name, password=None):

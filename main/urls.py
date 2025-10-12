@@ -1,32 +1,29 @@
-# main/urls.py
 
 from django.urls import path
+from .views import organizer_dashboard as organizer_dashboard_view
 from . import views
+from main.api.views import (
+    loginindex, signup, studentlogin, organizerlogin, adminlogin,
+    studentdashboard, organizerdashboard, admindashboard, 
+    EventList, organizerpending,update_profile,update_password
+)
 
 urlpatterns = [
-    path('', views.student_dashboard, name='home'),  # root URL
-    path('login/', views.login_view, name='login'),
-    # path('login/', views.student_login, name='login'),
-    path('update-profile/', views.update_profile, name='update_profile'),
-    path('studentdashboard/', views.student_dashboard, name='student_dashboard'),
-    path('update-password/', views.update_password, name='update_password'),
-    path('student-profile/', views.student_profile, name='student_profile'),
-    path('studentlogin/', views.student_login, name='student_login'),
-    path('signup/', views.student_signup, name='signup'),
-    path('signup/', views.signup_view, name='signup'),
-    path('accounts/login/', views.student_login, name='student_login'),
-    # path('signup/', views.student_signup, name='student_signup'),
+    path("", loginindex, name="loginindex"),                   
+    path("signup/", signup, name="signup"),                   
+    path("studentlogin/", studentlogin, name="studentlogin"),  
+    path("organizerlogin/", organizerlogin, name="organizerlogin"),
+    path("adminlogin/", adminlogin, name="adminlogin"),
+    path("studentdashboard/", studentdashboard, name="studentdashboard"),
+    path("organizerdashboard/", organizer_dashboard_view, name="organizerdashboard"),
+    path('edit-event/<int:event_id>/', views.edit_event, name='edit-event'),
+    path('delete-event/<int:event_id>/', views.delete_event, name='delete-event'),
+    path("admindashboard/", admindashboard, name="admindashboard"),
+    path("eventlist/", EventList, name="EventList"),
+    path("organizerpending/", organizerpending, name="organizerpending"),
 
-    path('organizerdashboard/', views.organizer_dashboard, name='organizer_dashboard'),
-
-    path('organizerlogin/', views.organizer_login, name='organizer_login'),
-
-    path('update-organizer-profile/', views.update_organizer_profile, name='update_organizer_profile'),
-
-    path('organizer-signup/', views.organizer_signup, name='organizer_signup'),
-    
-
-
-
+       
+    path("update-profile/", update_profile, name="update_profile"),
+    path("update-password/", update_password, name="update_password"),
 
 ]

@@ -6,8 +6,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Organizer Login</title>
-  {% comment %} <link rel="stylesheet" href="login.css"> {% endcomment %}
-  <link rel="stylesheet" href="{% static 'login.css' %}">
+  {% load static %}
+  <link rel="stylesheet" href="{% static 'css/login.css' %}">
 </head>
 <body>
   <div class="login-container">
@@ -16,22 +16,42 @@
     </div>
     <div class="login-right">
       <h2>Organizer Login</h2>
-      {% comment %} <input id="email" type="email" placeholder="Email">
-      <input id="password" type="password" placeholder="Password">
-      <button id="loginBtn">LOGIN</button> {% endcomment %}
+      
+      {% if error %}
+        <div class="error-message">{{ error }}</div>
+      {% endif %}
 
-      <form method="POST" action="{% url 'organizer_login' %}">
+      <form method="POST" action="{% url 'organizerlogin' %}">
         {% csrf_token %}
         <input name="email" type="email" placeholder="Email" required>
         <input name="password" type="password" placeholder="Password" required>
-        <button type="submit">LOGIN</button>
+        <button type="submit" id="loginBtn">LOGIN</button>
       </form>
-
+      
       <div class="links">
-        <a href="{% url 'organizer_signup' %}">Don't have an account? Create one →</a> <!-- connect this to the organizer sign up page -->
+        <a href="{% url 'signup' %}">Don't have an account? Create one →</a>
       </div>
     </div>
   </div>
-  <script src="{% static 'login.js' %}"></script>
+
+  <script>
+    // Image follow effect
+    const img = document.querySelector('.login-left img');
+    if(img) {
+      img.addEventListener('mousemove', (e) => {
+        const rect = img.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        const moveX = (x - rect.width / 2) / 10;
+        const moveY = (y - rect.height / 2) / 10;
+
+        img.style.transform = `translate(${moveX}px, ${moveY}px)`;
+      });
+
+      img.addEventListener('mouseleave', () => {
+        img.style.transform = 'translate(0, 0)';
+      });
+    }
+  </script>
 </body>
 </html>
