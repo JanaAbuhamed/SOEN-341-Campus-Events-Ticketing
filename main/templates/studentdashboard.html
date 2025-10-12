@@ -5,7 +5,13 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>My Tickets</title>
+
+  <!-- {% load static %} -->
+  <!-- <link rel="stylesheet" href="{% static 'studentdashboard.css' %}"> -->
+  <!-- <script src="{% static 'studentdashboard.js' %}"></script> -->
+
   <link rel="stylesheet" href="studentdashboard.css"/>
+   
 </head>
 <body>
   <header>
@@ -17,8 +23,14 @@
       <a class="btn" href="upcomingevents.html">Browse Events</a>
       <a class="btn secondary" href="{% url 'update_profile' %}">Edit Profile</a>
       <a class="btn secondary" href="{% url 'update_password' %}">Change Password</a>
+      
+      <!-- <a class="btn secondary" href="update_profile.html">Edit Profile</a>
+      <a class="btn secondary" href="update_password.html">Change Password</a> -->
+
       <button id="clearBtn" class="btn secondary">Clear All (dev)</button>
     </div>
+   
+
 
 
   <!-- Profile update form -->
@@ -40,6 +52,8 @@
       <p>Claim an event from Upcoming Events to see your QR here.</p>
       <a class="btn" href="upcomingevents.html">Find Events</a>
     </div>
+    
+
   </main>
 
   <!-- Native dialog for large QR -->
@@ -57,5 +71,6 @@
   <!-- QR lib then our JS -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   <script src="studentdashboard.js"></script>
+  
 </body>
 </html>
