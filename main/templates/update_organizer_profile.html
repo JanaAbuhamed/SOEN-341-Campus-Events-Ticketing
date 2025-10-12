@@ -1,0 +1,20 @@
+<!-- main/templates/update_organizer_profile.html -->
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>Update Organizer Profile</h2>
+
+<form method="POST">
+  {% csrf_token %}
+  {{ form.as_p }}
+  <button type="submit" class="btn-primary">Update Profile</button>
+</form>
+
+{% if messages %}
+  <ul>
+    {% for message in messages %}
+      <li>{{ message }}</li>
+    {% endfor %}
+  </ul>
+{% endif %}
+{% endblock %}

@@ -15,7 +15,17 @@ urlpatterns = [
     path('signup/', views.student_signup, name='signup'),
     path('signup/', views.signup_view, name='signup'),
     path('accounts/login/', views.student_login, name='student_login'),
-    path('signup/', views.student_signup, name='student_signup'),
+    # path('signup/', views.student_signup, name='student_signup'),
+
+    path('organizerdashboard/', views.organizer_dashboard, name='organizer_dashboard'),
+
+    path('organizerlogin/', views.organizer_login, name='organizer_login'),
+
+    path('update-organizer-profile/', views.update_organizer_profile, name='update_organizer_profile'),
+
+    path('organizer-signup/', views.organizer_signup, name='organizer_signup'),
+    
+
 
 
 
