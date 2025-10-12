@@ -1,11 +1,13 @@
 from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, action
-from django.shortcuts import render
+from django.shortcuts import get_object_or_404, render
 from ..models import Event, User
 from .serializers import EventSerializer, EventCreateSerializer
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.decorators import login_required, permission_required
+from django.http import HttpResponseForbidden, JsonResponse
 from django.shortcuts import redirect, render
 from django.urls import reverse
 from ..forms import StudentSignupForm, OrganizerSignupForm
@@ -17,9 +19,11 @@ class UserViewSet(viewsets.ViewSet):
         {"user_id": 2, "name": "Ali", "email": "ali@example.com", "role": 1, "status": 0},
     ]
 
+    @permission_required('main.can_view_events', raise_exception=True)
     def list(self, request):
         return Response(self.DUMMY_USERS)
 
+    @permission_required('main.can_view_events', raise_exception=True)
     def retrieve(self, request, pk=None):
         user = next((u for u in self.DUMMY_USERS if u["user_id"] == int(pk)), None)
         if not user:
@@ -50,11 +54,13 @@ class UserViewSet(viewsets.ViewSet):
 #EVENT VIEWS
 
 class EventViewSet(viewsets.ViewSet):
+    @permission_required('main.can_view_events', raise_exception=True)
     def list(self, request):
         events = Event.objects.all()
         serializer = EventSerializer(events, many=True)
         return Response(serializer.data)
 
+    @permission_required('main.can_view_events', raise_exception=True)
     def retrieve(self, request, pk=None):
         try:
             event = Event.objects.get(pk=pk)
@@ -63,14 +69,17 @@ class EventViewSet(viewsets.ViewSet):
         serializer = EventSerializer(event)
         return Response(serializer.data)
 
+    @permission_required('main.can_create_event', raise_exception=True)
     def create(self, request):
         serializer = EventCreateSerializer(data=request.data)
         if serializer.is_valid():
-            event = serializer.save(organizer=request.user) 
+            event = serializer.save(organizer=request.user)
             return_serializer = EventSerializer(event)
             return Response(return_serializer.data, status=201)
         return Response(serializer.errors, status=400)
 
+
+    @permission_required('main.can_edit_event', raise_exception=True)
     def update(self, request, pk=None):
         try:
             event = Event.objects.get(pk=pk)
@@ -83,14 +92,24 @@ class EventViewSet(viewsets.ViewSet):
             return Response(serializer.data)
         return Response(serializer.errors, status=400)
 
+
+    @permission_required('main.can_delete_event', raise_exception=True)
     def destroy(self, request, pk=None):
         try:
             event = Event.objects.get(pk=pk)
         except Event.DoesNotExist:
             return Response({"error": "Event not found"}, status=404)
+        
+        # Check if user owns the event or is admin
+        if event.organizer != request.user and request.user.role != 2:
+            return Response({"error": "Not authorized to delete this event"}, status=403)
+        
         event.delete()
         return Response(status=204)
+    
 
+
+    @permission_required('main.can_register_event', raise_exception=True)
     def register(self, request, pk=None):
         try:
             event = Event.objects.get(pk=pk)
@@ -98,20 +117,30 @@ class EventViewSet(viewsets.ViewSet):
             return Response({"error": "Event not found"}, status=404)
         
         if event.available_spots <= 0:
-            return Response(
-                {"error": "Event is full"}, 
-                status=status.HTTP_400_BAD_REQUEST
-            )
+            return Response({"error": "Event is full"}, status=status.HTTP_400_BAD_REQUEST)
+        
+        if request.user in event.attendees.all():
+            return Response({"error": "Already registered for this event"}, status=400)
+            
         event.attendees.add(request.user)
+        event.available_spots -= 1
+        event.save()
         return Response({"message": "Successfully registered for event"})
 
+
+    @permission_required('main.can_register_event', raise_exception=True)
     def unregister(self, request, pk=None):
         try:
             event = Event.objects.get(pk=pk)
         except Event.DoesNotExist:
             return Response({"error": "Event not found"}, status=404)
         
+        if request.user not in event.attendees.all():
+            return Response({"error": "Not registered for this event"}, status=400)
+            
         event.attendees.remove(request.user)
+        event.available_spots += 1
+        event.save()
         return Response({"message": "Successfully unregistered from event"})
     
    
@@ -133,8 +162,13 @@ def organizerlogin(request):
 def adminlogin(request):
     return render(request, "adminlogin.html")
 
+@login_required
+@permission_required('main.can_view_events', raise_exception=True)
 def studentdashboard(request):
-    return render(request, "studentdashboard.html")
+    # Additional check to ensure only students access this
+    if request.user.role != 0:
+        return HttpResponseForbidden("Student access required")
+    
 
 def organizerdashboard(request):
     return render(request, "organizerdashboard.html")
@@ -208,3 +242,135 @@ def organizerlogin(request):
             return render(request, "organizerpending.html")
     
     return render(request, "organizerlogin.html")
+
+
+def adminlogin(request):
+    if request.method == "POST":
+        email = request.POST.get('email')
+        password = request.POST.get('password')
+        
+        user = authenticate(request, email=email, password=password)
+        
+        if user is not None and user.role == 2:
+            login(request, user)
+            return redirect('admindashboard')
+        else:
+            return render(request, "adminlogin.html", {'error': 'Admin accounts only'})
+    
+    return render(request, "adminlogin.html")
+
+# RBAC PROTECTED VIEWS
+# Student Views
+@login_required
+@permission_required('main.can_view_events', raise_exception=True)
+def EventList(request):
+    events = Event.objects.all()
+    return render(request, "EventList.html", {'events': events})
+
+@login_required
+@permission_required('main.can_register_event', raise_exception=True)
+def register_for_event(request, event_id):
+    event = get_object_or_404(Event, id=event_id)
+    
+    if event.available_spots <= 0:
+        return JsonResponse({'error': 'Event is full'}, status=400)
+    
+    if request.user in event.attendees.all():
+        return JsonResponse({'error': 'Already registered'}, status=400)
+    
+    event.attendees.add(request.user)
+    event.available_spots -= 1
+    event.save()
+    
+    return JsonResponse({'message': 'Successfully registered for event'})
+
+@login_required
+@permission_required('main.can_register_event', raise_exception=True)
+def unregister_from_event(request, event_id):
+    event = get_object_or_404(Event, id=event_id)
+    
+    if request.user not in event.attendees.all():
+        return JsonResponse({'error': 'Not registered for this event'}, status=400)
+    
+    event.attendees.remove(request.user)
+    event.available_spots += 1
+    event.save()
+    
+    return JsonResponse({'message': 'Successfully unregistered from event'})
+
+# Organizer Views
+@login_required
+@permission_required('main.can_create_event', raise_exception=True)
+def create_event(request):
+    if request.method == "POST":
+        serializer = EventCreateSerializer(data=request.data)
+        if serializer.is_valid():
+            event = serializer.save(organizer=request.user)
+            return JsonResponse({'message': 'Event created successfully', 'event_id': event.id})
+        return JsonResponse(serializer.errors, status=400)
+    return render(request, "create_event.html")
+
+@login_required
+@permission_required('main.can_edit_event', raise_exception=True)
+def edit_event(request, event_id):
+    event = get_object_or_404(Event, id=event_id, organizer=request.user)
+    
+    if request.method == "POST":
+        serializer = EventSerializer(event, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return JsonResponse({'message': 'Event updated successfully'})
+        return JsonResponse(serializer.errors, status=400)
+    
+    return render(request, "edit_event.html", {'event': event})
+
+@login_required
+@permission_required('main.can_delete_event', raise_exception=True)
+def delete_event(request, event_id):
+    event = get_object_or_404(Event, id=event_id, organizer=request.user)
+    
+    if request.method == "POST":
+        event.delete()
+        return JsonResponse({'message': 'Event deleted successfully'})
+    
+    return render(request, "delete_event.html", {'event': event})
+
+# Admin Views
+@login_required
+@permission_required('main.can_approve_organizer', raise_exception=True)
+def admin_approve_organizers(request):
+    if request.user.role != 2:  # Additional admin role check
+        return HttpResponseForbidden("Admin access required")
+    
+    pending_organizers = User.objects.filter(role=1, status=0)
+    
+    if request.method == "POST":
+        organizer_id = request.POST.get('organizer_id')
+        action = request.POST.get('action')
+        
+        organizer = get_object_or_404(User, id=organizer_id, role=1, status=0)
+        
+        if action == 'approve':
+            organizer.status = 1
+            organizer.save()
+            return JsonResponse({'message': 'Organizer approved successfully'})
+        elif action == 'reject':
+            organizer.delete()
+            return JsonResponse({'message': 'Organizer application rejected'})
+    
+    return render(request, "admin_approve.html", {'pending_organizers': pending_organizers})
+
+@login_required
+@permission_required('main.can_approve_organizer', raise_exception=True)
+def admin_dashboard(request):
+    if request.user.role != 2:
+        return HttpResponseForbidden("Admin access required")
+    
+    stats = {
+        'total_events': Event.objects.count(),
+        'total_students': User.objects.filter(role=0).count(),
+        'total_organizers': User.objects.filter(role=1).count(),
+        'pending_approvals': User.objects.filter(role=1, status=0).count(),
+    }
+    
+    return render(request, "admindashboard.html", {'stats': stats})
