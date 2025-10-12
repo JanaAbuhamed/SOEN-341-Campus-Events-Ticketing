@@ -81,26 +81,26 @@ class BaseUserCreationForm(UserCreationForm):
 
 class StudentSignupForm(BaseUserCreationForm):
     def save(self, commit=True):
-        user = super().save(commit=False)
-        user.email = self.cleaned_data['email']
-        user.name = self.cleaned_data['name']
-        user.role = 0  # Student
-        user.status = 1  # Active immediately
-        
-        if commit:
-            user.save()
+        # Use your custom UserManager instead of default save
+        user = User.objects.create_user(
+            email=self.cleaned_data['email'],
+            name=self.cleaned_data['name'],
+            password=self.cleaned_data['password1'],  # Use password1 for confirmation
+            role=0,  # Student
+            status=1  # Active immediately
+        )
         return user
 
 class OrganizerSignupForm(BaseUserCreationForm):
     def save(self, commit=True):
-        user = super().save(commit=False)
-        user.email = self.cleaned_data['email']
-        user.name = self.cleaned_data['name']
-        user.role = 1  # Organizer
-        user.status = 0  # Pending approval
-        
-        if commit:
-            user.save()
+        # Use your custom UserManager instead of default save
+        user = User.objects.create_user(
+            email=self.cleaned_data['email'],
+            name=self.cleaned_data['name'],
+            password=self.cleaned_data['password1'],  # Use password1 for confirmation
+            role=1,  # Organizer
+            status=0  # Pending approval
+        )
         return user
 
 

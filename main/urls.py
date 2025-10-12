@@ -5,7 +5,7 @@ from . import views
 from main.api.views import (
     loginindex, signup, studentlogin, organizerlogin, adminlogin,
     studentdashboard, organizerdashboard, admindashboard, 
-    EventList, organizerpending
+    EventList, organizerpending,update_profile,update_password
 )
 
 urlpatterns = [
@@ -21,5 +21,9 @@ urlpatterns = [
     path("admindashboard/", admindashboard, name="admindashboard"),
     path("eventlist/", EventList, name="EventList"),
     path("organizerpending/", organizerpending, name="organizerpending"),
-]
 
+       
+    path("update-profile/", update_profile, name="update_profile"),
+    path("update-password/", update_password, name="update_password"),
+
+]
