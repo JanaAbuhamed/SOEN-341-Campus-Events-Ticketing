@@ -179,4 +179,16 @@
   #next-month:hover {
     background-color: #4b5563;
   }
+
+  .calendar-days div { position: relative; }
+
+.calendar-days .has-event::after {
+  content: "";
+  position: absolute;
+  bottom: 6px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #2563eb; /* blue dot */
+}
   

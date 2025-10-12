@@ -112,3 +112,23 @@ class Event(models.Model):
     def __str__(self):
         return self.title
     
+    # main/models.py
+from django.conf import settings
+from django.db import models
+
+class Ticket(models.Model):
+    CLAIMED = "CLAIMED"
+    CANCELLED = "CANCELLED"
+    STATUS_CHOICES = [(CLAIMED, "Claimed"), (CANCELLED, "Cancelled")]
+
+    event = models.ForeignKey('main.Event', on_delete=models.CASCADE, related_name='tickets')
+    owner = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='tickets')
+    status = models.CharField(max_length=16, choices=STATUS_CHOICES, default=CLAIMED)
+    ticket_id = models.CharField(max_length=32, blank=True)
+    claimed_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('event', 'owner')
+
+    def __str__(self):
+        return f"{self.owner} → {self.event} ({self.status})"
