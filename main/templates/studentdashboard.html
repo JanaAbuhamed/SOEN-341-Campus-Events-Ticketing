@@ -5,13 +5,19 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>My Tickets</title>
   <link rel="stylesheet" href="studentdashboard.css"/>
+  
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.css">
+
 </head>
+
 <body>
   <header>
     <h1 style="color:#fff; text-align:center; margin: 40px 0;">My Tickets</h1>
   </header>
 
   <main class="tickets-wrap">
+    <div id="ticket-calendar" style="background:#fff;border-radius:14px;padding:16px;box-shadow:0 10px 25px rgba(0,0,0,.08);margin:0 auto 20px;max-width:1100px;"></div>
+
     <div class="toolbar">
       <a class="btn" href="upcomingevents.html">Browse Events</a>
       <button id="clearBtn" class="btn secondary">Clear All (dev)</button>
@@ -42,5 +48,54 @@
   <!-- QR lib then our JS -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   <script src="studentdashboard.js"></script>
+
+  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>
+<script>
+  function readClaimedTicketsAsEvents() {
+    try {
+      const raw = localStorage.getItem('studentTickets') || '[]';
+      const tickets = JSON.parse(raw);
+      return tickets.map(t => ({
+        id: t.ticketId || `${t.name}-${t.date}`,
+        title: t.name,
+        start: t.date,
+        extendedProps: { org: t.organization, ticketId: t.ticketId }
+      }));
+    } catch { return []; }
+  }
+  function scrollToTicketCardsByDate(dateStr) {
+    const grid = document.getElementById('ticketsGrid');
+    if (!grid) return;
+    const cards = Array.from(grid.querySelectorAll('.card'));
+    cards.forEach(c => c.style.outline = '');
+    const matches = cards.filter(c => (c.textContent || '').includes(dateStr));
+    if (matches.length) {
+      matches[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
+      matches.forEach(c => c.style.outline = '3px solid #2563eb');
+      setTimeout(() => matches.forEach(c => c.style.outline = ''), 1500);
+    }
+  }
+  document.addEventListener('DOMContentLoaded', function () {
+    const el = document.getElementById('ticket-calendar');
+    if (!el || !window.FullCalendar) return;
+    const calendar = new FullCalendar.Calendar(el, {
+      initialView: 'dayGridMonth',
+      headerToolbar: { left: 'prev,next today', center: 'title', right: 'dayGridMonth,timeGridWeek,listWeek' },
+      events: readClaimedTicketsAsEvents(),
+      dateClick: (info) => scrollToTicketCardsByDate(info.dateStr),
+      eventClick: (info) => scrollToTicketCardsByDate(info.event.startStr.slice(0,10))
+    });
+    calendar.render();
+    const origRender = window.render;
+    if (typeof origRender === 'function') {
+      window.render = function () {
+        origRender();
+        calendar.removeAllEvents();
+        calendar.addEventSource(readClaimedTicketsAsEvents());
+      };
+    }
+  });
+</script>
+
 </body>
 </html>

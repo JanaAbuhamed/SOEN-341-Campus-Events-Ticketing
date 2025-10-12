@@ -1,9 +1,10 @@
 from rest_framework import serializers
-from ..models import User
-from ..models import Event
+from ..models import User, Event
 
+
+# ---------- USER ----------
 class UserSerializer(serializers.ModelSerializer):
-    password = serializers.CharField(write_only=True, required=True)  # hide password in GET responses
+    password = serializers.CharField(write_only=True, required=True)
 
     class Meta:
         model = User
@@ -24,25 +25,23 @@ class UserSerializer(serializers.ModelSerializer):
         instance.save()
         return instance
 
-# EVENT SERIALIZERS
 
+# ---------- EVENT ----------
 class EventSerializer(serializers.ModelSerializer):
     organizer = UserSerializer(read_only=True)
     available_spots = serializers.ReadOnlyField()
-    
+
     class Meta:
         model = Event
         fields = [
-            'id', 'title', 'description', 'date', 'time', 
+            'id', 'title', 'description', 'date', 'time',
             'location', 'capacity', 'ticket_type', 'organizer',
             'attendees', 'created_at', 'available_spots'
         ]
-        read_only_fields = ['organizer', 'attendees', 'created_at']
+        read_only_fields = ['organizer', 'attendees', 'created_at', 'available_spots']
+
 
 class EventCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Event
-        fields = [
-            'title', 'description', 'date', 'time', 
-            'location', 'capacity', 'ticket_type'
-        ]
+        fields = ['title', 'description', 'date', 'time', 'location', 'capacity', 'ticket_type']

@@ -5,6 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Student Calendar</title>
   <link rel="stylesheet" href="studentcalendar.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>
+
 </head>
 <body>
 
@@ -13,6 +16,7 @@
       <img src="images/logo.jpg" alt="EventHub Logo">
       <h2>Event Hub</h2>
     </div>
+    <div id="calendar" style="max-width: 1050px; margin: 30px auto;"></div>
     <ul class="sidebar-links">
       <li><a href="home.html">Home</a></li>
       <li><a href="student_profile.html" >Profile</a></li>
@@ -55,9 +59,47 @@
         <div class="calendar-footer">
           <p id="today-text">Today is October 11, 2025</p>
         </div>
+        <!-- List of events for the selected day -->
+<div id="day-events" style="max-width:700px;margin:12px auto 0;color:#475569;font-weight:400;"></div>
+
       </div>
     </div>
 
     <script src="studentcalendar.js"></script>
+    <script>
+  async function loadEvents() {
+    // When running through Django (127.0.0.1:8000)
+    const res = await fetch('/api/events/');
+
+    // If you preview via Live Server (5500/5502) instead of Django, use:
+    // const res = await fetch('http://127.0.0.1:8000/api/events/');
+
+    const data = await res.json();
+    return data.map(e => ({
+      id: e.id,
+      title: e.title || 'Event',
+      start: e.time ? `${e.date}T${e.time}` : e.date,
+      extendedProps: { location: e.location, capacity: e.capacity, status: e.status }
+    }));
+  }
+
+  document.addEventListener('DOMContentLoaded', async () => {
+    const el = document.getElementById('calendar');
+    if (!el) return;
+
+    const calendar = new FullCalendar.Calendar(el, {
+      initialView: 'dayGridMonth',
+      headerToolbar: { left: 'prev,next today', center: 'title', right: 'dayGridMonth,timeGridWeek,listWeek' },
+      events: await loadEvents(),
+      eventClick: (info) => {
+        const p = info.event.extendedProps || {};
+        alert(`${info.event.title}\n${info.event.start.toLocaleString()}\n${p.location || ''}`);
+      }
+    });
+
+    calendar.render();
+  });
+</script>
+
   </body>
 </html>
