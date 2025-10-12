@@ -11,6 +11,12 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
+import os
+
+# main/student_event/settings.py
+LOGIN_URL = 'login'  # this should match the name of your login view
+LOGIN_REDIRECT_URL = 'student_dashboard'  # where to go after login
+
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -29,6 +35,7 @@ DEBUG = True
 ALLOWED_HOSTS = []
 
 
+
 # Application definition
 
 INSTALLED_APPS = [
@@ -40,6 +47,12 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'main',               
     'rest_framework',      # DRF
+    
+]
+
+CSRF_TRUSTED_ORIGINS = [
+    'http://localhost:8000',
+    'http://127.0.0.1:8000',
 ]
 
 MIDDLEWARE = [
@@ -53,6 +66,11 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'student_event.urls'
+
+STATIC_URL = '/static/'
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'main/static'),
+]
 
 TEMPLATES = [
     {
@@ -72,13 +90,19 @@ TEMPLATES = [
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
+
         'NAME': 'student_event',  # phpMyAdmin DB name
         'USER': 'campus_event',
         'PASSWORD': 'campus_event',
         'HOST': 'localhost',
         'PORT': '3306', #truing to debug
+
+        # 'HOST': '127.0.0.1',  # <-- change this
+
+
     }
 }
+
 
 WSGI_APPLICATION = 'student_event.wsgi.application'
 
@@ -89,20 +113,26 @@ WSGI_APPLICATION = 'student_event.wsgi.application'
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
 
-AUTH_PASSWORD_VALIDATORS = [
-    {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
-    },
-]
+
+#SWITCHED TO COMMENTS FOR TESTING PURPOSES 
+
+# AUTH_PASSWORD_VALIDATORS = [
+# {
+ #       'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+ #   },
+#    {
+ #       'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+ #   },
+ #   {
+ #       'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+ #   },
+#    {
+ #       'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+ #   },
+#]
+
+
+#SWITCHED TO COMMENTS FOR TESTING PURPOSES 
 
 
 # Internationalization
