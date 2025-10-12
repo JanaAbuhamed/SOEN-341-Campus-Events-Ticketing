@@ -1,4 +1,5 @@
 from django.urls import path
+from . import views
 from .views import UserViewSet, EventViewSet
 from rest_framework.routers import DefaultRouter
 
@@ -38,12 +39,13 @@ event_unregister = EventViewSet.as_view({
 
 
 urlpatterns = [
+   # API routes
     path('users/', user_list, name='user-list'),
     path('users/<int:pk>/', user_detail, name='user-detail'),
-
     path('events/', event_list, name='event-list'),
     path('events/<int:pk>/', event_detail, name='event-detail'),
     path('events/<int:pk>/register/', event_register, name='event-register'),
     path('events/<int:pk>/unregister/', event_unregister, name='event-unregister'),
+
 ]
 

@@ -1,0 +1,47 @@
+<!-- main/templates/student_profile.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Student Profile - Event Hub</title>
+  <link rel="stylesheet" href="student_profile.css">
+</head>
+<body class="login-page">
+
+  <div class="sidebar">
+    <div class="sidebar-logo">
+      <img src="images/logo.jpg" alt="EventHub Logo">
+      <h2>Event Hub</h2>
+    </div>
+    <ul class="sidebar-links">
+      <li><a href="home.html">Home</a></li>
+      <li><a href="{% url 'student_profile' %}" class="active">Profile</a></li>
+      <li><a href="upcomingevents.html">Upcoming Events</a></li>
+      <li><a href="studentcalendar.html">Student Calendar</a></li>
+      <li><a href="studentdashboard.html">My Tickets</a></li>
+      <li><a href="loginindex.html" class="logout">Log Out</a></li>
+    </ul>
+  </div>
+
+  <div class="main-content">
+    <div class="profile-card">
+      <h2>Jane Doe</h2>
+      <p><strong>Student ID:</strong> 123456789</p>
+      <p><strong>Major:</strong> Software Engineering</p>
+      <p><strong>Email:</strong> jane.doe@university.edu</p>
+
+      <div class="landing-buttons">
+        <button onclick="location.href='upcomingevents.html'">Upcoming Events</button>
+        <button onclick="location.href='studentdashboard.html'">My Tickets</button>
+        <button onclick="location.href='studentcalendar.html'">My Calendar</button>
+      </div>
+
+      <div class="links">
+        <a href="{% url 'update_profile' %}">Edit Profile</a>
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>

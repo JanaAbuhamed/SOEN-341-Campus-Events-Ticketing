@@ -10,6 +10,15 @@ class UserManager(BaseUserManager):
         user = self.model(email=email, name=name, role=role, status=status)
         user.set_password(password)  # hashes password properly
         user.save(using=self._db)
+
+        from django.contrib.auth.models import Group
+        if role == 0:  # Student
+            group = Group.objects.get(name='Student')
+        elif role == 1:  # Organizer
+            group = Group.objects.get(name='Organizer') 
+        elif role == 2:  # Admin
+            group = Group.objects.get(name='Administrator')
+
         return user
 
     def create_superuser(self, email, name, password=None):

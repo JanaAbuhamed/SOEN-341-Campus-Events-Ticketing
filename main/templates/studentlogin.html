@@ -1,10 +1,14 @@
+<!-- main/templates/studentlogin.html -->
+{% load static %}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Student Login</title>
-  <link rel="stylesheet" href="login.css">
+  <link rel="stylesheet" href="{% static 'css/login.css' %}">
+  
 </head>
 <body>
   <div class="login-container">
@@ -13,16 +17,42 @@
     </div>
     <div class="login-right">
       <h2>Student Login</h2>
-      <input id="email" type="email" placeholder="Email">
-      <input id="password" type="password" placeholder="Password">
-      <button id="loginBtn">LOGIN</button>
+      
+      {% if error %}
+        <div class="error-message">{{ error }}</div>
+      {% endif %}
+
+      <form method="POST" action="{% url 'studentlogin' %}">
+        {% csrf_token %}
+        <input name="email" type="email" placeholder="Email" required>
+        <input name="password" type="password" placeholder="Password" required>
+        <button type="submit" id="loginBtn">LOGIN</button>
+      </form>
+      
       <div class="links">
-        <a href="signup.html">Don't have an account? Create one →</a> <!-- connect this to the student sign up page -->
+        <a href="{% url 'signup' %}">Don't have an account? Create one →</a>
       </div>
     </div>
   </div>
-  <script src="login.js"></script>
+
+  <script>
+    // Image follow effect
+    const img = document.querySelector('.login-left img');
+    if(img) {
+      img.addEventListener('mousemove', (e) => {
+        const rect = img.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        const moveX = (x - rect.width / 2) / 10;
+        const moveY = (y - rect.height / 2) / 10;
+
+        img.style.transform = `translate(${moveX}px, ${moveY}px)`;
+      });
+
+      img.addEventListener('mouseleave', () => {
+        img.style.transform = 'translate(0, 0)';
+      });
+    }
+  </script>
 </body>
 </html>
-
-
