@@ -14,7 +14,6 @@ from django.shortcuts import redirect, render
 from django.urls import reverse
 from ..forms import StudentSignupForm, OrganizerSignupForm, UserUpdateForm,  PasswordUpdateForm
 
-
 class UserViewSet(viewsets.ViewSet):
     DUMMY_USERS = [
         {"user_id": 1, "name": "Jana", "email": "jana@example.com", "role": 0, "status": 1},

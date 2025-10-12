@@ -1,11 +1,9 @@
 
 from django import forms
-from .models import User
+from .models import User, Event
 from django.contrib.auth import password_validation
 from django.contrib.auth.hashers import check_password
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm, PasswordChangeForm, UserChangeForm
-
-
 
 
 class UserUpdateForm(forms.ModelForm):
@@ -104,3 +102,9 @@ class OrganizerSignupForm(BaseUserCreationForm):
             status=0  # Pending approval
         )
         return user
+
+
+class EventForm(forms.ModelForm):
+    class Meta:
+        model = Event
+        fields = ['title', 'description', 'date', 'time', 'location', 'capacity']

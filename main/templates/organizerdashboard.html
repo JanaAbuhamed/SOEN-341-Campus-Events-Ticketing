@@ -4,8 +4,16 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
   <title>Organizer Dashboard</title>
   <link rel="stylesheet" href="{% static 'organizerdashboard.css' %}">
+  <style>
+    .error {
+      color: red;
+      font-size: 0.9em;
+      margin-top: 4px;
+    }
+  </style>
 </head>
 <body>
 
@@ -18,14 +26,51 @@
     <!-- Create Event Form -->
     <section class="dashboard-section active" id="create-event">
       <h2>Create New Event</h2>
-      <form method="POST" action="">
+      <form method="POST" action="{% url 'organizerdashboard' %}">
         {% csrf_token %}
-        <label>Title: <input type="text" name="title" required></label><br>
-        <label>Description: <textarea name="description" required></textarea></label><br>
-        <label>Date: <input type="date" name="date" required></label><br>
-        <label>Time: <input type="time" name="time" required></label><br>
-        <label>Location: <input type="text" name="location" required></label><br>
-        <label>Capacity: <input type="number" name="capacity" required></label><br>
+
+        <label>Title:
+          <input type="text" name="title" value="{{ form.title.value|default_if_none:'' }}" required>
+          {% if form.title.errors %}
+            <div class="error">{{ form.title.errors.0 }}</div>
+          {% endif %}
+        </label><br>
+
+        <label>Description:
+          <textarea name="description" required>{{ form.description.value|default_if_none:'' }}</textarea>
+          {% if form.description.errors %}
+            <div class="error">{{ form.description.errors.0 }}</div>
+          {% endif %}
+        </label><br>
+
+        <label>Date:
+          <input type="date" name="date" value="{{ form.date.value|default_if_none:'' }}" required>
+          {% if form.date.errors %}
+            <div class="error">{{ form.date.errors.0 }}</div>
+          {% endif %}
+        </label><br>
+
+        <label>Time:
+          <input type="time" name="time" value="{{ form.time.value|default_if_none:'' }}" required>
+          {% if form.time.errors %}
+            <div class="error">{{ form.time.errors.0 }}</div>
+          {% endif %}
+        </label><br>
+
+        <label>Location:
+          <input type="text" name="location" value="{{ form.location.value|default_if_none:'' }}" required>
+          {% if form.location.errors %}
+            <div class="error">{{ form.location.errors.0 }}</div>
+          {% endif %}
+        </label><br>
+
+        <label>Capacity:
+          <input type="number" name="capacity" value="{{ form.capacity.value|default_if_none:'' }}" required>
+          {% if form.capacity.errors %}
+            <div class="error">{{ form.capacity.errors.0 }}</div>
+          {% endif %}
+        </label><br>
+
         <button type="submit" class="btn-primary">Create Event</button>
       </form>
     </section>
