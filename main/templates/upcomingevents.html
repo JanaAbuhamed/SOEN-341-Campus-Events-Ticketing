@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Upcoming Events</title>
+  <link rel="stylesheet" href="upcomingevents.css">
+</head>
+<body class="home-page">
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="sidebar-logo">
+      <img src="images/logo.jpg" alt="EventHub Logo">
+      <h2>Event Hub</h2>
+    </div>
+    <ul class="sidebar-links">
+      <li><a href="home.html">Home</a></li>
+      <li><a href="student_profile.html">Profile</a></li>
+      <li><a href="upcomingevents.html" class="active">Upcoming Events</a></li>
+      <li><a href="studentcalendar.html">Student Calendar</a></li>
+      <li><a href="studentdashboard.html">My Tickets</a></li>
+      <li><a href="loginindex.html" class="logout">Log Out</a></li>
+    </ul>
+  </div>
+
+  <!-- Main Content -->
+  <div class="page-content">
+    <h2 class="page-title">Upcoming Events</h2>
+
+    <div class="search-container">
+      <input type="text" id="event-search" placeholder="Search events by title, category, or organization...">
+    </div>
+
+    <div class="event-grid">
+      <!-- your existing cards unchanged -->
+      <div class="event-card" 
+           data-title="Math Exam" 
+           data-date="2025-10-14" 
+           data-category="Exam" 
+           data-org="Math Dept" 
+           data-location="Room 101" 
+           data-capacity="50" 
+           data-description="Midterm Math Exam. Bring calculators.">
+        <h3>Math Exam</h3><p>Oct 14</p>
+      </div>
+
+      <div class="event-card" 
+           data-title="Web Dev Workshop" 
+           data-date="2025-10-20" 
+           data-category="Workshop" 
+           data-org="CS Club" 
+           data-location="Lab 3" 
+           data-capacity="30" 
+           data-description="Hands-on web development workshop.">
+        <h3>Web Dev Workshop</h3><p>Oct 20</p>
+      </div>
+
+      <div class="event-card" 
+           data-title="Campus Festival" 
+           data-date="2025-11-05" 
+           data-category="Festival" 
+           data-org="Student Union" 
+           data-location="Main Quad" 
+           data-capacity="500" 
+           data-description="Annual campus festival with music, food, and activities.">
+        <h3>Campus Festival</h3><p>Nov 5</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal -->
+  <div id="event-modal">
+    <div class="modal-content">
+      <span id="modal-close">&times;</span>
+      <h2 id="modal-title"></h2>
+      <p><strong>Date:</strong> <span id="modal-date"></span></p>
+      <p><strong>Category:</strong> <span id="modal-category"></span></p>
+      <p><strong>Organization:</strong> <span id="modal-org"></span></p>
+      <p><strong>Location:</strong> <span id="modal-location"></span></p>
+      <p><strong>Capacity:</strong> <span id="modal-capacity"></span></p>
+      <p id="modal-description"></p>
+      <div class="ClaimSaveBtn">
+        <button id="claimBtn">Claim</button>
+        <button id="saveBtn">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="upcomingevents.js"></script>
+</body>
+</html>

@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Organizer – Pending Approval</title>
+  <link rel="stylesheet" href="login.css"/>
+  <style>
+    .pending-wrap {
+      width: 680px; max-width: 92%;
+      background: #fff; border-radius: 12px;
+      padding: 32px; box-shadow: 0 10px 30px rgba(0,0,0,.1);
+      text-align: center;
+    }
+    .pending-wrap h2 { margin-bottom: 10px; color:#333; }
+    .muted { color:#666; margin-bottom: 18px; }
+    .pill {
+      display:inline-block; padding:8px 14px; border-radius:999px;
+      background:#fff1c4; color:#7a5d00; font-weight:600; margin-bottom:16px;
+    }
+    .small { font-size: 13px; color:#777; }
+    .actions { margin-top: 22px; display:flex; gap:10px; justify-content:center; flex-wrap:wrap; }
+    .btn {
+      padding: 10px 16px; border:none; border-radius:8px; cursor:pointer; font-weight:600;
+      background:#d4acdb; color:#fff;
+    }
+    .btn:hover { background:#977191; }
+    .email-box { font-family: monospace; background:#f5f5f7; padding:6px 10px; border-radius:6px; display:inline-block; }
+  </style>
+</head>
+<body>
+  <div class="pending-wrap">
+    <div class="pill">Status: Pending Admin Review</div>
+    <h2>Thanks for registering as an Organizer</h2>
+    <p class="muted">
+      Your account is awaiting admin approval. As soon as an admin approves it,
+      you’ll be redirected to your dashboard automatically.
+    </p>
+    <p class="small">Registered email: <span id="orgEmail" class="email-box">—</span></p>
+
+    <div class="actions">
+      <button id="refreshBtn" class="btn">Check Status Now</button>
+      <a class="btn" href="home.html" role="button">Back to Home</a>
+    </div>
+  </div>
+
+  <script src="organizer-pending.js" defer></script>
+</body>
+</html>
