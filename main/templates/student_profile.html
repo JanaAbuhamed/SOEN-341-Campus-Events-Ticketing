@@ -1,3 +1,4 @@
+<!-- main/templates/student_profile.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -15,7 +16,7 @@
     </div>
     <ul class="sidebar-links">
       <li><a href="home.html">Home</a></li>
-      <li><a href="student_profile.html" class="active">Profile</a></li>
+      <li><a href="{% url 'student_profile' %}" class="active">Profile</a></li>
       <li><a href="upcomingevents.html">Upcoming Events</a></li>
       <li><a href="studentcalendar.html">Student Calendar</a></li>
       <li><a href="studentdashboard.html">My Tickets</a></li>
@@ -37,7 +38,7 @@
       </div>
 
       <div class="links">
-        <a href="edit_profile.html">Edit Profile</a>
+        <a href="{% url 'update_profile' %}">Edit Profile</a>
       </div>
     </div>
   </div>
