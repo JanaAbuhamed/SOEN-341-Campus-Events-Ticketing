@@ -1,4 +1,4 @@
-from rest_framework import viewsets, status
+from rest_framework import viewsets, status, permissions
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, action
 from django.shortcuts import get_object_or_404, render
@@ -11,137 +11,152 @@ from django.http import HttpResponseForbidden, JsonResponse
 from django.shortcuts import redirect, render
 from django.urls import reverse
 from ..forms import StudentSignupForm, OrganizerSignupForm
+from .permissions import (
+    CanViewEvents, CanCreateEvent, CanEditEvent,
+    CanDeleteEvent, CanViewUsers
+)
 
 
 class UserViewSet(viewsets.ViewSet):
+    """
+    DRF-compatible ViewSet for User operations.
+    Uses custom permission classes instead of Django decorators.
+    """
+    permission_classes = [permissions.IsAuthenticated]
+
+    # Optional dummy data for demo/testing
     DUMMY_USERS = [
         {"user_id": 1, "name": "Jana", "email": "jana@example.com", "role": 0, "status": 1},
         {"user_id": 2, "name": "Ali", "email": "ali@example.com", "role": 1, "status": 0},
     ]
 
-    @permission_required('main.can_view_events', raise_exception=True)
+    def get_permissions(self):
+        """
+        Dynamically assign permissions based on action.
+        """
+        if self.action in ["list", "retrieve"]:
+            permission_classes = [CanViewUsers]
+        else:
+            permission_classes = [permissions.IsAuthenticated]
+        return [perm() for perm in permission_classes]
+
     def list(self, request):
+        """List all users (dummy or real)."""
         return Response(self.DUMMY_USERS)
 
-    @permission_required('main.can_view_events', raise_exception=True)
     def retrieve(self, request, pk=None):
+        """Get one user by ID."""
         user = next((u for u in self.DUMMY_USERS if u["user_id"] == int(pk)), None)
         if not user:
-            return Response({"error": "User not found"}, status=404)
+            return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
         return Response(user)
 
     def create(self, request):
-        new_user = request.data
+        """Create a new dummy user."""
+        new_user = request.data.copy()
         new_user["user_id"] = len(self.DUMMY_USERS) + 1
         self.DUMMY_USERS.append(new_user)
-        return Response(new_user, status=201)
+        return Response(new_user, status=status.HTTP_201_CREATED)
 
     def update(self, request, pk=None):
+        """Update dummy user data."""
         user = next((u for u in self.DUMMY_USERS if u["user_id"] == int(pk)), None)
         if not user:
-            return Response({"error": "User not found"}, status=404)
+            return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
         for key, value in request.data.items():
             user[key] = value
         return Response(user)
 
     def destroy(self, request, pk=None):
+        """Delete a dummy user."""
         user = next((u for u in self.DUMMY_USERS if u["user_id"] == int(pk)), None)
         if not user:
-            return Response({"error": "User not found"}, status=404)
+            return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
         self.DUMMY_USERS = [u for u in self.DUMMY_USERS if u["user_id"] != int(pk)]
-        return Response(status=204)
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 #EVENT VIEWS
 
 class EventViewSet(viewsets.ViewSet):
-    @permission_required('main.can_view_events', raise_exception=True)
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_permissions(self):
+        if self.action in ['list', 'retrieve']:
+            permission_classes = [CanViewEvents]
+        elif self.action == 'create':
+            permission_classes = [CanCreateEvent]
+        elif self.action == 'update':
+            permission_classes = [CanEditEvent]
+        elif self.action == 'destroy':
+            permission_classes = [CanDeleteEvent]
+        elif self.action in ['register', 'unregister']:
+            permission_classes = [CanRegisterEvent]
+        else:
+            permission_classes = [permissions.IsAuthenticated]
+        return [perm() for perm in permission_classes]
+
     def list(self, request):
         events = Event.objects.all()
         serializer = EventSerializer(events, many=True)
         return Response(serializer.data)
 
-    @permission_required('main.can_view_events', raise_exception=True)
     def retrieve(self, request, pk=None):
-        try:
-            event = Event.objects.get(pk=pk)
-        except Event.DoesNotExist:
+        event = Event.objects.filter(pk=pk).first()
+        if not event:
             return Response({"error": "Event not found"}, status=404)
-        serializer = EventSerializer(event)
-        return Response(serializer.data)
+        return Response(EventSerializer(event).data)
 
-    @permission_required('main.can_create_event', raise_exception=True)
     def create(self, request):
         serializer = EventCreateSerializer(data=request.data)
         if serializer.is_valid():
             event = serializer.save(organizer=request.user)
-            return_serializer = EventSerializer(event)
-            return Response(return_serializer.data, status=201)
+            return Response(EventSerializer(event).data, status=201)
         return Response(serializer.errors, status=400)
 
-
-    @permission_required('main.can_edit_event', raise_exception=True)
     def update(self, request, pk=None):
-        try:
-            event = Event.objects.get(pk=pk)
-        except Event.DoesNotExist:
+        event = Event.objects.filter(pk=pk).first()
+        if not event:
             return Response({"error": "Event not found"}, status=404)
-        
         serializer = EventSerializer(event, data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
         return Response(serializer.errors, status=400)
 
-
-    @permission_required('main.can_delete_event', raise_exception=True)
     def destroy(self, request, pk=None):
-        try:
-            event = Event.objects.get(pk=pk)
-        except Event.DoesNotExist:
+        event = Event.objects.filter(pk=pk).first()
+        if not event:
             return Response({"error": "Event not found"}, status=404)
-        
-        # Check if user owns the event or is admin
         if event.organizer != request.user and request.user.role != 2:
-            return Response({"error": "Not authorized to delete this event"}, status=403)
-        
+            return Response({"error": "Not authorized"}, status=403)
         event.delete()
         return Response(status=204)
-    
 
-
-    @permission_required('main.can_register_event', raise_exception=True)
+    @action(detail=True, methods=['post'])
     def register(self, request, pk=None):
-        try:
-            event = Event.objects.get(pk=pk)
-        except Event.DoesNotExist:
+        event = Event.objects.filter(pk=pk).first()
+        if not event:
             return Response({"error": "Event not found"}, status=404)
-        
         if event.available_spots <= 0:
-            return Response({"error": "Event is full"}, status=status.HTTP_400_BAD_REQUEST)
-        
+            return Response({"error": "Event is full"}, status=400)
         if request.user in event.attendees.all():
-            return Response({"error": "Already registered for this event"}, status=400)
-            
+            return Response({"error": "Already registered"}, status=400)
         event.attendees.add(request.user)
         event.available_spots -= 1
         event.save()
-        return Response({"message": "Successfully registered for event"})
+        return Response({"message": "Successfully registered"})
 
-
-    @permission_required('main.can_register_event', raise_exception=True)
+    @action(detail=True, methods=['post'])
     def unregister(self, request, pk=None):
-        try:
-            event = Event.objects.get(pk=pk)
-        except Event.DoesNotExist:
+        event = Event.objects.filter(pk=pk).first()
+        if not event:
             return Response({"error": "Event not found"}, status=404)
-        
         if request.user not in event.attendees.all():
-            return Response({"error": "Not registered for this event"}, status=400)
-            
+            return Response({"error": "Not registered"}, status=400)
         event.attendees.remove(request.user)
         event.available_spots += 1
         event.save()
-        return Response({"message": "Successfully unregistered from event"})
+        return Response({"message": "Successfully unregistered"})
     
    
     

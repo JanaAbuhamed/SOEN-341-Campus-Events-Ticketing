@@ -1,4 +1,3 @@
-// JavaScript
 document.addEventListener("DOMContentLoaded", async () => {
   const searchInput = document.getElementById("tableSearchInput");
   const tableBody = document.querySelector("#EventTable tbody");
@@ -7,10 +6,13 @@ document.addEventListener("DOMContentLoaded", async () => {
   const closeBtn = document.querySelector("#contentPanel .close-btn");
   let selectedRow = null;
 
+  // Get CSRF token from meta
+  const csrftoken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
   // Fetch events from API
   let events = [];
   try {
-    const response = await fetch("http://127.0.0.1:8000/api/events/");
+    const response = await fetch("/api/events/", { credentials: "include" });
     if (!response.ok) throw new Error("Failed to fetch events");
     events = await response.json();
   } catch (err) {
@@ -19,9 +21,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     return;
   }
 
-  // Populate table
   function populateTable(events) {
-    tableBody.innerHTML = ""; // clear existing rows
+    tableBody.innerHTML = "";
     events.forEach(event => {
       const organizerName = event.organizer?.name || "Unknown";
       const tr = document.createElement("tr");
@@ -44,7 +45,6 @@ document.addEventListener("DOMContentLoaded", async () => {
         <td>${event.ticket_type}</td>
       `;
 
-      // Row click event
       tr.addEventListener("click", () => {
         if (selectedRow === tr) {
           tr.classList.remove("selected");
@@ -53,12 +53,11 @@ document.addEventListener("DOMContentLoaded", async () => {
           return;
         }
 
-        // Deselect previous
         tableBody.querySelectorAll("tr").forEach(r => r.classList.remove("selected"));
         tr.classList.add("selected");
         selectedRow = tr;
 
-        const { id, title, date, time, location, capacity, ticket_type, status, organizer } = tr.dataset;
+        const { id, title, date, time, location, capacity, ticket_type, organizer } = tr.dataset;
 
         contentArea.innerHTML = `
           <h2><strong>${title}</strong></h2>
@@ -73,13 +72,16 @@ document.addEventListener("DOMContentLoaded", async () => {
           </div>
         `;
 
-        // Show overlay
         overlay.style.display = "flex";
 
-        // Register/Unregister actions
+        // Register
         contentArea.querySelector(".register-btn").addEventListener("click", async () => {
           try {
-            const res = await fetch(`http://127.0.0.1:8000/api/events/${id}/register/`, { method: "POST", credentials: "include" });
+            const res = await fetch(`/api/events/${id}/register/`, {
+              method: "POST",
+              credentials: "include",
+              headers: { "X-CSRFToken": csrftoken },
+            });
             const data = await res.json();
             alert(data.message || "Registered successfully");
           } catch {
@@ -87,9 +89,14 @@ document.addEventListener("DOMContentLoaded", async () => {
           }
         });
 
+        // Unregister
         contentArea.querySelector(".unregister-btn").addEventListener("click", async () => {
           try {
-            const res = await fetch(`http://127.0.0.1:8000/api/events/${id}/unregister/`, { method: "POST", credentials: "include" });
+            const res = await fetch(`/api/events/${id}/unregister/`, {
+              method: "POST",
+              credentials: "include",
+              headers: { "X-CSRFToken": csrftoken },
+            });
             const data = await res.json();
             alert(data.message || "Unregistered successfully");
           } catch {
@@ -105,12 +112,11 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   populateTable(events);
 
-  // Live table filter
+  // Live search
   searchInput.addEventListener("keyup", () => {
     const query = searchInput.value.toLowerCase();
     tableBody.querySelectorAll("tr").forEach(row => {
-      const rowText = row.textContent.toLowerCase();
-      row.style.display = rowText.includes(query) ? "" : "none";
+      row.style.display = row.textContent.toLowerCase().includes(query) ? "" : "none";
     });
   });
 
@@ -121,8 +127,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     selectedRow = null;
   });
 
-  overlay.addEventListener("click", (e) => {
-    if (e.target === overlay) { // Only if clicked outside the panel
+  overlay.addEventListener("click", e => {
+    if (e.target === overlay) {
       overlay.style.display = "none";
       if (selectedRow) selectedRow.classList.remove("selected");
       selectedRow = null;
