@@ -1,7 +1,7 @@
 # main/views.py
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
-from .forms import UserUpdateForm
+from .forms import UserUpdateForm, EventForm
 from django.contrib import messages
 from django.contrib.auth import update_session_auth_hash
 from .forms import PasswordUpdateForm
@@ -11,7 +11,8 @@ from django.contrib.auth.forms import AuthenticationForm
 
 from django.contrib.auth import authenticate, login
 
-from django.contrib.auth.models import User
+from main.models import User, Event
+
 
 def signup_view(request):
     if request.method == 'POST':
@@ -128,35 +129,29 @@ def delete_event(request, event_id):
     return redirect('organizer-dashboard')
 
 def organizer_dashboard(request):
-    # Simulate organizer login for testing (replace with request.user when login is ready)
     organizer = User.objects.get(email="org1@mail.com")
 
     if request.method == 'POST':
-        title = request.POST.get('title')
-        description = request.POST.get('description')
-        date = request.POST.get('date')
-        time = request.POST.get('time')
-        location = request.POST.get('location')
-        capacity = request.POST.get('capacity')
+        print("📩 POST received:", request.POST)  # ✅ Add this line
+        form = EventForm(request.POST)
+        if form.is_valid():
+            event = form.save(commit=False)
+            event.organizer = organizer
+            event.status = 'pending'
+            event.save()
+            print("✅ Event created:", event)
+            return redirect('organizerdashboard')
+        else:
+            print("❌ Form errors:", form.errors)
+    else:
+        form = EventForm()
 
-        Event.objects.create(
-            title=title,
-            description=description,
-            date=date,
-            time=time,
-            location=location,
-            capacity=capacity,
-            organizer=organizer,
-            status='pending'  # Event starts in pending state
-        )
-        return redirect('organizer-dashboard')
-
-    # Split events by status for dashboard display
     approved_events = Event.objects.filter(organizer=organizer, status='approved')
     pending_events = Event.objects.filter(organizer=organizer, status='pending')
     rejected_events = Event.objects.filter(organizer=organizer, status='rejected')
 
     return render(request, 'organizerdashboard.html', {
+        'form': form,
         'approved_events': approved_events,
         'pending_events': pending_events,
         'rejected_events': rejected_events

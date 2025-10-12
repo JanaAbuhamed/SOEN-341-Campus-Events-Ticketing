@@ -104,8 +104,7 @@ class OrganizerSignupForm(BaseUserCreationForm):
         return user
 
 
-
 class EventForm(forms.ModelForm):
     class Meta:
         model = Event
-        fields = ['title', 'location', 'date', 'organizer']  # match your model
+        fields = ['title', 'description', 'date', 'time', 'location', 'capacity']
