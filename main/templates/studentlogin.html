@@ -1,10 +1,14 @@
+<!-- main/templates/studentlogin.html -->
+{% load static %}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Student Login</title>
-  <link rel="stylesheet" href="login.css">
+  <link rel="stylesheet" href="{% static 'login.css' %}">
+  <!-- <link rel="stylesheet" href="login.css"> -->
 </head>
 <body>
   <div class="login-container">
@@ -13,11 +17,28 @@
     </div>
     <div class="login-right">
       <h2>Student Login</h2>
-      <input id="email" type="email" placeholder="Email">
+
+      {% if messages %}
+        <ul>
+          {% for message in messages %}
+            <li>{{ message }}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+      
+      <form method="POST">
+        {% csrf_token %}
+        <input id="email" name="username" type="email" placeholder="Email" required>
+        <input id="password" name="password" type="password" placeholder="Password" required>
+        <button type="submit">LOGIN</button>
+      </form>
+
+      <!-- <input id="email" type="email" placeholder="Email">
       <input id="password" type="password" placeholder="Password">
-      <button id="loginBtn">LOGIN</button>
+      <button id="loginBtn">LOGIN</button> -->
       <div class="links">
-        <a href="signup.html">Don't have an account? Create one →</a> <!-- connect this to the student sign up page -->
+        <a href="{% url 'signup' %}">Don't have an account? Create one →</a>
+        <!-- <a href="signup.html">Don't have an account? Create one →</a> --> <!-- connect this to the student sign up page -->
       </div>
     </div>
   </div>
