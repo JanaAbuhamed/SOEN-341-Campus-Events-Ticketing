@@ -42,6 +42,7 @@
               <th>Date</th>
               <th>Location</th>
               <th>Attendees</th>
+              <th>Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -52,9 +53,13 @@
               <td>{{ event.date }}</td>
               <td>{{ event.location }}</td>
               <td>{{ event.attendees.count }}</td>
+              <td>
+                <a href="{% url 'edit-event' event.id %}" class="btn-edit">Edit</a>
+                <a href="{% url 'delete-event' event.id %}" class="btn-delete">Delete</a>
+              </td>
             </tr>
             {% empty %}
-            <tr><td colspan="5">No approved events yet.</td></tr>
+            <tr><td colspan="6">No approved events yet.</td></tr>
             {% endfor %}
           </tbody>
         </table>
@@ -72,6 +77,7 @@
               <th>Title</th>
               <th>Date</th>
               <th>Status</th>
+              <th>Actions</th> 
             </tr>
           </thead>
           <tbody>
@@ -81,12 +87,16 @@
               <td>{{ event.title }}</td>
               <td>{{ event.date }}</td>
               <td>{{ event.get_status_display }}</td>
+              <td>
+                <a href="{% url 'edit-event' event.id %}" class="btn-edit">Edit</a>
+                <a href="{% url 'delete-event' event.id %}" class="btn-delete">Delete</a>
+              </td>
             </tr>
             {% empty %}
-            <tr><td colspan="4">No pending events.</td></tr>
+            <tr><td colspan="5">No pending events.</td></tr>
             {% endfor %}
           </tbody>
-        </table>
+        </table>  
       </div>
     </section>
 
