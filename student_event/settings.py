@@ -12,6 +12,11 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 from pathlib import Path
 
+# main/student_event/settings.py
+LOGIN_URL = 'login'  # this should match the name of your login view
+LOGIN_REDIRECT_URL = 'student_dashboard'  # where to go after login
+
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -29,6 +34,7 @@ DEBUG = True
 ALLOWED_HOSTS = []
 
 
+
 # Application definition
 
 INSTALLED_APPS = [
@@ -40,6 +46,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'main',               
     'rest_framework',      # DRF
+    
 ]
 
 MIDDLEWARE = [
@@ -72,13 +79,19 @@ TEMPLATES = [
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
+
         'NAME': 'student_event',  # phpMyAdmin DB name
         'USER': 'campus_event',
         'PASSWORD': 'campus_event',
         'HOST': 'localhost',
         'PORT': '3306', #truing to debug
+
+        # 'HOST': '127.0.0.1',  # <-- change this
+
+
     }
 }
+
 
 WSGI_APPLICATION = 'student_event.wsgi.application'
 

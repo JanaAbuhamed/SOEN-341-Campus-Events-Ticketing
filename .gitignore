@@ -1,2 +1,10 @@
+<<<<<<< HEAD
+__pycache__/
+*.pyc
+=======
+venv/
+>>>>>>> eb06ab3e5ee9d9a20073a4c2eb2081e0c053b072
+__pycache__/
+*.pyc
 __pycache__/
 *.pyc
