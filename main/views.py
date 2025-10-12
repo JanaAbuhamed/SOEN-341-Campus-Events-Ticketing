@@ -119,14 +119,14 @@ def edit_event(request, event_id):
 
     if request.method == 'POST' and form.is_valid():
         form.save()
-        return redirect('organizer-dashboard')
+        return redirect('organizerdashboard')
 
     return render(request, 'edit_event.html', {'form': form, 'event': event})
 
 def delete_event(request, event_id):
     event = get_object_or_404(Event, id=event_id)
     event.delete()
-    return redirect('organizer-dashboard')
+    return redirect('organizerdashboard')
 
 def organizer_dashboard(request):
     organizer = User.objects.get(email="org1@mail.com")
