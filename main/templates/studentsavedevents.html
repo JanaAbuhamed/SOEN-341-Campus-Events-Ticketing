@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Saved Events</title>
+  <link rel="stylesheet" href="studentsavedevents.css">
+</head>
+<body>
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="sidebar-logo">
+      <img src="images/logo.jpg" alt="EventHub Logo">
+      <h2>Event Hub</h2>
+    </div>
+    <ul class="sidebar-links">
+      <li><a href="home.html">Home</a></li>
+      <li><a href="student_profile.html">Profile</a></li>
+      <li><a href="upcomingevents.html">Upcoming Events</a></li>
+      <li><a href="studentcalendar.html">Student Calendar</a></li>
+      <li><a href="studentdashboard.html">My Tickets</a></li>
+      <li><a href="studentsavedevents.html" class="active">My Saved Events</a></li>
+      <li><a href="loginindex.html" class="logout">Log Out</a></li>
+    </ul>
+  </div>
+
+  <!-- Main Content -->
+  <div class="page-content">
+    <h2 class="page-title">My Saved Events</h2>
+
+    <div id="saved-events" class="event-grid">
+      <!-- Events dynamically loaded here -->
+    </div>
+
+    <p id="empty-message" style="text-align:center; color:#666; margin-top:20px; display:none;">
+      You haven’t saved any events yet.
+    </p>
+  </div>
+
+  <script src="studentsavedevents.js"></script>
+</body>
+</html>

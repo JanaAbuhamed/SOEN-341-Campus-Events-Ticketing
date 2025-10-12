@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Pending Organizer Requests</title>
+  <title>All Events</title>
   <link rel="stylesheet" href="admindashboard.css">
 </head>
 <body>
@@ -13,26 +13,24 @@
       <h2>Event Hub</h2>
     </div>
     <ul>
-      <li><a href="admindashboard.html" class="active">Pending Requests</a></li>
+      <li><a href="admindashboard.html">Pending Requests</a></li>
       <li><a href="admin-users.html">Users</a></li>
-      <li><a href="admin-events.html">Events</a></li>
+      <li><a href="admin-events.html" class="active">Events</a></li>
     </ul>
   </div>
 
   <main class="content">
-    <header><h1>Pending Organizer Requests</h1></header>
+    <header><h1>All Events</h1></header>
     <section class="dashboard-section">
       <div class="table-container">
-        <table id="pendingTable">
-          <thead>
-            <tr><th>ID</th><th>Name</th><th>Email</th><th>Actions</th></tr>
-          </thead>
+        <table id="eventsTable">
+          <thead><tr><th>ID</th><th>Title</th><th>Category</th><th>Date</th></tr></thead>
           <tbody></tbody>
         </table>
       </div>
     </section>
   </main>
 
-  <script src="admindashboard.js"></script>
+  <script src="admin-events.js"></script>
 </body>
 </html>
