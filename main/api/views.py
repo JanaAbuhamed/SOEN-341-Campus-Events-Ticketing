@@ -150,12 +150,6 @@ class EventViewSet(viewsets.ViewSet):
 def loginindex(request):
     return render(request, "loginindex.html")
 
-def signup(request):
-    return render(request, "signup.html")
-
-def studentlogin(request):
-    return render(request, "studentlogin.html")
-
 def organizerlogin(request):
     return render(request, "organizerlogin.html")
 
@@ -163,12 +157,18 @@ def adminlogin(request):
     return render(request, "adminlogin.html")
 
 @login_required
-@permission_required('main.can_view_events', raise_exception=True)
+#@permission_required('main.can_view_events', raise_exception=True)
 def studentdashboard(request):
-    # Additional check to ensure only students access this
+    
     if request.user.role != 0:
+        from django.http import HttpResponseForbidden
         return HttpResponseForbidden("Student access required")
     
+    # Add debug print to confirm it's working
+    print(f"SUCCESS: Student dashboard accessed by {request.user.email}")
+    
+    return render(request, "studentdashboard.html")
+
 
 def organizerdashboard(request):
     return render(request, "organizerdashboard.html")
@@ -176,8 +176,6 @@ def organizerdashboard(request):
 def admindashboard(request):
     return render(request, "admindashboard.html")
 
-def EventList(request):
-    return render(request, "EventList.html")
 
 def organizerpending(request):
     return render(request, "organizer-pending.html")
