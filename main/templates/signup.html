@@ -5,7 +5,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Sign Up / Register</title>
-  <link rel="stylesheet" href="{% static 'signup.css' %}">
+  {% load static %}
+  <link rel="stylesheet" href="{% static 'css/signup.css' %}">
 </head>
 <body>
 
@@ -16,45 +17,85 @@
     <div class="right">
       <h2>Sign Up</h2>
 
+      {% if form.errors %}
+        <div class="error-message">
+          Please correct the errors below.
+        </div>
+      {% endif %}
+
       <div class="toggle-buttons">
         <button id="btnStudent" class="active" onclick="showForm('student')">Student</button>
         <button id="btnOrganizer" onclick="showForm('organizer')">Organizer</button>
       </div>
 
       <!-- Student Form -->
-      <form id="studentForm" method="POST">
+      <form id="studentForm" method="POST" action="{% url 'signup' %}">
         {% csrf_token %}
-        <input type="hidden" name="user_type" value="student">
+        <input type="hidden" name="role" value="student">
+        
         <div class="form-group">
-          <label for="studentName">Name</label>
-          <input type="text" id="studentName" name="name" placeholder="Name" required />
+          <label for="id_name">Name</label>
+          {{ form.name }}
+          {% if form.name.errors %}
+            <div class="error">{{ form.name.errors }}</div>
+          {% endif %}
         </div>
         <div class="form-group">
-          <label for="studentEmail">Email</label>
-          <input type="email" id="studentEmail" name="email" placeholder="Email address" required />
+          <label for="id_email">Email</label>
+          {{ form.email }}
+          {% if form.email.errors %}
+            <div class="error">{{ form.email.errors }}</div>
+          {% endif %}
         </div>
         <div class="form-group">
-          <label for="studentPass">Password</label>
-          <input type="password" id="studentPass" name="password" placeholder="Password" required />
+          <label for="id_password1">Password</label>
+          {{ form.password1 }}
+          {% if form.password1.errors %}
+            <div class="error">{{ form.password1.errors }}</div>
+          {% endif %}
+        </div>
+        <div class="form-group">
+          <label for="id_password2">Confirm Password</label>
+          {{ form.password2 }}
+          {% if form.password2.errors %}
+            <div class="error">{{ form.password2.errors }}</div>
+          {% endif %}
         </div>
         <button type="submit" class="btn">Register as Student</button>
       </form>
 
       <!-- Organizer Form -->
-      <form id="organizerForm" class="hidden" method="POST">
+      <form id="organizerForm" method="POST" action="{% url 'signup' %}" class="hidden">
         {% csrf_token %}
-        <input type="hidden" name="user_type" value="organizer">
+        <input type="hidden" name="role" value="organizer">
+        
         <div class="form-group">
-          <label for="orgName">Name</label>
-          <input type="text" id="orgName" name="name" placeholder="Name" required />
+          <label for="id_name">Name</label>
+          {{ form.name }}
+          {% if form.name.errors %}
+            <div class="error">{{ form.name.errors }}</div>
+          {% endif %}
         </div>
         <div class="form-group">
-          <label for="orgEmail">Email</label>
-          <input type="email" id="orgEmail" name="email" placeholder="Email address" required />
+          <label for="id_email">Email</label>
+          {{ form.email }}
+          {% if form.email.errors %}
+            <div class="error">{{ form.email.errors }}</div>
+          {% endif %}
         </div>
         <div class="form-group">
-          <label for="orgPass">Password</label>
-          <input type="password" id="orgPass" name="password" placeholder="Password" required />
+          <label for="id_password1">Password</label>
+          {{ form.password1 }}
+          {% if form.password1.errors %}
+            <div class="error">{{ form.password1.errors }}</div>
+          {% endif %}
+        </div>
+        <div class="form-group">
+          <label for="id_password2">Confirm Password</label>
+          {{ form.password2 }}
+          {% if form.password2.errors %}
+            <div class="error">{{ form.password2.errors }}</div>
+          {% endif %}
         </div>
         <div class="note">
           * Organizer account requires admin approval before activation.
