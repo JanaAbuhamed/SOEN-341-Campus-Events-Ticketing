@@ -5,7 +5,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Organizer Dashboard</title>
-  <link rel="stylesheet" href="{% static 'login.css' %}">
   <link rel="stylesheet" href="{% static 'organizerdashboard.css' %}">
 </head>
 <body>
@@ -16,8 +15,8 @@
 
   <main class="dashboard-container">
 
-    <!-- Create Event Box -->
-    <section class="dashboard-section">
+    <!-- Create Event Form -->
+    <section class="dashboard-section active" id="create-event">
       <h2>Create New Event</h2>
       <form method="POST" action="">
         {% csrf_token %}
@@ -27,15 +26,15 @@
         <label>Time: <input type="time" name="time" required></label><br>
         <label>Location: <input type="text" name="location" required></label><br>
         <label>Capacity: <input type="number" name="capacity" required></label><br>
-        <button type="submit">Create Event</button>
+        <button type="submit" class="btn-primary">Create Event</button>
       </form>
     </section>
 
-    <!-- My Events Box -->
-    <section class="dashboard-section">
+    <!-- Approved Events -->
+    <section class="dashboard-section active" id="events">
       <h2>My Events</h2>
       <div class="table-container">
-        <table id="eventsTable">
+        <table>
           <thead>
             <tr>
               <th>Event ID</th>
@@ -62,11 +61,11 @@
       </div>
     </section>
 
-    <!-- Pending Approvals Box -->
-    <section class="dashboard-section">
+    <!-- Pending Approvals -->
+    <section class="dashboard-section active" id="tasks">
       <h2>Pending Approvals</h2>
       <div class="table-container">
-        <table id="tasksTable">
+        <table>
           <thead>
             <tr>
               <th>Event ID</th>
