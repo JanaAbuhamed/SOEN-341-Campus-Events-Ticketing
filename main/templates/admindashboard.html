@@ -4,81 +4,85 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Admin Dashboard</title>
-  <link rel="stylesheet" href="login.css"> <!-- consistent style -->
-  <link rel="stylesheet" href="admindashboard.css">
+  <link rel="stylesheet" href="/static/css/admindashboard.css">
+  <script src="/static/js/admindashboard.js" defer></script>
+  <meta name="csrf-token" content="{{ csrf_token }}">
 </head>
 <body>
-  <header>
-    <h1>Admin Dashboard</h1>
-  </header>
+  <h1><b>Admin Dashboard</b></h1>
 
-  <main class="dashboard-container">
+  <!-- Tab container -->
+  <div class="tab-container">
+    <div class="tabs">
+      <button class="tab-btn active" data-tab="students">Students</button>
+      <button class="tab-btn" data-tab="organizers">Organizers</button>
+      <button class="tab-btn" data-tab="events">Events</button>
+    </div>
 
-    <section class="dashboard-section">
-      <h2>Users List</h2>
-      <div class="table-container">
-        <table id="usersTable">
+    <!-- Students Tab -->
+    <div class="tab-content active" id="students">
+      <div class="table-card">
+        <h2>Students</h2>
+        <div class="search-container">
+          <label for="tableSearchInput">Search User:</label>
+          <input type="text" id="tableSearchInput" class="table-search" placeholder="Type to search by ID, Name, or Email...">
+        </div>
+        <table class="filterable-table" id="StudentTable">
+          <thead><tr><th>ID</th><th>Email</th><th>Name</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Organizers Tab -->
+    <div class="tab-content" id="organizers">
+      <div class="table-card">
+        <h2>Organizers</h2>
+        <div class="search-container">
+          <label for="organizerSearchInput">Search Organizer:</label>
+          <input type="text" id="organizerSearchInput" class="table-search" placeholder="Type to search by ID, Name, or Email...">
+        </div>
+        <table class="filterable-table" id="OrganizerTable">
+          <thead><tr><th>ID</th><th>Email</th><th>Name</th><th>Action</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Events Tab -->
+    <div class="tab-content" id="events">
+      <div class="table-card">
+        <h2>Events</h2>
+        <div class="search-container">
+          <label for="eventSearchInput">Search Event:</label>
+          <input type="text" id="eventSearchInput" class="table-search" placeholder="Search by title, date, or location...">
+        </div>
+        <table class="filterable-table" id="EventTable">
           <thead>
             <tr>
               <th>ID</th>
-              <th>Name</th>
-              <th>Email</th>
+              <th>Title</th>
+              <th>Organizer</th>
+              <th>Date</th>
+              <th>Time</th>
+              <th>Location</th>
+              <th>Ticket Type</th>
+              <th>Capacity</th>
+              <th>Status</th>
             </tr>
           </thead>
-          <tbody>
-            <tr>
-              <td>1</td>
-              <td>John Doe</td>
-              <td>john@example.com</td>
-            </tr>
-            <tr>
-              <td>2</td>
-              <td>Jane Smith</td>
-              <td>jane@example.com</td>
-            </tr>
-          </tbody>
+          <tbody></tbody>
         </table>
       </div>
-    </section>
+    </div>
+  </div>
 
-    <section class="dashboard-section">
-      <h2>Pending Organizer Requests</h2>
-      <div class="table-container">
-        <table id="pendingTable">
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Name</th>
-              <th>Email</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>101</td>
-              <td>Mark Wilson</td>
-              <td>mark@events.com</td>
-              <td>
-                <button class="btn approve">Approve</button>
-                <button class="btn reject">Reject</button>
-              </td>
-            </tr>
-            <tr>
-              <td>102</td>
-              <td>Lisa Brown</td>
-              <td>lisa@events.com</td>
-              <td>
-                <button class="btn approve">Approve</button>
-                <button class="btn reject">Reject</button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </section>
-
-  </main>
-
-  <script src="admindashboard.js"></script>
+  <!-- Event overlay -->
+  <div id="contentOverlay">
+    <div id="contentPanel">
+      <button class="close-btn">&times;</button>
+      <div id="contentArea"></div>
+    </div>
+  </div>
 </body>
 </html>

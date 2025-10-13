@@ -44,5 +44,5 @@ class EventCreateSerializer(serializers.ModelSerializer):
         model = Event
         fields = [
             'title', 'description', 'date', 'time', 
-            'location', 'capacity', 'ticket_type'
+            'location', 'capacity', 'ticket_type', 'status'
         ]

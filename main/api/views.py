@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from rest_framework.decorators import api_view, action
 from django.shortcuts import get_object_or_404, render
 from ..models import Event, User
-from .serializers import EventSerializer, EventCreateSerializer
+from .serializers import EventSerializer, EventCreateSerializer, UserSerializer
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, update_session_auth_hash
 from django.contrib.auth.forms import UserCreationForm
@@ -12,31 +12,21 @@ from django.contrib.auth.decorators import login_required, permission_required
 from django.http import HttpResponseForbidden, JsonResponse
 from django.shortcuts import redirect, render
 from django.urls import reverse
-from ..forms import StudentSignupForm, OrganizerSignupForm, UserUpdateForm,  PasswordUpdateForm
+from ..forms import StudentSignupForm, OrganizerSignupForm, UserUpdateForm, PasswordUpdateForm
 from .permissions import (
     CanViewEvents, CanCreateEvent, CanEditEvent,
     CanDeleteEvent, CanViewUsers
 )
 
-
-
 class UserViewSet(viewsets.ViewSet):
     """
-    DRF-compatible ViewSet for User operations.
-    Uses custom permission classes instead of Django decorators.
+    DRF ViewSet for User operations using real database data.
     """
+
     permission_classes = [permissions.IsAuthenticated]
 
-    # Optional dummy data for demo/testing
-    DUMMY_USERS = [
-        {"user_id": 1, "name": "Jana", "email": "jana@example.com", "role": 0, "status": 1},
-        {"user_id": 2, "name": "Ali", "email": "ali@example.com", "role": 1, "status": 0},
-    ]
-
     def get_permissions(self):
-        """
-        Dynamically assign permissions based on action.
-        """
+        """Assign permissions dynamically."""
         if self.action in ["list", "retrieve"]:
             permission_classes = [CanViewUsers]
         else:
@@ -44,39 +34,50 @@ class UserViewSet(viewsets.ViewSet):
         return [perm() for perm in permission_classes]
 
     def list(self, request):
-        """List all users (dummy or real)."""
-        return Response(self.DUMMY_USERS)
+        """List all users."""
+        users = User.objects.all()
+        serializer = UserSerializer(users, many=True)
+        return Response(serializer.data)
 
     def retrieve(self, request, pk=None):
-        """Get one user by ID."""
-        user = next((u for u in self.DUMMY_USERS if u["user_id"] == int(pk)), None)
-        if not user:
+        """Retrieve a single user by ID."""
+        try:
+            user = User.objects.get(pk=pk)
+        except User.DoesNotExist:
             return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
-        return Response(user)
+        serializer = UserSerializer(user)
+        return Response(serializer.data)
 
     def create(self, request):
-        """Create a new dummy user."""
-        new_user = request.data.copy()
-        new_user["user_id"] = len(self.DUMMY_USERS) + 1
-        self.DUMMY_USERS.append(new_user)
-        return Response(new_user, status=status.HTTP_201_CREATED)
+        """Create a new user."""
+        serializer = UserSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def update(self, request, pk=None):
-        """Update dummy user data."""
-        user = next((u for u in self.DUMMY_USERS if u["user_id"] == int(pk)), None)
-        if not user:
+        """Update an existing user."""
+        try:
+            user = User.objects.get(pk=pk)
+        except User.DoesNotExist:
             return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
-        for key, value in request.data.items():
-            user[key] = value
-        return Response(user)
+
+        serializer = UserSerializer(user, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def destroy(self, request, pk=None):
-        """Delete a dummy user."""
-        user = next((u for u in self.DUMMY_USERS if u["user_id"] == int(pk)), None)
-        if not user:
+        """Delete a user."""
+        try:
+            user = User.objects.get(pk=pk)
+            user.delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        except User.DoesNotExist:
             return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
-        self.DUMMY_USERS = [u for u in self.DUMMY_USERS if u["user_id"] != int(pk)]
-        return Response(status=status.HTTP_204_NO_CONTENT)
+
 
 #EVENT VIEWS
 
