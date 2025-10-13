@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<title>Event List</title>
+<html>
+<head>
+    <link rel="stylesheet" href="../static/css/EventList.css">
+    <script src="../static/js/EventList.js" defer></script>
+    <meta name="csrf-token" content="{{ csrf_token }}">
+</head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<body>
+<h1><b>Welcome to the Event List</b></h1>
+<div class="table-card">
+    <!-- The Search Input Field -->
+    <div class="search-container">
+        <label for="tableSearchInput">Search Event:</label>
+        <input type="text" id="tableSearchInput" placeholder="Type to search by Name, Category, Organization, or Date...">
+    </div>
+
+    <!-- Event Table with filtering -->
+    <div class="table-container"> 
+    <table class="filterable-table" id="EventTable">
+        <thead>
+            <tr>
+                <th scope="col">Event Name</th>
+                <th scope="col">Organizer</th>
+                <th scope="col">Date</th>
+                <th scope="col">Time</th>
+                <th scope="col">Category</th>
+                
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Rows will be populated by JavaScript // placeholder for database -->
+        </tbody>
+    </table>
+    </div>
+
+    <!-- Overlay container -->
+    <div id="contentOverlay">
+        <div id="contentPanel">
+            <button class="close-btn">&times;</button>
+            <div id="contentArea"></div>
+        </div>
+    </div>
+</div>
+
+
+</body>
+</html>
