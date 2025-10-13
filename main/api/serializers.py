@@ -34,7 +34,7 @@ class EventSerializer(serializers.ModelSerializer):
         model = Event
         fields = [
             'id', 'title', 'description', 'date', 'time', 
-            'location', 'capacity', 'ticket_type', 'organizer',
+            'location', 'capacity', 'ticket_type','status', 'organizer',
             'attendees', 'created_at', 'available_spots'
         ]
         read_only_fields = ['organizer', 'attendees', 'created_at']

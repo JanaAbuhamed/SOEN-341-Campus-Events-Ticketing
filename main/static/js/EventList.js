@@ -20,7 +20,18 @@ document.addEventListener("DOMContentLoaded", async () => {
     tableBody.innerHTML = `<tr><td colspan="5">Failed to load events</td></tr>`;
     return;
   }
+  try {
+    const response = await fetch("/api/events/", { credentials: "include" });
+    if (!response.ok) throw new Error("Failed to fetch events");
+    events = await response.json();
 
+    // Filter only approved events
+    events = events.filter(event => event.status === "approved");
+  } catch (err) {
+    console.error(err);
+    tableBody.innerHTML = `<tr><td colspan="5">Failed to load events</td></tr>`;
+    return;
+  }
   function populateTable(events) {
     tableBody.innerHTML = "";
     events.forEach(event => {
