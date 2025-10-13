@@ -8,9 +8,12 @@
   
   <header>
     <title>Organizer Dashboard</title>
+    {% comment %} <a href="{% url 'edit_profile' %}">Edit Profile</a> {% endcomment %}
+
+
     <a href="{% url 'update_organizer_profile' %}" class="btn-edit-profile">Edit Profile</a>
   </header>
-  
+
   <link rel="stylesheet" href="{% static 'organizerdashboard.css' %}">
   <style>
     .error {

@@ -40,4 +40,12 @@ urlpatterns = [
     path("update-profile/", update_profile, name="update_profile"),
     path("update-password/", update_password, name="update_password"),
 
+    
+    path('organizer/edit-profile/', update_organizer_profile, name='update_organizer_profile'),
+
+
+
+
+
+
 ]
