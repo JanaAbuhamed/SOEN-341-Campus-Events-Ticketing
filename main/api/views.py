@@ -1,20 +1,23 @@
 from rest_framework import viewsets, status, permissions
+from django.contrib.auth.models import Group
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, action
 from django.shortcuts import get_object_or_404, render
 from ..models import Event, User
 from .serializers import EventSerializer, EventCreateSerializer
-from django.contrib.auth import authenticate, login
+from django.contrib import messages
+from django.contrib.auth import authenticate, login, update_session_auth_hash
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.decorators import login_required, permission_required
 from django.http import HttpResponseForbidden, JsonResponse
 from django.shortcuts import redirect, render
 from django.urls import reverse
-from ..forms import StudentSignupForm, OrganizerSignupForm
+from ..forms import StudentSignupForm, OrganizerSignupForm, UserUpdateForm, PasswordUpdateForm
 from .permissions import (
     CanViewEvents, CanCreateEvent, CanEditEvent,
     CanDeleteEvent, CanViewUsers
 )
+
 
 
 class UserViewSet(viewsets.ViewSet):
@@ -216,6 +219,14 @@ def signup(request):
             
         if form.is_valid():
             user = form.save()
+            
+            if role == 'student':
+                group = Group.objects.get(name='Student')
+                user.groups.add(group)
+            else:
+                group = Group.objects.get(name='Organizer') 
+                user.groups.add(group)
+            
             login(request, user)
             request.session['user_role'] = role
             
@@ -223,8 +234,6 @@ def signup(request):
                 return redirect('studentdashboard')
             else:
                 return redirect('organizerpending')
-        # If form is invalid, it will show errors in the template
-    
     else:
         form = StudentSignupForm()
     
@@ -281,6 +290,41 @@ def adminlogin(request):
 
 # RBAC PROTECTED VIEWS
 # Student Views
+
+
+@login_required
+def update_profile(request):
+    user = request.user
+    if request.method == 'POST':
+        form = UserUpdateForm(request.POST, instance=user)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Your profile has been updated successfully!")
+            return redirect('studentdashboard') 
+    else:
+        form = UserUpdateForm(instance=user)
+    return render(request, 'update_profile.html', {'form': form})
+
+
+@login_required 
+def update_password(request):
+    form = None
+
+    if request.method == "POST":
+        form = PasswordUpdateForm(request.user, request.POST)
+        if form.is_valid():
+            new_password = form.cleaned_data["new_password"]
+            request.user.set_password(new_password)
+            request.user.save()
+            update_session_auth_hash(request, request.user)
+            messages.success(request, "Your password has been updated successfully!")
+            return redirect("studentdashboard") 
+        else:
+            form = PasswordUpdateForm(request.user)
+    return render(request, "update_password.html", {"form": form})
+
+
+
 @login_required
 @permission_required('main.can_view_events', raise_exception=True)
 def EventList(request):
@@ -317,6 +361,12 @@ def unregister_from_event(request, event_id):
     event.save()
     
     return JsonResponse({'message': 'Successfully unregistered from event'})
+
+
+
+
+
+
 
 # Organizer Views
 @login_required

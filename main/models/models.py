@@ -1,5 +1,5 @@
 from django.db import models
-from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
+from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin, Group
 from django.utils import timezone
 
 class UserManager(BaseUserManager):
@@ -11,7 +11,6 @@ class UserManager(BaseUserManager):
         user.set_password(password)  # hashes password properly
         user.save(using=self._db)
 
-        from django.contrib.auth.models import Group
         if role == 0:  # Student
             group = Group.objects.get(name='Student')
         elif role == 1:  # Organizer
