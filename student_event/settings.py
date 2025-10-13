@@ -13,10 +13,16 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 from pathlib import Path
 import os
 
+import os
+
+
+
+
 # main/student_event/settings.py
 LOGIN_URL = 'login'  # this should match the name of your login view
 LOGIN_REDIRECT_URL = 'student_dashboard'  # where to go after login
 
+AUTH_USER_MODEL = 'main.User'
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -35,6 +41,9 @@ DEBUG = True
 ALLOWED_HOSTS = []
 
 
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, "main", "templates"),
+]
 
 # Application definition
 

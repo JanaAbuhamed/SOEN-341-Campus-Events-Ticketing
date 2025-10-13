@@ -1,9 +1,21 @@
+# main/forms.py
 
 from django import forms
 from .models import User, Event
 from django.contrib.auth import password_validation
 from django.contrib.auth.hashers import check_password
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm, PasswordChangeForm, UserChangeForm
+
+class OrganizerUpdateForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = ['name', 'email']  
+
+    def clean_email(self):
+        email = self.cleaned_data.get('email')
+        if User.objects.exclude(pk=self.instance.pk).filter(email=email).exists():
+            raise forms.ValidationError("This email is already in use.")
+        return email
 
 
 class UserUpdateForm(forms.ModelForm):

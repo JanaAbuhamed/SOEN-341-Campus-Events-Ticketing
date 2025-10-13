@@ -1,0 +1,33 @@
+<!-- main/templates/base.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Campus Event Tickets</title>
+  {% load static %}
+  <link rel="stylesheet" href="{% static 'css/organizerdashboard.css' %}">
+</head>
+<body>
+
+  <!-- Optional: header/navbar -->
+  <header>
+    <h1>Campus Event Tickets</h1>
+    {% if user.is_authenticated %}
+      <p>Welcome, {{ user.name }}!</p>
+    {% endif %}
+  </header>
+
+  <!-- Main content -->
+  <main>
+    {% block content %}
+    {% endblock %}
+  </main>
+
+  <!-- Optional: footer -->
+  <footer>
+    <p>&copy; 2025 Campus Event Tickets</p>
+  </footer>
+
+</body>
+</html>

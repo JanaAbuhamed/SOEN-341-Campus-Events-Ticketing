@@ -1,3 +1,4 @@
+<!-- main/templates/organizer-pending.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -36,7 +37,7 @@
       Your account is awaiting admin approval. As soon as an admin approves it,
       you’ll be redirected to your dashboard automatically.
     </p>
-    <p class="small">Registered email: <span id="orgEmail" class="email-box">—</span></p>
+    <p class="small">Registered email: <span id="orgEmail" class="email-box">{{ email }}</span>
 
     <div class="actions">
       <button id="refreshBtn" class="btn">Check Status Now</button>

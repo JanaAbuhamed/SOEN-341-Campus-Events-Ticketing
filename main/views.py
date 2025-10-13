@@ -13,6 +13,148 @@ from django.contrib.auth import authenticate, login
 
 from main.models import User, Event
 
+# from django.contrib.auth.models import User
+
+from .forms import OrganizerUpdateForm
+from .models import User
+
+
+
+# @login_required
+# def update_organizer_profile(request): # ensure only organizers can access
+#     user = request.user
+
+#     if request.method == 'POST':
+#         form = UserUpdateForm(request.POST, instance=user)
+#         if form.is_valid():
+#             form.save()
+#             messages.success(request, "Your profile has been updated successfully!")
+#             return redirect('organizer_dashboard')  # or student_dashboard
+#     else:
+#         form = UserUpdateForm(instance=user)
+
+#     return render(request, 'update_organizer_profile.html', {'form': form})
+
+
+@login_required
+def update_organizer_profile(request):
+    if request.user.role != 1:
+        messages.error(request, "Access denied: organizers only.")
+        return redirect('organizerlogin')
+
+    organizer = request.user
+
+    if request.method == 'POST':
+        form = OrganizerUpdateForm(request.POST, instance=organizer)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Profile updated successfully!")
+            return redirect('organizerdashboard')
+    else:
+        form = OrganizerUpdateForm(instance=organizer)
+
+    return render(request, 'update_organizer_profile.html', {'form': form})
+
+
+
+
+
+@login_required(login_url='organizerlogin')
+def edit_profile(request):
+    organizer = request.user.organizer  # assuming a OneToOne link from User to Organizer
+    if not organizer.is_approved:
+        return redirect('pending_admin_review')
+
+    if request.method == 'POST':
+        # Update organizer profile logic here
+        organizer.name = request.POST.get('name')
+        organizer.email = request.POST.get('email')
+        organizer.save()
+        return redirect('organizerdashboard')
+
+    return render(request, 'edit_profile.html', {'organizer': organizer})
+
+
+
+
+
+
+
+
+
+
+
+
+def organizer_signup(request):
+    if request.method == "POST":
+        name = request.POST.get("name")
+        email = request.POST.get("email")
+        password = request.POST.get("password")
+
+        if User.objects.filter(email=email).exists():
+            messages.error(request, "Email already registered.")
+            return redirect("organizer_signup")
+
+        # role 1 = Organizer, status 0 = Pending approval
+        user = User.objects.create_user(
+            email=email,
+            username=email,  # keep username = email
+            name=name,
+            password=password,
+            role=1,
+            status=0  # pending approval
+        )
+        user.save()
+
+        messages.success(request, "Organizer account created! Waiting for admin approval.")
+        return redirect("organizer_login")
+
+    return render(request, "organizer_signup.html")
+
+# def organizer_login(request):
+#     if request.method == "POST":
+#         email = request.POST.get("email")
+#         password = request.POST.get("password")
+
+#         user = authenticate(request, username=email, password=password)
+
+#         if user is not None and user.role == 1:
+#             if user.status == 1:
+#                 login(request, user)
+#                 return redirect("organizerdashboard")
+#             else:
+#                 messages.info(request, "Your account is pending admin approval.")
+#                 return render(request, "organizer-pending.html", {"email": email})
+#         else:
+#             messages.error(request, "Invalid organizer credentials.")
+#             return redirect("organizerlogin")
+#     return render(request, "organizerlogin.html")
+
+
+
+def organizer_login(request):
+    if request.method == "POST":
+        email = request.POST.get("email")
+        password = request.POST.get("password")
+
+        user = authenticate(request, username=email, password=password)
+
+        if user is not None and user.role == 1:
+            if user.status == 1:  # Approved organizer
+                login(request, user)
+                return redirect("organizerdashboard")
+            else:
+                return render(request, "organizer-pending.html", {"email": user.email})
+        else:
+            messages.error(request, "Invalid organizer credentials.")
+            return redirect("organizerlogin")
+    return render(request, "organizerlogin.html")
+
+
+
+
+
+
 
 def signup_view(request):
     if request.method == 'POST':
@@ -75,8 +217,56 @@ def student_dashboard(request):
     # return render(request, 'student_profile.html')
     return render(request, 'studentdashboard.html')
 
+@login_required
+# def organizer_dashboard(request):
+#     return render(request, 'organizerdashboard.html')
+# @login_required
+# def organizer_dashboard(request):
+#     user = request.user
+
+#     # Only organizers can access
+#     if user.role != 1:
+#         messages.error(request, "Access denied: organizers only.")
+#         return redirect("loginindex")
+
+#     # Handle creating new events
+#     if request.method == 'POST':
+#         form = EventForm(request.POST)
+#         if form.is_valid():
+#             event = form.save(commit=False)
+#             event.organizer = user
+#             event.status = 'pending'
+#             event.save()
+#             messages.success(request, "Event created successfully!")
+#             return redirect('organizerdashboard')
+#         else:
+#             print("❌ Form errors:", form.errors)
+#     else:
+#         form = EventForm()
+
+    # approved_events = Event.objects.filter(organizer=user, status='approved')
+    # pending_events = Event.objects.filter(organizer=user, status='pending')
+    # rejected_events = Event.objects.filter(organizer=user, status='rejected')
+
+    # return render(request, 'organizerdashboard.html', {
+    #     'form': form,
+    #     'approved_events': approved_events,
+    #     'pending_events': pending_events,
+    #     'rejected_events': rejected_events
+    # })
+
+# Organizer dashboard view
+def organizer_dashboard(request):
+    if request.user.role != 1:
+        return redirect('some-appropriate-page')  # only organizers allowed
+
+    organizer = request.user  # logged-in user
+    events = organizer.organized_events.all()  # get their events
+    return render(request, 'organizerdashboard.html', {'organizer': organizer, 'events': events})
 
 
+
+# for student
 @login_required
 def update_profile(request):
     user = request.user  # currently logged-in user
@@ -94,6 +284,7 @@ def update_profile(request):
 
 
 
+# for student
 @login_required 
 def update_password(request):
     if request.method == "POST":

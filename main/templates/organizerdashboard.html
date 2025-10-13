@@ -1,3 +1,4 @@
+{% comment %} main/templates/organizerdashboard.html {% endcomment %}
 {% load static %}
 <!DOCTYPE html>
 <html lang="en">
@@ -5,8 +6,15 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Organizer Dashboard</title>
-  <link rel="stylesheet" href="{% static 'organizerdashboard.css' %}">
+  <header>
+    <title>Organizer Dashboard</title>
+    {% comment %} <a href="{% url 'edit_profile' %}">Edit Profile</a> {% endcomment %}
+
+
+    <a href="{% url 'update_organizer_profile' %}" class="btn-edit-profile">Edit Profile</a>
+  </header>
+
+  <link rel="stylesheet" href="{% static 'css/organizerdashboard.css' %}">
   <style>
     .error {
       color: red;

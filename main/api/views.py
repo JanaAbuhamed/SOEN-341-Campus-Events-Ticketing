@@ -227,7 +227,7 @@ def signup(request):
             if role == 'student':
                 return redirect('studentdashboard')
             else:
-                return redirect('organizerpending')
+                return redirect('organizer-pending')
     else:
         form = StudentSignupForm()
     
@@ -245,6 +245,7 @@ def studentlogin(request):
             return redirect('studentdashboard')
         else:
             return render(request, "studentlogin.html", {'error': 'Invalid credentials or not a student account'})
+
     
     return render(request, "studentlogin.html")
 
@@ -262,7 +263,7 @@ def organizerlogin(request):
             else:
                 return render(request, "organizerlogin.html", {'error': 'Organizer account pending approval'})
         else:
-            return render(request, "organizerpending.html")
+            return render(request, "organizer-pending.html")
     
     return render(request, "organizerlogin.html")
 
