@@ -1,4 +1,6 @@
-"*.pyc" 
+# Python bytecode
 *.pyc
 __pycache__/
+
+# Virtual environment
 venv/
