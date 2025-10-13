@@ -1,6 +1,6 @@
 pymysql
 
-mysqlclient
+
 django
 djangorestframework
 djangorestframework-simplejwt
