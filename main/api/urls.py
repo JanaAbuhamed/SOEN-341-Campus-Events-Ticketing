@@ -1,8 +1,12 @@
 from django.urls import path
 from . import views
 from .views import UserViewSet, EventViewSet
+from rest_framework.routers import DefaultRouter
 from .views import UserViewSet, EventViewSet
 
+router = DefaultRouter()
+router.register(r'users', UserViewSet, basename='user')
+router.register(r'events', EventViewSet, basename='event')
 
 user_list = UserViewSet.as_view({
     'get': 'list',
