@@ -20,20 +20,45 @@ from .models import User
 
 
 
+# @login_required
+# def update_organizer_profile(request): # ensure only organizers can access
+#     user = request.user
+
+#     if request.method == 'POST':
+#         form = UserUpdateForm(request.POST, instance=user)
+#         if form.is_valid():
+#             form.save()
+#             messages.success(request, "Your profile has been updated successfully!")
+#             return redirect('organizer_dashboard')  # or student_dashboard
+#     else:
+#         form = UserUpdateForm(instance=user)
+
+#     return render(request, 'update_organizer_profile.html', {'form': form})
+
+
 @login_required
-def update_organizer_profile(request): # ensure only organizers can access
+def update_organizer_profile(request):
     user = request.user
+
+    if user.role != 1:  # ensure only organizers access
+        messages.error(request, "Access denied: organizers only.")
+        return redirect("loginindex")
 
     if request.method == 'POST':
         form = UserUpdateForm(request.POST, instance=user)
         if form.is_valid():
             form.save()
             messages.success(request, "Your profile has been updated successfully!")
-            return redirect('organizer_dashboard')  # or student_dashboard
+            return redirect('organizerdashboard')
     else:
         form = UserUpdateForm(instance=user)
 
     return render(request, 'update_organizer_profile.html', {'form': form})
+
+
+
+
+
 
 def organizer_signup(request):
     if request.method == "POST":
@@ -66,20 +91,20 @@ def organizer_login(request):
         email = request.POST.get("email")
         password = request.POST.get("password")
 
-        user = authenticate(request, username=email, password=password)  # username = email
+        user = authenticate(request, username=email, password=password)
 
-        if user is not None and getattr(user, "role", None) == 1:
-            if user.status == 1:  # active
+        if user is not None and user.role == 1:
+            if user.status == 1:
                 login(request, user)
-                return redirect("organizer_dashboard")
-            else:  # pending
+                return redirect("organizerdashboard")
+            else:
                 messages.info(request, "Your account is pending admin approval.")
-                return render(request, "organizer_pending.html", {"email": email})
+                return render(request, "organizer-pending.html", {"email": email})
         else:
             messages.error(request, "Invalid organizer credentials.")
-            return redirect("organizer_login")
-
+            return redirect("organizerlogin")
     return render(request, "organizerlogin.html")
+
 
 
 
@@ -147,8 +172,42 @@ def student_dashboard(request):
     return render(request, 'studentdashboard.html')
 
 @login_required
+# def organizer_dashboard(request):
+#     return render(request, 'organizerdashboard.html')
+@login_required
 def organizer_dashboard(request):
-    return render(request, 'organizerdashboard.html')
+    user = request.user
+
+    # Only organizers can access
+    if user.role != 1:
+        messages.error(request, "Access denied: organizers only.")
+        return redirect("loginindex")
+
+    # Handle creating new events
+    if request.method == 'POST':
+        form = EventForm(request.POST)
+        if form.is_valid():
+            event = form.save(commit=False)
+            event.organizer = user
+            event.status = 'pending'
+            event.save()
+            messages.success(request, "Event created successfully!")
+            return redirect('organizerdashboard')
+        else:
+            print("❌ Form errors:", form.errors)
+    else:
+        form = EventForm()
+
+    approved_events = Event.objects.filter(organizer=user, status='approved')
+    pending_events = Event.objects.filter(organizer=user, status='pending')
+    rejected_events = Event.objects.filter(organizer=user, status='rejected')
+
+    return render(request, 'organizerdashboard.html', {
+        'form': form,
+        'approved_events': approved_events,
+        'pending_events': pending_events,
+        'rejected_events': rejected_events
+    })
 
 
 # for student

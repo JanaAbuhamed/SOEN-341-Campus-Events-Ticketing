@@ -1,12 +1,21 @@
+# main/urls.py
 
 from django.urls import path
-from .views import organizer_dashboard as organizer_dashboard_view
+# from .views import organizer_dashboard as organizer_dashboard_view
+from .views import organizer_dashboard, update_organizer_profile
 from . import views
+# from main.api.views import (
+#     loginindex, signup, studentlogin, organizerlogin, adminlogin,
+#     studentdashboard, organizerdashboard, admindashboard, 
+#     EventList, organizerpending,update_profile,update_password
+# )
+
 from main.api.views import (
     loginindex, signup, studentlogin, organizerlogin, adminlogin,
-    studentdashboard, organizerdashboard, admindashboard, 
-    EventList, organizerpending,update_profile,update_password
+    studentdashboard, admindashboard, 
+    EventList, organizerpending, update_profile, update_password
 )
+
 
 urlpatterns = [
     path("", loginindex, name="loginindex"),                   
@@ -15,7 +24,12 @@ urlpatterns = [
     path("organizerlogin/", organizerlogin, name="organizerlogin"),
     path("adminlogin/", adminlogin, name="adminlogin"),
     path("studentdashboard/", studentdashboard, name="studentdashboard"),
-    path("organizerdashboard/", organizer_dashboard_view, name="organizerdashboard"),
+
+    # path("organizerdashboard/", organizer_dashboard_view, name="organizerdashboard"),
+    
+    path("organizerdashboard/", organizer_dashboard, name="organizerdashboard"),
+    path("update-organizer-profile/", update_organizer_profile, name="update_organizer_profile"),
+
     path('edit-event/<int:event_id>/', views.edit_event, name='edit-event'),
     path('delete-event/<int:event_id>/', views.delete_event, name='delete-event'),
     path("admindashboard/", admindashboard, name="admindashboard"),
