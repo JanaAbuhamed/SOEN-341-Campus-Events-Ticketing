@@ -27,7 +27,8 @@ class UserViewSet(viewsets.ViewSet):
     # Optional dummy data for demo/testing
     DUMMY_USERS = [
         {"user_id": 1, "name": "Jana", "email": "jana@example.com", "role": 0, "status": 1},
-        {"user_id": 2, "name": "Ali", "email": "ali@example.com", "role": 1, "status": 0},
+        {"user_id": 2, "name": "Alib", "email": "ali@example.com", "role": 1, "status": 0},
+        {"user_id": 3, "name": "Charlie", "email": "charlie@example.com", "role": 0, "status": 1},
     ]
 
     def get_permissions(self):
@@ -68,12 +69,18 @@ class UserViewSet(viewsets.ViewSet):
         return Response(user)
 
     def destroy(self, request, pk=None):
-        """Delete a dummy user."""
-        user = next((u for u in self.DUMMY_USERS if u["user_id"] == int(pk)), None)
+        """Delete a user (called via DELETE /api/users/<pk>/)"""
+        # Find the user in the class-level DUMMY_USERS
+        user = next((u for u in UserViewSet.DUMMY_USERS if u["user_id"] == int(pk)), None)
         if not user:
-            return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
-        self.DUMMY_USERS = [u for u in self.DUMMY_USERS if u["user_id"] != int(pk)]
-        return Response(status=status.HTTP_204_NO_CONTENT)
+            return Response({"error": "User not found"}, status=404)
+
+        # Remove the user from the class variable
+        UserViewSet.DUMMY_USERS = [u for u in UserViewSet.DUMMY_USERS if u["user_id"] != int(pk)]
+
+        # Return HTTP 204 (No Content) to indicate deletion
+        return Response(status=204)
+
 
 #EVENT VIEWS
 
