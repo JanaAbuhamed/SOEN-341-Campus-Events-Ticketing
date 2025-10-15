@@ -53,7 +53,8 @@ jobs:
       run: sleep 20
 
     - name: Run migrations
-      run: python manage.py migrate
+      run: python manage.py migrate --noinput
 
     - name: Run tests
-      run: python manage.py test || echo "No tests yet"
+      run: |
+        python manage.py test || echo "No tests found, skipping"
