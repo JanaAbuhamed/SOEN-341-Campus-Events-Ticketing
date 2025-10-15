@@ -10,6 +10,31 @@ jobs:
   test:
     runs-on: ubuntu-latest
 
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_DATABASE: student_event
+          MYSQL_USER: campus_event
+          MYSQL_PASSWORD: campus_event
+          MYSQL_ROOT_PASSWORD: root
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h localhost"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=3
+
+    env:
+      DB_NAME: student_event
+      DB_USER: campus_event
+      DB_PASSWORD: campus_event
+      DB_HOST: 127.0.0.1
+      DB_PORT: 3306
+      SECRET_KEY: dummykey
+      DEBUG: True
+
     steps:
     - name: Checkout code
       uses: actions/checkout@v3
@@ -24,6 +49,11 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
 
-    - name: Run Django tests
-      run: |
-        python manage.py test || echo "No tests yet"
+    - name: Wait for MySQL to be ready
+      run: sleep 20
+
+    - name: Run migrations
+      run: python manage.py migrate
+
+    - name: Run tests
+      run: python manage.py test || echo "No tests yet"
