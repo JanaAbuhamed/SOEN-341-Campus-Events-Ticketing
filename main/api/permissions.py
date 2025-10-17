@@ -2,7 +2,9 @@ from rest_framework import permissions
 
 class CanViewEvents(permissions.BasePermission):
     def has_permission(self, request, view):
-        return request.user.has_perm('main.can_view_events')
+        # Allow all authenticated users (students, organizers, admins)
+        return request.user.is_authenticated
+
 
 class CanCreateEvent(permissions.BasePermission):
     def has_permission(self, request, view):

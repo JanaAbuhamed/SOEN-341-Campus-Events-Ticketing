@@ -50,6 +50,16 @@ function renderCalendar() {
     }
 
     daysEl.appendChild(div);
+    // Highlight days that have events
+const dateString = `${year}-${String(month + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
+
+events.forEach(event => {
+  if (event.date === dateString) {
+    div.classList.add("event-day");  // add CSS style
+    div.title = `${event.title} (${event.time})`;  // tooltip
+  }
+});
+
   }
 
   // Add next month's starting days

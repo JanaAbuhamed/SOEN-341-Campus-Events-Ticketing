@@ -94,7 +94,8 @@ class EventViewSet(viewsets.ViewSet):
         elif self.action == 'destroy':
             permission_classes = [CanDeleteEvent]
         elif self.action in ['register', 'unregister']:
-            permission_classes = [CanRegisterEvent]
+            permission_classes = [permissions.IsAuthenticated]
+
         else:
             permission_classes = [permissions.IsAuthenticated]
         return [perm() for perm in permission_classes]

@@ -33,7 +33,7 @@ urlpatterns = [
     path('edit-event/<int:event_id>/', views.edit_event, name='edit-event'),
     path('delete-event/<int:event_id>/', views.delete_event, name='delete-event'),
     path("admindashboard/", admindashboard, name="admindashboard"),
-    path("eventlist/", EventList, name="EventList"),
+
     path("organizerpending/", organizerpending, name="organizerpending"),
 
        
@@ -42,7 +42,15 @@ urlpatterns = [
 
     
     path('organizer/edit-profile/', update_organizer_profile, name='update_organizer_profile'),
+    # Event list HTML and API
+    path('eventlist/', views.eventlist, name='eventlist'),
+    path('api/events/', views.eventlist_api, name='eventlist_api'),
+    # Event Registration API
+path('api/events/<int:event_id>/register/', views.register_event, name='register_event'),
+path('api/events/<int:event_id>/unregister/', views.unregister_event, name='unregister_event'),
 
+
+path("studentcalendar/", views.student_calendar, name="student_calendar"),
 
 
 
