@@ -1,63 +1,57 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Student Calendar</title>
-  <link rel="stylesheet" href="studentcalendar.css">
+
+  <link rel="stylesheet" href="{% static 'css/studentcalendar.css' %}">
 </head>
 <body>
 
+  <!-- Sidebar -->
   <div class="sidebar">
     <div class="sidebar-logo">
-      <img src="images/logo.jpg" alt="EventHub Logo">
+      <img src="{% static 'images/logo.jpg' %}" alt="EventHub Logo">
       <h2>Event Hub</h2>
     </div>
     <ul class="sidebar-links">
-      <li><a href="home.html">Home</a></li>
-      <li><a href="student_profile.html" >Profile</a></li>
-      <li><a href="upcomingevents.html">Upcoming Events</a></li>
-      <li><a href="studentcalendar.html" class="active">Student Calendar</a></li>
-      <li><a href="loginindex.html" class="logout">Log Out</a></li>
+      <li><a href="{% url 'eventlist' %}">Upcoming Events</a></li>
+      <li><a href="{% url 'student_profile' %}">Profile</a></li>
+      <li><a href="{% url 'studentdashboard' %}">My Tickets</a></li>
+      <li><a href="{% url 'studentcalendar' %}" class="active">Student Calendar</a></li>
+      <li><a href="{% url 'loginindex' %}" class="logout">Log Out</a></li>
     </ul>
   </div>
 
-
-
-  <body>
-    <div class="calendar-container">
-      <div class="calendar-card">
-        <!-- Header -->
-        <div class="calendar-header">
-          <button id="prev-month"><i class="fa-solid fa-chevron-left">←</i></button>
-          <div>
-            <h1 id="month" class="month-name">October</h1>
-            <p id="year" class="year">2025</p>
-          </div>
-          <button id="next-month"><i class="fa-solid fa-chevron-right">→</i></button>
+  <!-- Calendar Content -->
+  <div class="calendar-container">
+    <div class="calendar-card">
+      <div class="calendar-header">
+        <button id="prev-month">←</button>
+        <div>
+          <h1 id="month" class="month-name">October</h1>
+          <p id="year" class="year">2025</p>
         </div>
+        <button id="next-month">→</button>
+      </div>
 
-        <!-- Weekdays -->
-        <div class="calendar-weekdays">
-          <div>Sun</div>
-          <div>Mon</div>
-          <div>Tue</div>
-          <div>Wed</div>
-          <div>Thu</div>
-          <div>Fri</div>
-          <div>Sat</div>
-        </div>
+      <div class="calendar-weekdays">
+        <div>Sun</div><div>Mon</div><div>Tue</div>
+        <div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div>
+      </div>
 
-        <!-- Days -->
-        <div id="calendar-days" class="calendar-days"></div>
+      <div id="calendar-days" class="calendar-days"></div>
 
-        <!-- Footer -->
-        <div class="calendar-footer">
-          <p id="today-text">Today is October 11, 2025</p>
-        </div>
+      <div class="calendar-footer">
+        <p id="today-text"></p>
       </div>
     </div>
+  </div>
 
-    <script src="studentcalendar.js"></script>
-  </body>
+  <!-- Scripts -->
+  
+  <script src="{% static 'js/studentcalendar.js' %}"></script>
+</body>
 </html>

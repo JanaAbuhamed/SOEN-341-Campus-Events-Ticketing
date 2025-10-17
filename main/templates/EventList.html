@@ -1,11 +1,17 @@
+{% load static %}
 <!DOCTYPE html>
-<title>Event List</title>
 <html>
 <head>
-    <link rel="stylesheet" href="../static/css/EventList.css">
-    <script src="../static/js/EventList.js" defer></script>
-    <meta name="csrf-token" content="{{ csrf_token }}">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Event List</title>
+
+  <!-- Correct static linking -->
+  <link rel="stylesheet" href="{% static 'css/eventlist.css' %}">
+  <script src="{% static 'js/eventlist.js' %}" defer></script>
+
+  <meta name="csrf-token" content="{{ csrf_token }}">
 </head>
+
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <body>
 <h1><b>Welcome to the Event List</b></h1>

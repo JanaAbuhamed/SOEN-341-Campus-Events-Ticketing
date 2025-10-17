@@ -16,7 +16,10 @@ from main.models import User, Event
 # from django.contrib.auth.models import User
 
 from .forms import OrganizerUpdateForm
-from .models import User
+from .models import User, Event
+from django.http import JsonResponse
+
+
 
 
 
@@ -60,25 +63,38 @@ def update_organizer_profile(request):
 
 
 @login_required(login_url='organizerlogin')
-def edit_profile(request):
-    organizer = request.user.organizer  # assuming a OneToOne link from User to Organizer
-    if not organizer.is_approved:
-        return redirect('pending_admin_review')
+def organizer_dashboard(request):
+    user = request.user
+
+    # Only organizers can access
+    if user.role != 1:
+        messages.error(request, "Access denied: organizers only.")
+        return redirect("loginindex")
 
     if request.method == 'POST':
-        # Update organizer profile logic here
-        organizer.name = request.POST.get('name')
-        organizer.email = request.POST.get('email')
-        organizer.save()
-        return redirect('organizerdashboard')
+        form = EventForm(request.POST)
+        if form.is_valid():
+            event = form.save(commit=False)
+            event.organizer = user
+            event.status = 'pending'  # pending approval
+            event.save()
+            messages.success(request, "Event created successfully!")
+            return redirect('organizerdashboard')
+        else:
+            messages.error(request, "Error creating event. Please check form.")
+    else:
+        form = EventForm()
 
-    return render(request, 'edit_profile.html', {'organizer': organizer})
+    approved_events = Event.objects.filter(organizer=user, status='approved')
+    pending_events = Event.objects.filter(organizer=user, status='pending')
+    rejected_events = Event.objects.filter(organizer=user, status='rejected')
 
-
-
-
-
-
+    return render(request, 'organizerdashboard.html', {
+        'form': form,
+        'approved_events': approved_events,
+        'pending_events': pending_events,
+        'rejected_events': rejected_events
+    })
 
 
 
@@ -214,8 +230,32 @@ def student_profile(request):
 
 @login_required
 def student_dashboard(request):
-    # return render(request, 'student_profile.html')
-    return render(request, 'studentdashboard.html')
+    user = request.user
+
+    # Show only events this student registered for
+    registered_events = Event.objects.filter(attendees=user)
+
+    event_data = [
+        {
+            "title": e.title,
+            "date": str(e.date),
+            "time": str(e.time),
+            "location": e.location,
+            "ticket_type": e.ticket_type,
+            "capacity": e.capacity,
+            "organizer": e.organizer.name,
+        }
+        for e in registered_events
+    ]
+
+    return render(request, "studentdashboard.html", {'events': event_data})
+
+
+    event_data = [
+        {"title": e.title, "date": str(e.date), "time": str(e.time), "location": e.location}
+        for e in events
+    ]
+    return render(request, 'studentdashboard.html', {'events': event_data})
 
 @login_required
 # def organizer_dashboard(request):
@@ -319,31 +359,79 @@ def delete_event(request, event_id):
     event.delete()
     return redirect('organizerdashboard')
 
-def organizer_dashboard(request):
-    organizer = User.objects.get(email="org1@mail.com")
 
-    if request.method == 'POST':
-        print("📩 POST received:", request.POST)  # ✅ Add this line
-        form = EventForm(request.POST)
-        if form.is_valid():
-            event = form.save(commit=False)
-            event.organizer = organizer
-            event.status = 'pending'
+@login_required(login_url='studentlogin')
+def eventlist(request):
+    events = Event.objects.filter(status='approved')
+    return render(request, 'eventlist.html', {'events': events})
+
+from django.http import JsonResponse
+
+def eventlist_api(request):
+    """Return approved events as JSON."""
+    events = list(Event.objects.filter(status='approved').values(
+        'id', 'title', 'description', 'date', 'time', 'location',
+        'capacity', 'ticket_type', 'status',
+        'organizer__name'
+    ))
+    return JsonResponse(events, safe=False)
+
+@login_required(login_url='studentlogin')
+def student_calendar(request):
+    """Display a calendar of the student's registered or available events."""
+    user = request.user
+
+    # For now: show all approved events
+    events = Event.objects.filter(status='approved')
+
+    event_data = [
+        {
+            "title": e.title,
+            "start": f"{e.date}T{e.time}",
+            "location": e.location,
+        }
+        for e in events
+    ]
+
+    return render(request, "studentcalendar.html", {"events": event_data})
+
+from django.views.decorators.csrf import csrf_exempt
+
+@login_required(login_url='studentlogin')
+@csrf_exempt
+def register_event(request, event_id):
+    """Registers the current student for a specific event."""
+    if request.method == "POST":
+        try:
+            event = Event.objects.get(id=event_id)
+
+            # Check if already registered
+            if request.user in event.attendees.all():
+                return JsonResponse({"message": "Already registered for this event."}, status=400)
+
+            # Register student
+            event.attendees.add(request.user)
             event.save()
-            print("✅ Event created:", event)
-            return redirect('organizerdashboard')
-        else:
-            print("❌ Form errors:", form.errors)
-    else:
-        form = EventForm()
 
-    approved_events = Event.objects.filter(organizer=organizer, status='approved')
-    pending_events = Event.objects.filter(organizer=organizer, status='pending')
-    rejected_events = Event.objects.filter(organizer=organizer, status='rejected')
+            return JsonResponse({"message": f"Successfully registered for {event.title}!"}, status=200)
+        except Event.DoesNotExist:
+            return JsonResponse({"message": "Event not found."}, status=404)
+        except Exception as e:
+            print("❌ Register error:", e)
+            return JsonResponse({"message": "Error registering for event"}, status=400)
+    return JsonResponse({"message": "Invalid request"}, status=405)
 
-    return render(request, 'organizerdashboard.html', {
-        'form': form,
-        'approved_events': approved_events,
-        'pending_events': pending_events,
-        'rejected_events': rejected_events
-    })
+@login_required(login_url='studentlogin')
+@csrf_exempt
+def unregister_event(request, event_id):
+    """Unregisters the current student from a specific event."""
+    if request.method == "POST":
+        try:
+            event = Event.objects.get(id=event_id)
+            return JsonResponse({"message": f"Unregistered from {event.title}."}, status=200)
+        except Event.DoesNotExist:
+            return JsonResponse({"message": "Event not found."}, status=404)
+        except Exception as e:
+            print("❌ Unregister error:", e)
+            return JsonResponse({"message": "Error unregistering from event"}, status=400)
+    return JsonResponse({"message": "Invalid request"}, status=405)

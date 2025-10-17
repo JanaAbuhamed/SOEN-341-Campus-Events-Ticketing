@@ -19,7 +19,7 @@ import os
 
 
 # main/student_event/settings.py
-LOGIN_URL = 'login'  # this should match the name of your login view
+LOGIN_URL = '/studentlogin/'  # this should match the name of your login view
 LOGIN_REDIRECT_URL = 'student_dashboard'  # where to go after login
 
 AUTH_USER_MODEL = 'main.User'
@@ -38,7 +38,7 @@ SECRET_KEY = 'django-insecure-c02l$+ss##*v!1r8tvy93yv4$va0ht6%tx*9n@rkw7$-&rkh0j
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
 
 
 STATICFILES_DIRS = [
@@ -164,7 +164,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
@@ -173,3 +173,9 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # tells Django which model to use for authentication (logins, passwords, sessions, etc.).
 AUTH_USER_MODEL = 'main.User'
+
+import os
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'main', 'static'),
+]
+DEBUG = True

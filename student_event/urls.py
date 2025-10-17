@@ -20,8 +20,12 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include('main.api.urls')),  # <-- points to urls.py inside main/api
     path('', include('main.urls')),  # make sure this includes app URLs
+
+path('api/events/', include('main.urls')),
+
 ]
