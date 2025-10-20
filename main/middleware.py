@@ -1,3 +1,4 @@
+
 # main/middleware.py
 from django.http import JsonResponse
 from django.shortcuts import redirect
@@ -60,3 +61,7 @@ class RoleAuthorizationMiddleware:
                 return redirect('loginindex')
         
         return None
+
+
+
+

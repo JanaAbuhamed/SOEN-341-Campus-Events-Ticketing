@@ -1,129 +1,242 @@
-/* General styling */
-body {
-    margin: 0;
-    padding: 0;
-    background: linear-gradient(135deg, #7b2ff7, #f107a3);
-    font-family: Arial, sans-serif;
-    min-height: 100vh;
+
+/* ===== Admin Dashboard – centered & aligned ===== */
+
+:root{
+  --page-max: 1100px;
+  --g1: #7b2ff7;
+  --g2: #f107a3;
+  --ink: #111827;
+  --muted: #6b7280;
+  --border: #e5e7eb;
+  --card: #ffffff;
+  --shadow: 0 10px 30px rgba(0,0,0,.08);
+  --radius: 16px;
 }
 
-h1 {
-    text-align: center;
-    margin-top: 20px;
-    font-size: 50px;
-    color: white;
+* { box-sizing: border-box; }
+
+html, body { height: 100%; }
+
+body{
+  margin: 0;
+  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans";
+  color: var(--ink);
+  background: radial-gradient(1100px 600px at 50% -10%, rgba(255,255,255,.25), transparent 60%),
+              linear-gradient(135deg, var(--g1), var(--g2));
+  background-attachment: fixed;
 }
 
-/* Tabs */
-.tabs {
-    display: flex;
-    gap: 10px;
-    margin: 20px auto;
-    justify-content: center;
+/* ---------- Page shell ---------- */
+h1{
+  text-align: center;
+  color: #fff;
+  margin: 40px 0 18px;
+  font-size: clamp(28px, 4.2vw, 42px);
+  line-height: 1.2;
+  letter-spacing: .3px;
 }
 
-.tab-btn {
-    padding: 8px 16px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    background-color: #eee;
-    font-weight: bold;
+/* A single centered container that everything uses */
+.tab-container{
+  max-width: var(--page-max);
+  margin: 0 auto 60px;
+  padding: 0 18px;
 }
 
-.tab-btn.active {
-    background-color: #7b2ff7;
-    color: white;
+/* Tabs centered */
+.tabs{
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin: 6px 0 18px;
+}
+.tab-btn{
+  background: rgba(255,255,255,.16);
+  color: #fff;
+  border: 1px solid rgba(255,255,255,.25);
+  padding: 8px 14px;
+  border-radius: 999px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform .05s ease, background .2s ease;
+}
+.tab-btn:hover{ transform: translateY(-1px); }
+.tab-btn.active{
+  background: #ffffff;
+  color: var(--ink);
+  border-color: #fff;
 }
 
-/* Tab content */
-.tab-content {
-    display: none;
+/* Actions bar centered within the same grid, buttons aligned right */
+.actions-bar{
+  max-width: var(--page-max);
+  margin: 0 auto 18px;
+  padding: 0 18px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
 }
 
-.tab-content.active {
-    display: block;
+/* Pills (Create User / Create Event) */
+.pill-btn{
+  background: #5b6cff;
+  color: #fff;
+  border: none;
+  border-radius: 999px;
+  padding: 10px 16px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: var(--shadow);
+}
+.pill-btn.secondary{ background:#7b5cff; }
+.pill-btn:disabled{ opacity:.6; cursor:not-allowed; }
+
+/* Optional bulk bars shown by JS */
+.bulkbar{
+  display:none; align-items:center; gap:10px;
+  background:#f8fafc; border:1px solid var(--border);
+  border-radius:10px; padding:8px 10px;
+}
+.bulkbar.show{ display:flex; }
+
+/* ---------- Cards / tables ---------- */
+.table-card{
+  background: var(--card);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  margin: 0 auto 26px;
+}
+.table-card h2{
+  margin: 0;
+  padding: 16px 18px;
+  border-bottom: 1px solid var(--border);
+  font-size: 20px;
 }
 
-/* Table cards */
-.table-card {
-    background-color: #fff;
-    border-radius: 8px;
-    padding: 20px;
-    max-width: 1000px;
-    margin: 20px auto;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+.search-container{
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 18px 8px;
+}
+.search-container label{
+  color: var(--muted);
+  font-weight: 600;
+}
+.table-search{
+  flex: 1;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 10px 12px;
+  outline: none;
 }
 
-/* Search inputs */
-.table-search {
-    padding: 8px 12px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    font-size: 1rem;
-    width: 100%;
-    max-width: 500px;
+/* Table */
+.filterable-table{
+  width: 100%;
+  border-collapse: collapse;
+}
+.filterable-table thead th{
+  text-align: left;
+  background: #f9fafb;
+  border-bottom: 1px solid var(--border);
+  color: #374151;
+  padding: 12px 18px;
+  font-weight: 700;
+}
+.filterable-table tbody td{
+  padding: 12px 18px;
+  border-bottom: 1px solid var(--border);
+}
+.filterable-table tbody tr:hover{ background: #fbfdff; }
+.filterable-table tbody tr.selected{ background-color: #d0e7ff; }
+
+/* tiny buttons in table */
+.btn-mini{
+  border-radius:999px; border:1px solid #d1d5db; background:#fff;
+  padding:6px 12px; font-weight:700; cursor:pointer;
+}
+.btn-mini.link{ color:#2563eb; border-color:#bfdbfe; }
+.btn-mini.danger{ color:#b91c1c; border-color:#fca5a5; }
+
+/* badges */
+.badge{
+  display:inline-block; padding:4px 10px; border-radius:999px;
+  font-weight:700; font-size:.85rem; white-space:nowrap;
+}
+.badge-approved{ background:#e9f5ff; color:#2563eb; }
+.badge-pending{  background:#fff7ed; color:#c2410c; }
+.badge-rejected{ background:#fee2e2; color:#b91c1c; }
+.badge-active{   background:#e8fff3; color:#047857; }
+.badge-suspended{background:#ffe4e6; color:#be123c; }
+
+/* checkbox col width */
+th.chk, td.chk{ width: 28px; }
+input[type="checkbox"]{ transform: scale(1.1); }
+
+/* ---------- Overlays / Modals ---------- */
+.modal{
+  position: fixed; inset: 0;
+  display: none;
+  align-items: center; justify-content: center;
+  background: rgba(17,24,39,.40);
+  z-index: 1000;
+  padding: 24px;
+}
+.modal.show{ display: flex; }
+
+.modal-card{
+  width: min(900px, 92vw);
+  max-height: 92vh;
+  overflow: auto;
+  background: #fff;
+  border-radius: 18px;
+  box-shadow: 0 40px 90px rgba(0,0,0,.35);
+  margin: 0 auto; /* keeps the card perfectly centered */
+}
+.modal-head{
+  display:flex; align-items:center; justify-content:space-between;
+  padding: 16px 20px; border-bottom:1px solid var(--border);
+}
+.modal-body{ padding: 20px; }
+.modal-close{ border:none; background:transparent; font-size:22px; cursor:pointer; }
+
+/* Form grid inside modals */
+.grid-2{ display:grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.field{ display:flex; flex-direction:column; gap:6px; }
+.field input, .field select, .field textarea{
+  border:1px solid var(--border);
+  border-radius:12px;
+  padding:10px 12px;
+  width:100%;
+  font-size:14px;
+  outline:none;
+}
+.submit-row{ display:flex; justify-content:flex-end; margin-top:12px; }
+
+/* Content overlay (if you use #contentOverlay/#contentPanel anywhere) */
+#contentOverlay{
+  display:none; position:fixed; inset:0;
+  background: rgba(0,0,0,.5); z-index:1000;
+  justify-content:center; align-items:center; padding:24px;
+}
+#contentPanel{
+  background:#fff; padding:20px; border-radius:12px;
+  max-width: 600px; width: min(600px, 92vw);
+  max-height: 80vh; overflow:auto; position:relative;
+  box-shadow: var(--shadow);
+}
+#contentPanel .close-btn{
+  position:absolute; top:10px; right:15px;
+  background:none; border:none; font-size:1.2rem; cursor:pointer;
 }
 
-/* Table styling */
-.filterable-table {
-    width: 100%;
-    margin: 20px auto;
-    border-collapse: collapse;
+/* Small screens */
+@media (max-width: 720px){
+  .grid-2{ grid-template-columns: 1fr; }
+  .actions-bar{ justify-content: center; }
+  .modal-card{ width: 96vw; }
 }
 
-.filterable-table thead th {
-    padding: 12px 4px;
-    background-color: #f2f2f2;
-    border-bottom: 2px solid #ccc;
-    text-align: left;
-    font-weight: 600;
-}
 
-.filterable-table tbody td {
-    padding: 12px 4px;
-    border-bottom: 1px solid #ddd;
-}
-
-.filterable-table tbody tr:hover {
-    background-color: #f9f9f9;
-}
-
-.filterable-table tbody tr.selected {
-    background-color: #d0e7ff;
-}
-
-/* Overlay styling */
-#contentOverlay {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0,0,0,0.5);
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-}
-
-#contentPanel {
-    background-color: #fff;
-    padding: 20px;
-    border-radius: 8px;
-    max-width: 600px;
-    width: 90%;
-    max-height: 80%;
-    overflow-y: auto;
-    position: relative;
-}
-
-#contentPanel .close-btn {
-    position: absolute;
-    top: 10px;
-    right: 15px;
-    background: none;
-    border: none;
-    font-size: 1.2rem;
-    cursor: pointer;
-}

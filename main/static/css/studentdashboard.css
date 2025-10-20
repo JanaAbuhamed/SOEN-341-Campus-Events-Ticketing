@@ -1,23 +1,161 @@
-body{margin:0;min-height:100vh;background:linear-gradient(135deg,#7b2ff7,#f107a3);font-family:Arial,sans-serif;color:#333}
-.tickets-wrap{max-width:1100px;margin:0 auto 60px;padding:20px}
-.toolbar{display:flex;gap:10px;justify-content:flex-end;margin-bottom:16px}
-.btn{padding:10px 16px;border:none;border-radius:8px;background:#d4acdb;color:#fff;font-weight:600;cursor:pointer;transition:.2s;text-decoration:none;display:inline-block}
-.btn:hover{background:#977191}
-.btn.secondary{background:#888}.btn.secondary:hover{background:#666}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px}
-.card{background:#fff;border-radius:14px;padding:16px;box-shadow:0 10px 25px rgba(0,0,0,.08);display:flex;flex-direction:column;gap:10px}
-.card h4{margin:0 0 6px}
-.meta{color:#666;font-size:.9rem}
-.tag{display:inline-block;padding:4px 8px;background:#f1f1f1;border-radius:999px;font-size:.8rem;color:#555}
-.qr{width:140px;height:140px;align-self:center}
-.card-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:8px}
-.empty{background:#fff;border-radius:14px;padding:40px 20px;text-align:center;box-shadow:0 10px 25px rgba(0,0,0,.08)}
-.empty img{width:90px;opacity:.8}
-.hidden{display:none}
-/* dialog */
-#qrDialog{border:none;padding:0;width:min(92%,540px);background:transparent}
-#qrDialog::backdrop{background:rgba(0,0,0,.5)}
-.dialog-body{background:#fff;border-radius:12px;padding:20px;box-shadow:0 10px 30px rgba(0,0,0,.2);position:relative;text-align:center}
-.close{position:absolute;right:10px;top:8px;background:none;border:none;font-size:28px;cursor:pointer}
-.qr-large{width:260px;height:260px;margin:14px auto;display:flex;align-items:center;justify-content:center}
-.modal-actions{display:flex;justify-content:center;gap:10px}
+/* ===== PAGE LAYOUT ===== */
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #7b2ff7, #f107a3);
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+  color: #333;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start; /* Header at top, content centered below */
+  overflow-x: hidden;
+  animation: fadeIn 0.8s ease-out;
+}
+
+/* ===== PAGE TITLE ===== */
+h1 {
+  color: #fff;
+  font-size: 2.4rem;
+  font-weight: 700;
+  text-align: center;
+  margin: 50px 0 20px;
+  letter-spacing: 0.5px;
+  animation: slideDown 0.8s ease-out;
+}
+
+/* ===== MAIN CONTAINER ===== */
+.tickets-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+
+  width: 100%;
+  max-width: 1100px;
+  padding: 0 20px 60px;
+  box-sizing: border-box;
+  animation: fadeIn 1s ease-out;
+}
+
+/* ===== NAVIGATION BUTTONS ===== */
+.toolbar {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+
+.btn {
+  padding: 10px 18px;
+  border: none;
+  border-radius: 999px;
+  background: #6b5cff;
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.25s;
+  text-decoration: none;
+  display: inline-block;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+}
+.btn:hover {
+  filter: brightness(1.1);
+  transform: translateY(-1px);
+}
+.btn.secondary {
+  background: #8f8aa9;
+}
+
+/* ===== TICKETS GRID ===== */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 24px;
+  justify-content: center;
+  align-items: start;
+  width: 100%;
+  max-width: 1000px;
+}
+
+/* ===== TICKET CARD ===== */
+.card {
+  background: #fff;
+  border-radius: 18px;
+  padding: 22px;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow: hidden;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.18);
+}
+
+.card h4 {
+  margin: 0 0 10px;
+  font-size: 1.15rem;
+  color: #222;
+}
+
+.meta {
+  color: #555;
+  font-size: 0.95rem;
+  margin: 2px 0;
+}
+
+/* ===== QR CODE AREA ===== */
+.qr {
+  margin-top: 12px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.qr-box {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.qr-box canvas,
+.qr-box img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* ===== DOWNLOAD BUTTON ===== */
+.card-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  margin-top: 12px;
+}
+
+/* ===== EMPTY STATE ===== */
+.empty {
+  background: #fff;
+  border-radius: 16px;
+  padding: 34px 20px;
+  text-align: center;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.1);
+  max-width: 540px;
+  margin: 26px auto;
+}
+.hidden {
+  display: none;
+}
+
+/* ===== ANIMATIONS ===== */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-20px); }
+  to { opacity: 1; transform: translateY(0); }
+}

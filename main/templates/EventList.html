@@ -1,49 +1,137 @@
+{% load static %}
 <!DOCTYPE html>
-<title>Event List</title>
-<html>
+<html lang="en">
 <head>
-    <link rel="stylesheet" href="../static/css/EventList.css">
-    <script src="../static/js/EventList.js" defer></script>
-    <meta name="csrf-token" content="{{ csrf_token }}">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Event Finder</title>
+
+  <style>
+    :root{
+      --grad-start:#7b5cff;
+      --grad-end:#ff3cac;
+      --primary:#5c5cff;
+      --primary-hover:#6a6aff;
+      --chip-bg:rgba(255,255,255,0.22);
+      --chip-hover:rgba(255,255,255,0.36);
+    }
+
+    body{
+      margin:0;
+      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      background:linear-gradient(135deg,var(--grad-start) 0%,var(--grad-end) 100%);
+      color:#333;
+    }
+
+    header{ text-align:center; padding:48px 16px 28px; color:#fff; }
+    header h1{ font-size:2.4rem; font-weight:800; margin:0 0 16px; }
+
+    .chipbar{ display:flex; justify-content:center; gap:14px; flex-wrap:wrap; }
+    .chipbar a{
+      background:var(--chip-bg); color:#fff; border-radius:999px; padding:10px 16px;
+      text-decoration:none; font-weight:700; transition:background .2s;
+    }
+    .chipbar a:hover{ background:var(--chip-hover); }
+
+    main{
+      background:#f7f7fa; min-height:calc(100vh - 220px);
+      border-radius:24px 24px 0 0; padding:32px;
+    }
+
+    .search-box{ text-align:center; margin:24px 0 32px; }
+    .search-box input{
+      width:320px; padding:10px 16px; border-radius:999px; border:1px solid #ccc;
+      font-size:1rem; outline:none; transition:border .2s;
+    }
+    .search-box input:focus{ border-color:var(--primary); }
+
+    table{
+      width:100%; max-width:1100px; margin:0 auto; border-collapse:collapse; background:#fff;
+      border-radius:16px; box-shadow:0 8px 24px rgba(0,0,0,.05); overflow:hidden;
+    }
+    th, td{ text-align:left; padding:14px 18px; border-bottom:1px solid #eee; }
+    th{ background:#fafafa; font-weight:800; }
+    tr:last-child td{ border-bottom:none; }
+
+    .btn-primary{
+      background:var(--primary); color:#fff; border:none; border-radius:999px; padding:8px 16px;
+      font-weight:700; cursor:pointer; text-decoration:none; transition:background .18s;
+    }
+    .btn-primary:hover{ background:var(--primary-hover); }
+
+    .btn-disabled{
+      background:#ddd; color:#777; border-radius:999px; padding:8px 16px; font-weight:700; cursor:not-allowed;
+    }
+
+    form{ margin:0; display:inline; }
+  </style>
 </head>
-<meta name="viewport" content="width=device-width, initial-scale=1">
 <body>
-<h1><b>Welcome to the Event List</b></h1>
-<div class="table-card">
-    <!-- The Search Input Field -->
-    <div class="search-container">
-        <label for="tableSearchInput">Search Event:</label>
-        <input type="text" id="tableSearchInput" placeholder="Type to search by Name, Category, Organization, or Date...">
-    </div>
 
-    <!-- Event Table with filtering -->
-    <div class="table-container"> 
-    <table class="filterable-table" id="EventTable">
-        <thead>
-            <tr>
-                <th scope="col">Event Name</th>
-                <th scope="col">Organizer</th>
-                <th scope="col">Date</th>
-                <th scope="col">Time</th>
-                <th scope="col">Category</th>
-                
-            </tr>
-        </thead>
-        <tbody>
-            <!-- Rows will be populated by JavaScript // placeholder for database -->
-        </tbody>
-    </table>
-    </div>
+<header>
+  <h1>Event Finder</h1>
+  <div class="chipbar">
+    <a href="{% url 'studentdashboard' %}">Manage Tickets</a>
+    <a href="{% url 'update_profile' %}">Edit Profile</a>
+    <a href="{% url 'update_password' %}">Change Password</a>
+  </div>
+</header>
 
-    <!-- Overlay container -->
-    <div id="contentOverlay">
-        <div id="contentPanel">
-            <button class="close-btn">&times;</button>
-            <div id="contentArea"></div>
-        </div>
-    </div>
-</div>
+<main>
+  <div class="search-box">
+    <input id="searchInput" type="text" placeholder="Search by name, organizer, or date…">
+  </div>
 
+  <table>
+    <thead>
+      <tr>
+        <th>Event Name</th>
+        <th>Organizer</th>
+        <th>Date</th>
+        <th>Time</th>
+        <th>Category</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+
+    <tbody id="eventTable">
+      {% for event in events %}
+        <tr>
+          <td>{{ event.title }}</td>
+          <td>{{ event.organizer }}</td>
+          <td>{{ event.date|date:"Y-m-d" }}</td>
+          <td>{{ event.time }}</td>
+          <td>{{ event.category }}</td>
+          <td>
+            {% if event.id in my_event_ids %}
+              <span class="btn-disabled">Claimed</span>
+            {% else %}
+              <form method="post" action="{% url 'claim_event' event.id %}">
+                {% csrf_token %}
+                <button type="submit" class="btn-primary">Claim</button>
+              </form>
+            {% endif %}
+          </td>
+        </tr>
+      {% empty %}
+        <tr>
+          <td colspan="6" style="text-align:center; padding:20px;">No events available.</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</main>
+
+<script>
+  const searchInput = document.getElementById('searchInput');
+  const tableBody = document.getElementById('eventTable');
+  searchInput.addEventListener('input', () => {
+    const q = searchInput.value.toLowerCase();
+    for (const row of tableBody.rows) {
+      row.style.display = row.innerText.toLowerCase().includes(q) ? '' : 'none';
+    }
+  });
+</script>
 
 </body>
 </html>

@@ -1,3 +1,4 @@
+
 from rest_framework import permissions
 
 class CanViewEvents(permissions.BasePermission):
