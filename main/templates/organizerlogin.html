@@ -6,28 +6,52 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Organizer Login</title>
-  {% load static %}
   <link rel="stylesheet" href="{% static 'css/login.css' %}">
+  <style>
+    .error-message{
+      background:#fde8e8;
+      color:#a40000;
+      border:1px solid #f5b5b5;
+      padding:10px 12px;
+      border-radius:8px;
+      margin-bottom:12px;
+      font-size:.95rem;
+    }
+  </style>
 </head>
 <body>
   <div class="login-container">
     <div class="login-left">
       <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="Organizer Icon">
     </div>
+
     <div class="login-right">
       <h2>Organizer Login</h2>
-      
+
       {% if error %}
         <div class="error-message">{{ error }}</div>
       {% endif %}
 
-      <form method="POST" action="{% url 'organizerlogin' %}">
+      <form method="post" action="{% url 'organizerlogin' %}">
         {% csrf_token %}
-        <input name="email" type="email" placeholder="Email" required>
-        <input name="password" type="password" placeholder="Password" required>
+        <input
+          name="email"
+          type="email"
+          placeholder="Email"
+          required
+          value="{{ prefill_email|default:'' }}"
+          autocomplete="email"
+        >
+        <input
+          name="password"
+          type="password"
+          placeholder="Password"
+          required
+          autocomplete="current-password"
+        >
         <button type="submit" id="loginBtn">LOGIN</button>
       </form>
-      
+
       <div class="links">
         <a href="{% url 'signup' %}">Don't have an account? Create one →</a>
       </div>
@@ -35,19 +59,17 @@
   </div>
 
   <script>
-    // Image follow effect
+    // Image follow effect (kept from your version)
     const img = document.querySelector('.login-left img');
-    if(img) {
+    if (img) {
       img.addEventListener('mousemove', (e) => {
         const rect = img.getBoundingClientRect();
         const x = e.clientX - rect.left;
         const y = e.clientY - rect.top;
         const moveX = (x - rect.width / 2) / 10;
         const moveY = (y - rect.height / 2) / 10;
-
         img.style.transform = `translate(${moveX}px, ${moveY}px)`;
       });
-
       img.addEventListener('mouseleave', () => {
         img.style.transform = 'translate(0, 0)';
       });

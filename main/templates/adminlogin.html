@@ -1,23 +1,40 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Admin Login</title>
-  <link rel="stylesheet" href="login.css">
+  <link rel="stylesheet" href="{% static 'css/login.css' %}">
 </head>
 <body>
   <div class="login-container">
     <div class="login-left">
       <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="Admin Icon">
     </div>
+
     <div class="login-right">
       <h2>Admin Login</h2>
-      <input id="email" type="email" placeholder="Email">
-      <input id="password" type="password" placeholder="Password">
-      <button id="loginBtn">LOGIN</button>
+
+      {% if error %}
+        <div class="error-message">{{ error }}</div>
+      {% endif %}
+
+      <form method="POST" action="{% url 'adminlogin' %}">
+        {% csrf_token %}
+        <!-- Explicit hidden token fallback to avoid rare template/caching issues -->
+        {% if csrf_token %}
+          <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+        {% endif %}
+        <input name="email" type="email" placeholder="Email" value="{{ prefill_email|default:'' }}" required>
+        <input name="password" type="password" placeholder="Password" required>
+        <button type="submit">LOGIN</button>
+      </form>
+
+      <div class="links" style="margin-top:12px;">
+        <a href="{% url 'loginindex' %}">Back to home →</a>
+      </div>
     </div>
   </div>
-  <script src="login.js"></script>
 </body>
 </html>
