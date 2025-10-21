@@ -5,5 +5,3 @@ django
 djangorestframework
 djangorestframework-simplejwt
 django-cors-headers
-qrcode[pil]
-Pillow

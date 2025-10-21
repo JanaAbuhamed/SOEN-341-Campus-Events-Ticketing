@@ -1,3 +1,5 @@
+# main/forms.py
+
 from django import forms
 from .models import User, Event
 from django.contrib.auth import password_validation
@@ -118,5 +120,3 @@ class EventForm(forms.ModelForm):
     class Meta:
         model = Event
         fields = ['title', 'description', 'date', 'time', 'location', 'capacity']
-
-

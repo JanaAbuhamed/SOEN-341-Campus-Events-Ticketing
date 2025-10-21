@@ -1,86 +1,26 @@
-
-{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Admin Dashboard</title>
-  <link rel="stylesheet" href="{% static 'css/admindashboard.css' %}">
+  <link rel="stylesheet" href="/static/css/admindashboard.css">
+  <script src="/static/js/admindashboard.js" defer></script>
   <meta name="csrf-token" content="{{ csrf_token }}">
-  <style>
-    .actions-bar{max-width:1080px;margin:0 auto 18px;display:flex;gap:12px;justify-content:flex-end}
-    .pill-btn{background:#5b6cff;color:#fff;border:none;border-radius:999px;padding:10px 16px;font-weight:700;cursor:pointer}
-    .pill-btn.secondary{background:#7b5cff}
-    .pill-btn:disabled{opacity:.6;cursor:not-allowed}
-    .bulkbar{display:none;align-items:center;gap:10px;background:#f8fafc;border:1px solid #e5e7eb;border-radius:10px;padding:8px 10px}
-    .bulkbar.show{display:flex}
-
-    .badge{display:inline-block;padding:4px 10px;border-radius:999px;font-weight:700;font-size:.85rem}
-    .badge-approved{background:#e9f5ff;color:#2563eb}
-    .badge-pending{background:#fff7ed;color:#c2410c}
-    .badge-rejected{background:#fee2e2;color:#b91c1c}
-    .badge-active{background:#e8fff3;color:#047857}
-    .badge-suspended{background:#ffe4e6;color:#be123c}
-
-    .btn-mini{border-radius:999px;border:1px solid #ddd;background:#fff;padding:4px 10px;font-weight:700;cursor:pointer}
-    .btn-mini.danger{border-color:#fca5a5;color:#b91c1c;background:#fff}
-    .btn-mini.link{color:#2563eb;border-color:#bfdbfe}
-
-    .modal{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.35);z-index:1000}
-    .modal.show{display:flex}
-    .modal-card{width:min(960px,96vw);max-height:92vh;overflow:auto;background:#fff;border-radius:18px;box-shadow:0 30px 50px rgba(0,0,0,.15)}
-    .modal-head{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid #eee}
-    .modal-body{padding:20px}
-    .modal-close{border:none;background:transparent;font-size:22px;cursor:pointer}
-
-    .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-    .field{display:flex;flex-direction:column;gap:6px}
-    .field input,.field select,.field textarea{border:1px solid #ddd;border-radius:12px;padding:10px 12px;width:100%;font-size:14px}
-    .submit-row{display:flex;justify-content:flex-end;margin-top:12px}
-
-    /* checkbox column */
-    th.chk, td.chk{width:28px}
-    input[type="checkbox"]{transform:scale(1.1)}
-  </style>
 </head>
 <body>
   <h1><b>Admin Dashboard</b></h1>
 
+  <!-- Tab container -->
   <div class="tab-container">
     <div class="tabs">
-      <button class="tab-btn {% if tab == 'students' %}active{% endif %}" data-tab="students">Students</button>
-      <button class="tab-btn {% if tab == 'organizers' %}active{% endif %}" data-tab="organizers">Organizers</button>
-      <button class="tab-btn {% if tab == 'events' %}active{% endif %}" data-tab="events">Events</button>
+      <button class="tab-btn active" data-tab="students">Students</button>
+      <button class="tab-btn" data-tab="organizers">Organizers</button>
+      <button class="tab-btn" data-tab="events">Events</button>
     </div>
 
-    <div class="actions-bar">
-      <div class="bulkbar" id="bulkUsersBar">
-        <strong>Bulk action:</strong>
-        <select id="bulkUsersAction">
-          <option value="activate">Activate/Approve</option>
-          <option value="pending">Set Pending</option>
-          <option value="suspend">Suspend</option>
-          <option value="delete">Delete</option>
-        </select>
-        <button class="pill-btn" id="applyUsersBulk">Apply</button>
-      </div>
-      <div class="bulkbar" id="bulkEventsBar">
-        <strong>Bulk action:</strong>
-        <select id="bulkEventsAction">
-          <option value="approve">Approve</option>
-          <option value="reject">Reject</option>
-          <option value="delete">Delete</option>
-        </select>
-        <button class="pill-btn" id="applyEventsBulk">Apply</button>
-      </div>
-
-      <button class="pill-btn" id="openCreateUser" data-for="students" style="{% if tab != 'students' %}display:none{% endif %}">➕ Create User</button>
-      <button class="pill-btn secondary" id="openCreateEvent" data-for="events" style="{% if tab != 'events' %}display:none{% endif %}">➕ Create Event</button>
-    </div>
-
-    <!-- Students -->
-    <div class="tab-content {% if tab == 'students' %}active{% endif %}" id="students">
+    <!-- Students Tab -->
+    <div class="tab-content active" id="students">
       <div class="table-card">
         <h2>Students</h2>
         <div class="search-container">
@@ -88,40 +28,14 @@
           <input type="text" id="tableSearchInput" class="table-search" placeholder="Type to search by ID, Name, or Email...">
         </div>
         <table class="filterable-table" id="StudentTable">
-          <thead>
-            <tr>
-              <th class="chk"><input type="checkbox" data-master="students"></th>
-              <th>ID</th><th>Email</th><th>Name</th><th>Status</th><th>Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for s in students %}
-              <tr data-id="{{ s.user_id }}" data-type="user">
-                <td class="chk"><input type="checkbox" data-row="students"></td>
-                <td>{{ s.user_id }}</td>
-                <td>{{ s.email }}</td>
-                <td>{{ s.name }}</td>
-                <td>
-                  {% if s.status == 1 %}<span class="badge badge-active">Active</span>
-                  {% elif s.status == 2 %}<span class="badge badge-suspended">Suspended</span>
-                  {% else %}<span class="badge badge-pending">Pending</span>{% endif %}
-                </td>
-                <td>
-                  <button class="btn-mini link" data-user-activate>Activate</button>
-                  <button class="btn-mini" data-user-pending>Pending</button>
-                  <button class="btn-mini danger" data-user-suspend>Suspend</button>
-                </td>
-              </tr>
-            {% empty %}
-              <tr><td colspan="6">No students found.</td></tr>
-            {% endfor %}
-          </tbody>
+          <thead><tr><th>ID</th><th>Email</th><th>Name</th></tr></thead>
+          <tbody></tbody>
         </table>
       </div>
     </div>
 
-    <!-- Organizers -->
-    <div class="tab-content {% if tab == 'organizers' %}active{% endif %}" id="organizers">
+    <!-- Organizers Tab -->
+    <div class="tab-content" id="organizers">
       <div class="table-card">
         <h2>Organizers</h2>
         <div class="search-container">
@@ -129,40 +43,14 @@
           <input type="text" id="organizerSearchInput" class="table-search" placeholder="Type to search by ID, Name, or Email...">
         </div>
         <table class="filterable-table" id="OrganizerTable">
-          <thead>
-            <tr>
-              <th class="chk"><input type="checkbox" data-master="organizers"></th>
-              <th>ID</th><th>Email</th><th>Name</th><th>Status</th><th>Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for o in organizers %}
-              <tr data-id="{{ o.user_id }}" data-type="user">
-                <td class="chk"><input type="checkbox" data-row="organizers"></td>
-                <td>{{ o.user_id }}</td>
-                <td>{{ o.email }}</td>
-                <td>{{ o.name }}</td>
-                <td>
-                  {% if o.status == 1 %}<span class="badge badge-active">Active</span>
-                  {% elif o.status == 2 %}<span class="badge badge-suspended">Suspended</span>
-                  {% else %}<span class="badge badge-pending">Pending</span>{% endif %}
-                </td>
-                <td>
-                  <button class="btn-mini link" data-user-activate>Activate</button>
-                  <button class="btn-mini" data-user-pending>Pending</button>
-                  <button class="btn-mini danger" data-user-suspend>Suspend</button>
-                </td>
-              </tr>
-            {% empty %}
-              <tr><td colspan="6">No organizers found.</td></tr>
-            {% endfor %}
-          </tbody>
+          <thead><tr><th>ID</th><th>Email</th><th>Name</th><th>Action</th></tr></thead>
+          <tbody></tbody>
         </table>
       </div>
     </div>
 
-    <!-- Events -->
-    <div class="tab-content {% if tab == 'events' %}active{% endif %}" id="events">
+    <!-- Events Tab -->
+    <div class="tab-content" id="events">
       <div class="table-card">
         <h2>Events</h2>
         <div class="search-container">
@@ -172,336 +60,29 @@
         <table class="filterable-table" id="EventTable">
           <thead>
             <tr>
-              <th class="chk"><input type="checkbox" data-master="events"></th>
-              <th>ID</th><th>Title</th><th>Organizer</th><th>Date</th><th>Time</th><th>Location</th><th>Ticket Type</th><th>Capacity</th><th>Status</th><th>Action</th>
+              <th>ID</th>
+              <th>Title</th>
+              <th>Organizer</th>
+              <th>Date</th>
+              <th>Time</th>
+              <th>Location</th>
+              <th>Ticket Type</th>
+              <th>Capacity</th>
+              <th>Status</th>
             </tr>
           </thead>
-          <tbody>
-            {% for e in events %}
-              <tr data-id="{{ e.id }}" data-type="event" data-event='{
-                "id":"{{ e.id }}",
-                "title":"{{ e.title|escapejs }}",
-                "description":"{{ e.description|default_if_none:''|escapejs }}",
-                "date":"{{ e.date }}",
-                "time":"{{ e.time }}",
-                "location":"{{ e.location|escapejs }}",
-                "capacity":"{{ e.capacity }}",
-                "ticket_type":"{{ e.ticket_type }}",
-                "status":"{{ e.status }}",
-                "organizer_id":"{{ e.organizer.user_id }}"}'>
-                <td class="chk"><input type="checkbox" data-row="events"></td>
-                <td>{{ e.id }}</td>
-                <td>{{ e.title }}</td>
-                <td>{{ e.organizer.name }}</td>
-                <td>{{ e.date }}</td>
-                <td>{{ e.time }}</td>
-                <td>{{ e.location }}</td>
-                <td>{{ e.get_ticket_type_display }}</td>
-                <td>{{ e.capacity }}</td>
-                <td>
-                  {% if e.status == "approved" %}
-                    <span class="badge badge-approved">Approved</span>
-                  {% elif e.status == "pending" %}
-                    <span class="badge badge-pending">Pending</span>
-                  {% elif e.status == "rejected" %}
-                    <span class="badge badge-rejected">Rejected</span>
-                  {% else %}
-                    {{ e.status }}
-                  {% endif %}
-                </td>
-                <td style="white-space:nowrap">
-                  <button class="btn-mini link" data-event-approve>Approve</button>
-                  <button class="btn-mini danger" data-event-reject>Reject</button>
-                  <button class="btn-mini" data-edit-event>Edit</button>
-                </td>
-              </tr>
-            {% empty %}
-              <tr><td colspan="11">No events found.</td></tr>
-            {% endfor %}
-          </tbody>
+          <tbody></tbody>
         </table>
       </div>
     </div>
   </div>
 
-  <!-- Create User Modal -->
-  <div class="modal" id="modalCreateUser">
-    <div class="modal-card">
-      <div class="modal-head">
-        <h3>Create User</h3>
-        <button class="modal-close" data-close>&times;</button>
-      </div>
-      <div class="modal-body">
-        <form method="post" action="{% url 'admin_create_user' %}">
-          {% csrf_token %}
-          <div class="grid-2">
-            <div class="field"><label>Name</label><input name="name" required></div>
-            <div class="field"><label>Email</label><input name="email" type="email" required></div>
-            <div class="field"><label>Password</label><input name="password" type="password" required></div>
-            <div class="field"><label>Role</label>
-              <select name="role"><option value="0">Student</option><option value="1">Organizer</option><option value="2">Admin</option></select>
-            </div>
-            <div class="field"><label>Status</label>
-              <select name="status"><option value="1" selected>Active</option><option value="0">Pending</option><option value="2">Suspended</option></select>
-            </div>
-          </div>
-          <div class="submit-row"><button class="pill-btn" type="submit">Create</button></div>
-        </form>
-      </div>
+  <!-- Event overlay -->
+  <div id="contentOverlay">
+    <div id="contentPanel">
+      <button class="close-btn">&times;</button>
+      <div id="contentArea"></div>
     </div>
   </div>
-
-  <!-- Create Event Modal -->
-  <div class="modal" id="modalCreateEvent">
-    <div class="modal-card">
-      <div class="modal-head">
-        <h3>Create Event</h3>
-        <button class="modal-close" data-close>&times;</button>
-      </div>
-      <div class="modal-body">
-        <form method="post" action="{% url 'admin_create_event' %}">
-          {% csrf_token %}
-          <div class="grid-2">
-            <div class="field"><label>Title</label><input name="title" required></div>
-            <div class="field"><label>Organizer</label>
-              <select name="organizer_id" required>
-                {% for o in organizers %}<option value="{{ o.user_id }}">{{ o.name }} ({{ o.email }})</option>{% endfor %}
-              </select>
-            </div>
-            <div class="field" style="grid-column:1/-1"><label>Description</label><textarea name="description" rows="3"></textarea></div>
-            <div class="field"><label>Date</label><input name="date" type="date" required></div>
-            <div class="field"><label>Time</label><input name="time" type="time" required></div>
-            <div class="field"><label>Location</label><input name="location" required></div>
-            <div class="field"><label>Capacity</label><input name="capacity" type="number" min="1" required></div>
-            <div class="field"><label>Ticket Type</label>
-              <select name="ticket_type"><option value="free">Free</option><option value="general">General Admission</option><option value="vip">VIP</option></select>
-            </div>
-            <div class="field"><label>Status</label>
-              <select name="status"><option value="pending">Pending Admin Review</option><option value="approved">Approved</option><option value="rejected">Rejected</option><option value="draft">Draft</option></select>
-            </div>
-          </div>
-          <div class="submit-row"><button class="pill-btn" type="submit">Create</button></div>
-        </form>
-      </div>
-    </div>
-  </div>
-
-  <!-- Edit Event Modal (unchanged except used by AJAX too) -->
-  <div class="modal" id="modalEditEvent">
-    <div class="modal-card">
-      <div class="modal-head">
-        <h3>Edit Event</h3>
-        <button class="modal-close" data-close>&times;</button>
-      </div>
-      <div class="modal-body">
-        <form method="post" id="editEventForm">
-          {% csrf_token %}
-          <input type="hidden" name="event_id" id="edit_event_id">
-          <div class="grid-2">
-            <div class="field"><label>Title</label><input name="title" id="edit_title" required></div>
-            <div class="field"><label>Organizer</label>
-              <select name="organizer_id" id="edit_organizer_id" required>
-                {% for o in organizers %}<option value="{{ o.user_id }}">{{ o.name }} ({{ o.email }})</option>{% endfor %}
-              </select>
-            </div>
-            <div class="field" style="grid-column:1/-1"><label>Description</label><textarea name="description" id="edit_description" rows="3"></textarea></div>
-            <div class="field"><label>Date</label><input name="date" id="edit_date" type="date" required></div>
-            <div class="field"><label>Time</label><input name="time" id="edit_time" type="time" required></div>
-            <div class="field"><label>Location</label><input name="location" id="edit_location" required></div>
-            <div class="field"><label>Capacity</label><input name="capacity" id="edit_capacity" type="number" min="1" required></div>
-            <div class="field"><label>Ticket Type</label>
-              <select name="ticket_type" id="edit_ticket_type"><option value="free">Free</option><option value="general">General Admission</option><option value="vip">VIP</option></select>
-            </div>
-            <div class="field"><label>Status</label>
-              <select name="status" id="edit_status"><option value="pending">Pending Admin Review</option><option value="approved">Approved</option><option value="rejected">Rejected</option><option value="draft">Draft</option></select>
-            </div>
-          </div>
-          <div class="submit-row"><button class="pill-btn" type="submit">Save</button></div>
-        </form>
-      </div>
-    </div>
-  </div>
-
-  <script>
-    // Tab behavior & contextual buttons
-    const btns = document.querySelectorAll('.tab-btn');
-    const tabs = document.querySelectorAll('.tab-content');
-    const actionsBarBtns = document.querySelectorAll('.actions-bar [data-for]');
-    const bulkUsersBar = document.getElementById('bulkUsersBar');
-    const bulkEventsBar = document.getElementById('bulkEventsBar');
-
-    btns.forEach(b => {
-      b.addEventListener('click', () => {
-        btns.forEach(x => x.classList.remove('active'));
-        tabs.forEach(t => t.classList.remove('active'));
-        b.classList.add('active');
-        const id = b.dataset.tab;
-        document.getElementById(id).classList.add('active');
-        const url = new URL(window.location.href);
-        url.searchParams.set('tab', id); history.replaceState(null,'',url.toString());
-        actionsBarBtns.forEach(el=> el.style.display = (el.getAttribute('data-for')===id)?'inline-block':'none');
-        // hide both bulk bars when switching
-        bulkUsersBar.classList.remove('show');
-        bulkEventsBar.classList.remove('show');
-        document.querySelectorAll('input[type="checkbox"][data-row]').forEach(c=>c.checked=false);
-        document.querySelectorAll('input[type="checkbox"][data-master]').forEach(c=>c.checked=false);
-      });
-    });
-
-    // Client-side filters
-    function wireFilter(inputId, tableId){
-      const input = document.getElementById(inputId);
-      const tbody = document.getElementById(tableId)?.querySelector('tbody');
-      if (!input || !tbody) return;
-      input.addEventListener('input', () => {
-        const q = input.value.toLowerCase();
-        for (const row of tbody.rows) row.style.display = row.innerText.toLowerCase().includes(q)?'':'none';
-      });
-    }
-    wireFilter('tableSearchInput','StudentTable');
-    wireFilter('organizerSearchInput','OrganizerTable');
-    wireFilter('eventSearchInput','EventTable');
-
-    // Simple modals
-    const modalCreateUser = document.getElementById('modalCreateUser');
-    const modalCreateEvent = document.getElementById('modalCreateEvent');
-    const modalEditEvent   = document.getElementById('modalEditEvent');
-    const open = m => m.classList.add('show');
-    const close = m => m.classList.remove('show');
-    document.querySelectorAll('[data-close]').forEach(btn=>btn.addEventListener('click', ()=> close(btn.closest('.modal'))));
-    [modalCreateUser, modalCreateEvent, modalEditEvent].forEach(m=>m.addEventListener('click', (e)=>{ if(e.target===m) close(m); }));
-    document.getElementById('openCreateUser')?.addEventListener('click', ()=> open(modalCreateUser));
-    document.getElementById('openCreateEvent')?.addEventListener('click', ()=> open(modalCreateEvent));
-
-    // Edit Event modal populate
-    document.querySelectorAll('[data-edit-event]').forEach(btn=>{
-      btn.addEventListener('click', ()=>{
-        const data = JSON.parse(btn.closest('tr').getAttribute('data-event'));
-        document.getElementById('edit_event_id').value = data.id;
-        document.getElementById('edit_title').value = data.title||'';
-        document.getElementById('edit_description').value = data.description||'';
-        document.getElementById('edit_date').value = data.date||'';
-        document.getElementById('edit_time').value = data.time||'';
-        document.getElementById('edit_location').value = data.location||'';
-        document.getElementById('edit_capacity').value = data.capacity||1;
-        document.getElementById('edit_ticket_type').value = data.ticket_type||'free';
-        document.getElementById('edit_status').value = data.status||'pending';
-        document.getElementById('edit_organizer_id').value = data.organizer_id||'';
-        const form = document.getElementById('editEventForm');
-        form.action = `{% url 'admin_edit_event' 0 %}`.replace('/0/','/'+data.id+'/');
-        open(modalEditEvent);
-      });
-    });
-
-    // CSRF helper
-    const getCSRF = () => document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-
-    // Inline user status (AJAX)
-    function sendUserStatus(userId, status){
-      return fetch(`{% url 'admin_user_set_status_json' 0 %}`.replace('/0/','/'+userId+'/'),{
-        method:'POST',
-        headers:{'X-CSRFToken':getCSRF(),'X-Requested-With':'XMLHttpRequest'},
-        body:new URLSearchParams({status:String(status)})
-      }).then(r=>r.json());
-    }
-    document.querySelectorAll('[data-user-activate],[data-user-pending],[data-user-suspend]').forEach(btn=>{
-      btn.addEventListener('click', async ()=>{
-        const tr = btn.closest('tr'); const id = tr.getAttribute('data-id');
-        const status = btn.hasAttribute('data-user-activate') ? 1 :
-                       btn.hasAttribute('data-user-pending')  ? 0 : 2;
-        const res = await sendUserStatus(id, status);
-        if(res.ok){
-          const cell = tr.querySelector('td:nth-child(5)');
-          if(status===1) cell.innerHTML = '<span class="badge badge-active">Active</span>';
-          else if(status===2) cell.innerHTML = '<span class="badge badge-suspended">Suspended</span>';
-          else cell.innerHTML = '<span class="badge badge-pending">Pending</span>';
-        }
-      });
-    });
-
-    // Inline event approve/reject (AJAX)
-    async function setEventStatus(id, status){
-      const res = await fetch(`{% url 'admin_update_event_status' 0 %}`.replace('/0/','/'+id+'/'),{
-        method:'POST',
-        headers:{'X-CSRFToken':getCSRF(),'X-Requested-With':'XMLHttpRequest'},
-        body:new URLSearchParams({status})
-      });
-      return res.json();
-    }
-    document.querySelectorAll('[data-event-approve],[data-event-reject]').forEach(btn=>{
-      btn.addEventListener('click', async ()=>{
-        const tr = btn.closest('tr'); const id = tr.getAttribute('data-id');
-        const status = btn.hasAttribute('data-event-approve') ? 'approved' : 'rejected';
-        const res = await setEventStatus(id, status);
-        if(res.ok){
-          const cell = tr.querySelector('td:nth-last-child(2)');
-          if(status==='approved') cell.innerHTML = '<span class="badge badge-approved">Approved</span>';
-          else cell.innerHTML = '<span class="badge badge-rejected">Rejected</span>';
-        }
-      });
-    });
-
-    // Bulk selection & bars
-    function syncBulkBars(){
-      const anyUserChecked = !!document.querySelector('input[data-row="students"]:checked, input[data-row="organizers"]:checked');
-      const anyEventChecked= !!document.querySelector('input[data-row="events"]:checked');
-      bulkUsersBar.classList.toggle('show', anyUserChecked);
-      bulkEventsBar.classList.toggle('show', anyEventChecked);
-    }
-    document.querySelectorAll('input[type="checkbox"][data-row]').forEach(cb=> cb.addEventListener('change', syncBulkBars));
-    document.querySelectorAll('input[type="checkbox"][data-master]').forEach(master=>{
-      master.addEventListener('change', ()=>{
-        const group = master.getAttribute('data-master');
-        document.querySelectorAll(`input[type="checkbox"][data-row="${group}"]`).forEach(cb=> cb.checked = master.checked);
-        syncBulkBars();
-      });
-    });
-
-    // Bulk apply helpers
-    async function postBulk(url, ids, action){
-      const params = new URLSearchParams(); ids.forEach(id=>params.append('ids[]', id)); params.append('action', action);
-      const res = await fetch(url,{method:'POST',headers:{'X-CSRFToken':getCSRF(),'X-Requested-With':'XMLHttpRequest'},body:params});
-      return res.json();
-    }
-
-    document.getElementById('applyUsersBulk')?.addEventListener('click', async ()=>{
-      const ids = Array.from(document.querySelectorAll('tr[data-type="user"] input[data-row]:checked')).map(cb=>cb.closest('tr').getAttribute('data-id'));
-      if(!ids.length) return;
-      const action = document.getElementById('bulkUsersAction').value;
-      const res = await postBulk("{% url 'admin_users_bulk' %}", ids, action);
-      if(res.ok){
-        // Simple in-place refresh of badges for status actions
-        if(['activate','pending','suspend'].includes(action)){
-          const map = {activate:'<span class="badge badge-active">Active</span>', pending:'<span class="badge badge-pending">Pending</span>', suspend:'<span class="badge badge-suspended">Suspended</span>'};
-          ids.forEach(id=>{
-            const tr = document.querySelector(`tr[data-type="user"][data-id="${id}"]`);
-            if(tr){ tr.querySelector('td:nth-child(5)').innerHTML = map[action]; tr.querySelector('input[data-row]').checked=false; }
-          });
-        }else{ // delete
-          ids.forEach(id=> document.querySelector(`tr[data-type="user"][data-id="${id}"]`)?.remove());
-        }
-        syncBulkBars();
-      }
-    });
-
-    document.getElementById('applyEventsBulk')?.addEventListener('click', async ()=>{
-      const ids = Array.from(document.querySelectorAll('tr[data-type="event"] input[data-row]:checked')).map(cb=>cb.closest('tr').getAttribute('data-id'));
-      if(!ids.length) return;
-      const action = document.getElementById('bulkEventsAction').value;
-      const res = await postBulk("{% url 'admin_events_bulk' %}", ids, action);
-      if(res.ok){
-        if(action==='approve' || action==='reject'){
-          const html = action==='approve' ? '<span class="badge badge-approved">Approved</span>' : '<span class="badge badge-rejected">Rejected</span>';
-          ids.forEach(id=>{
-            const tr = document.querySelector(`tr[data-type="event"][data-id="${id}"]`);
-            if(tr){ tr.querySelector('td:nth-last-child(2)').innerHTML = html; tr.querySelector('input[data-row]').checked=false; }
-          });
-        }else{ ids.forEach(id=> document.querySelector(`tr[data-type="event"][data-id="${id}"]`)?.remove()); }
-        syncBulkBars();
-      }
-    });
-  </script>
 </body>
 </html>
-
-
