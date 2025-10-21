@@ -1,4 +1,3 @@
-# student_event/settings.py
 from pathlib import Path
 import os
 
@@ -42,7 +41,7 @@ MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'corsheaders.middleware.CorsMiddleware',
-    'django.middleware.common.CommonMiddleware',  # keep only one instance
+    'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
@@ -70,29 +69,53 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'student_event.wsgi.application'
 
-# Database
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'student_event',
-        'USER': 'campus_event',
-        'PASSWORD': 'campus_event',
-        'HOST': 'localhost',
-        'PORT': '3306',
-    }
-}
+# ---------------------------------------------------------------------
+# DATABASE CONFIGURATION
+# ---------------------------------------------------------------------
+# Use SQLite automatically inside GitHub Actions CI
+# Use MySQL locally and in production
 
-# Internationalization
+USE_SQLITE_FOR_CI = os.environ.get("GITHUB_ACTIONS") == "true" or os.environ.get("USE_SQLITE_FOR_CI") == "1"
+
+if USE_SQLITE_FOR_CI:
+    # GitHub Actions CI: use SQLite (no external DB needed)
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": BASE_DIR / "ci.sqlite3",
+        }
+    }
+else:
+    # Local / Production: use MySQL
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.mysql",
+            "NAME": os.environ.get("MYSQL_DATABASE", "student_event"),
+            "USER": os.environ.get("MYSQL_USER", "campus_event"),
+            "PASSWORD": os.environ.get("MYSQL_PASSWORD", "campus_event"),
+            "HOST": os.environ.get("MYSQL_HOST", "localhost"),
+            "PORT": os.environ.get("MYSQL_PORT", "3306"),
+            "OPTIONS": {"init_command": "SET sql_mode='STRICT_TRANS_TABLES'"},
+        }
+    }
+
+# ---------------------------------------------------------------------
+# INTERNATIONALIZATION
+# ---------------------------------------------------------------------
 LANGUAGE_CODE = 'en-us'
 TIME_ZONE = 'UTC'
 USE_I18N = True
 USE_TZ = True
 
-# Static files (CSS, JavaScript, Images)
+# ---------------------------------------------------------------------
+# STATIC FILES
+# ---------------------------------------------------------------------
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'main', 'static'),
 ]
 
-# Default primary key field type
+# ---------------------------------------------------------------------
+# DEFAULT PRIMARY KEY FIELD TYPE
+# ---------------------------------------------------------------------
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
