@@ -74,6 +74,7 @@ class Ticket(models.Model):
         unique_together = ('event', 'user')  # each user can only have 1 ticket per event
 
     def __str__(self):
+        return f"{self.user.name} - {self.event.title}"
     
 
 # EVENT MODEL
