@@ -1,36 +1,110 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Campus Events Ticketing</title>
-  <link rel="stylesheet" href="home.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Campus Events</title>
+  <style>
+    :root{
+      --grad-start:#7b5cff; --grad-end:#ff3cac;
+      --primary:#5c5cff; --primary-hover:#6a6aff;
+      --muted:#707070; --chip-bg:rgba(255,255,255,0.22);
+      --chip-hover:rgba(255,255,255,0.36);
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0; font-family:Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      background:linear-gradient(135deg,var(--grad-start) 0%,var(--grad-end) 100%);
+      color:#333;
+    }
+    header{ display:flex; align-items:center; justify-content:space-between; gap:16px; padding:18px 24px; color:#fff; }
+    .brand{ display:flex; align-items:center; gap:10px; font-weight:800; font-size:1.4rem; letter-spacing:.2px; }
+    .brand img{ width:36px; height:36px; border-radius:8px; object-fit:cover; }
+    .actions{ display:flex; gap:10px; flex-wrap:wrap; }
+    .btn{ border-radius:999px; padding:10px 16px; text-decoration:none; font-weight:700; }
+    .btn-outline{ border:1px solid rgba(255,255,255,.85); color:#fff; }
+    .btn-solid{ background:#fff; color:#333; }
+    .btn-outline:hover{ background:var(--chip-hover) }
+    .btn-solid:hover{ background:#f3f3f3 }
+
+    .hero{ text-align:center; color:#fff; padding:28px 16px 10px; }
+    .hero h1{ margin:6px 0 6px; font-size:2.2rem; font-weight:900; }
+    .hero p{ margin:0; opacity:.9 }
+
+    main{ background:#f7f7fa; border-radius:24px 24px 0 0; padding:28px 20px 48px; min-height:calc(100vh - 220px); }
+    .wrap{ max-width:1100px; margin:0 auto; }
+
+    table{ width:100%; border-collapse:collapse; background:#fff; border-radius:16px; box-shadow:0 8px 24px rgba(0,0,0,.05); overflow:hidden; }
+    th, td{ text-align:left; padding:14px 18px; border-bottom:1px solid #eee; }
+    th{ background:#fafafa; font-weight:800; }
+    tr:last-child td{ border-bottom:none; }
+
+    .badge{ display:inline-block; padding:4px 10px; border-radius:999px; font-size:.8rem; background:#eef; color:#334; }
+    .btn-primary{ background:var(--primary); color:#fff; border:none; border-radius:999px; padding:8px 14px; font-weight:700; text-decoration:none; }
+    .btn-primary:hover{ background:var(--primary-hover); }
+    .muted{ color:var(--muted); }
+    .empty{ text-align:center; color:var(--muted); padding:34px 0; }
+  </style>
 </head>
-<body class="home-page">
+<body>
 
-  <div class="home-main">
-
-      <!-- Logo -->
-    <div class="logo-container">
-      <img src="images/logo.jpg" alt="EventHub Logo" class="logo">
-    </div>
-
-    <div class="hook-text">
-      <h1><i> EVENT HUB</i></h1>
-      <h2>Experience Campus Like Never Before!</h2><br>
-      <p>Discover, book, and enjoy unforgettable university events. <br> 
-         Join your community — one ticket at a time!</p>
-    </div>
-
-    <div class="home-links">
-      <a href="loginindex.html" class="home-link">Log In</a>
-      <a href="signup.html" class="home-link">Sign Up</a>
-    </div>
-
-    <div class="contact-tab">
-      <a href="#">Contact Us</a>
-    </div>
+<header>
+  <div class="brand">
+    <!-- optional logo in /static/images/logo.jpg -->
+    <img src="{% static 'images/logo.jpg' %}" alt="Logo" onerror="this.style.display='none'">
+    Campus Events
   </div>
+  <div class="actions">
+    <a class="btn btn-outline" href="{% url 'studentlogin' %}">Student Login</a>
+    <a class="btn btn-outline" href="{% url 'organizerlogin' %}">Organizer Login</a>
+    <a class="btn btn-solid"   href="{% url 'signup' %}">Sign Up</a>
+  </div>
+</header>
+
+<section class="hero">
+  <h1>Discover approved campus events</h1>
+  <p class="muted">Browse what’s coming up. Log in to view details and claim tickets.</p>
+</section>
+
+<main>
+  <div class="wrap">
+    {% if events %}
+      <table>
+        <thead>
+          <tr>
+            <th>Event</th>
+            <th>Organizer</th>
+            <th>Date</th>
+            <th>Time</th>
+            <th>Location</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for e in events %}
+            <tr>
+              <td>
+                <strong>{{ e.title }}</strong><br>
+                <span class="badge">{{ e.category|default:"General" }}</span>
+              </td>
+              <td>{{ e.organizer.name }}</td>
+              <td>{{ e.date|date:"Y-m-d" }}</td>
+              <td>{{ e.time }}</td>
+              <td>{{ e.location }}</td>
+              <td>
+                <!-- Guests go to login; after login, redirected to that event’s detail -->
+                <a class="btn-primary" href="{% url 'studentlogin' %}?next={% url 'EventDetail' e.id %}">View</a>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% else %}
+      <div class="empty">No upcoming approved events yet. Check back soon!</div>
+    {% endif %}
+  </div>
+</main>
 
 </body>
 </html>

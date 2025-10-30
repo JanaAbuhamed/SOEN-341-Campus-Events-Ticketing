@@ -2,6 +2,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin, Group
 from django.utils import timezone
+from django.conf import settings  # NEW
 
 class UserManager(BaseUserManager):
     def create_user(self, email, name, password=None, role=0, status=0):
@@ -63,8 +64,8 @@ class User(AbstractBaseUser, PermissionsMixin):
     def __str__(self):
         return f"{self.name} ({self.get_role_display()})"
 
-# EVENT MODEL
 
+# EVENT MODEL
 class Event(models.Model):
     TICKET_TYPES = [
         ('free', 'Free'),
@@ -78,7 +79,6 @@ class Event(models.Model):
         ('approved', 'Approved'),
         ('rejected', 'Rejected'),
     ]
-    
 
     title = models.CharField(max_length=200)
     description = models.TextField()
@@ -87,39 +87,86 @@ class Event(models.Model):
     location = models.CharField(max_length=200)
     capacity = models.PositiveIntegerField()
 
+    # NEW (optional) – used for student filtering
+    category = models.CharField(max_length=100, blank=True, default="")
+
     ticket_type = models.CharField(
-        max_length = 20, 
-        choices = TICKET_TYPES, 
-        default = 'free'
+        max_length=20,
+        choices=TICKET_TYPES,
+        default='free'
     )
-    
+
     status = models.CharField(
-        max_length = 20,
-        choices = EVENT_STATUS,
-        default = 'draft'
+        max_length=20,
+        choices=EVENT_STATUS,
+        default='draft'
     )
 
     attendees = models.ManyToManyField(
-        User, 
-        related_name = "events_attending",
-        blank = True  
+        User,
+        related_name="events_attending",
+        blank=True
     )
-    
+
     organizer = models.ForeignKey(
         User,
-        on_delete = models.CASCADE,
-        related_name = "organized_events",
+        on_delete=models.CASCADE,
+        related_name="organized_events",
         limit_choices_to={'role': 1}
     )
-    
-    created_at = models.DateTimeField(default = timezone.now)
-    updated_at = models.DateTimeField(auto_now = True)
+
+    created_at = models.DateTimeField(default=timezone.now)
+    updated_at = models.DateTimeField(auto_now=True)
 
     def available_spots(self):
         return self.capacity - self.attendees.count()
 
     def __str__(self):
         return self.title
-    
+
+class SavedEvent(models.Model):
+    """
+    A student's saved/favourite events (one per user+event).
+    """
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="saved_events")
+    event = models.ForeignKey(Event, on_delete=models.CASCADE, related_name="saves")
+    created_at = models.DateTimeField(default=timezone.now)
+
+    class Meta:
+        unique_together = ("user", "event")
+
+    def __str__(self):
+        return f"{self.user.email} → {self.event.title}"
 
 
+# NEW – favourites / saved events + "remind me" flag
+class SavedEvent(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="saved_events")
+    event = models.ForeignKey(Event, on_delete=models.CASCADE, related_name="saved_by")
+    remind_me = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ("user", "event")
+
+    def __str__(self):
+        return f"{self.user.email} → {self.event.title}"
+
+class Payment(models.Model):
+    STATUS_CHOICES = (
+        ("succeeded", "Succeeded"),
+        ("failed", "Failed"),
+        ("pending", "Pending"),
+    )
+    user      = models.ForeignKey("main.User", on_delete=models.CASCADE, related_name="payments")
+    event     = models.ForeignKey("main.Event", on_delete=models.CASCADE, related_name="payments")
+    amount    = models.DecimalField(max_digits=8, decimal_places=2, default=0)
+    status    = models.CharField(max_length=16, choices=STATUS_CHOICES, default="succeeded")
+    txn_id    = models.CharField(max_length=64, blank=True)  # fake transaction id
+    created_at = models.DateTimeField(default=timezone.now)
+
+    class Meta:
+        unique_together = ("user", "event")  # 1 payment per user per event
+
+    def __str__(self):
+        return f"{self.user_id}:{self.event_id} {self.status} {self.amount}"
