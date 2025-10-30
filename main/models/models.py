@@ -64,6 +64,21 @@ class User(AbstractBaseUser, PermissionsMixin):
     def __str__(self):
         return f"{self.name} ({self.get_role_display()})"
 
+#  TICKET MODEL
+
+class Ticket(models.Model):
+    event = models.ForeignKey('Event', on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    purchase_date = models.DateTimeField(default=timezone.now)
+
+    class Meta:
+        unique_together = ('event', 'user')  # each user can only have 1 ticket per event
+
+    def __str__(self):
+        return f"{self.user.name} - {self.event.title}"
+    
+
+# EVENT MODEL
 
 # EVENT MODEL
 class Event(models.Model):
@@ -80,6 +95,7 @@ class Event(models.Model):
         ('rejected', 'Rejected'),
     ]
 
+    
     title = models.CharField(max_length=200)
     description = models.TextField()
     date = models.DateField()
@@ -103,11 +119,13 @@ class Event(models.Model):
     )
 
     attendees = models.ManyToManyField(
-        User,
-        related_name="events_attending",
-        blank=True
-    )
+    User,
+    through='Ticket',
+    related_name='events_attending',
+    blank=True
+)
 
+    
     organizer = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
@@ -121,7 +139,21 @@ class Event(models.Model):
     def available_spots(self):
         return self.capacity - self.attendees.count()
 
-    def __str__(self):
+    
+def attendee_info(self):
+    """Return a list of dicts with attendee details including purchase date."""
+    tickets = Ticket.objects.filter(event=self)
+    return [
+        {
+            'full_name': ticket.user.name,
+            'email': ticket.user.email,
+            # Convert UTC to local time
+            'purchase_date': ticket.purchase_date.strftime("%Y-%m-%d %H:%M"),
+        }
+        for ticket in tickets
+    ]
+
+def __str__(self):
         return self.title
 
 class SavedEvent(models.Model):
