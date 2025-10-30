@@ -34,6 +34,7 @@ jobs:
       DB_PORT: 3306
       SECRET_KEY: dummykey
       DEBUG: True
+      DJANGO_SETTINGS_MODULE: SOEN-341-Campus-Events-Ticketing.settings
 
     steps:
     - name: Checkout code
