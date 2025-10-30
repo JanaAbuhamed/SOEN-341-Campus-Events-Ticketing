@@ -8,75 +8,61 @@
 
   <style>
     :root{
-      --grad-start:#7b5cff;
-      --grad-end:#ff3cac;
-      --primary:#5c5cff;
-      --primary-hover:#6a6aff;
-      --chip-bg:rgba(255,255,255,0.22);
-      --chip-hover:rgba(255,255,255,0.36);
+      --grad-start:#7b5cff; --grad-end:#ff3cac;
+      --primary:#5c5cff; --primary-hover:#6a6aff;
+      --chip-bg:rgba(255,255,255,0.22); --chip-hover:rgba(255,255,255,0.36);
       --card-shadow:0 10px 30px rgba(0,0,0,.08);
     }
     *{box-sizing:border-box}
-    body{
-      margin:0;
-      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-      background:linear-gradient(135deg,var(--grad-start) 0%,var(--grad-end) 100%);
-      color:#333;
-    }
+    body{ margin:0; font-family:Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      background:linear-gradient(135deg,var(--grad-start) 0%,var(--grad-end) 100%); color:#333; }
     header{ text-align:center; padding:56px 16px 32px; color:#fff; }
     header h1{ margin:0 0 18px; font-size:2.6rem; font-weight:800; }
-
     .chipbar{ display:flex; justify-content:center; gap:14px; flex-wrap:wrap; }
-    .chipbar a{
-      background:var(--chip-bg); color:#fff; text-decoration:none; font-weight:700;
-      padding:10px 16px; border-radius:999px; transition:background .2s;
-    }
+    .chipbar a{ background:var(--chip-bg); color:#fff; text-decoration:none; font-weight:700;
+      padding:10px 16px; border-radius:999px; transition:background .2s; }
     .chipbar a:hover{ background:var(--chip-hover); }
 
-    main{
-      background:#f7f7fa; border-radius:24px 24px 0 0;
-      min-height:calc(100vh - 220px); padding:28px 22px 60px;
-    }
+    main{ background:#f7f7fa; border-radius:24px 24px 0 0; min-height:calc(100vh - 220px);
+      padding:28px 22px 60px; }
 
     .flash{ max-width:1100px; margin:0 auto 18px; }
-    .flash .msg{
-      background:#fff; border-left:6px solid #36c26e; padding:10px 14px; border-radius:10px;
-      box-shadow:0 6px 18px rgba(0,0,0,.05); color:#1d3b29;
-    }
+    .flash .msg{ background:#fff; border-left:6px solid #36c26e; padding:10px 14px; border-radius:10px;
+      box-shadow:0 6px 18px rgba(0,0,0,.05); color:#1d3b29; }
 
-    .grid{
-      display:grid; grid-template-columns:repeat(auto-fill,minmax(320px,1fr));
-      gap:22px; max-width:1100px; margin:0 auto;
-    }
-    .card{
-      background:#fff; border-radius:18px; box-shadow:var(--card-shadow);
-      padding:22px 22px 20px;
-    }
+    /* Ticket grid */
+    .grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(320px,1fr));
+      gap:22px; max-width:1100px; margin:0 auto; }
+    .card{ background:#fff; border-radius:18px; box-shadow:var(--card-shadow); padding:22px; }
     .card h3{ margin:0 0 6px; font-size:1.25rem; }
     .meta{ color:#555; font-size:.95rem; line-height:1.55; margin-bottom:8px; }
     .meta b{ color:#222; }
-
     .qr{ display:flex; justify-content:center; margin:14px 0 12px; }
     .qr img{ width:160px; height:160px; }
-
     .actions{ display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
-
-    .btn-primary{
-      background:var(--primary); color:#fff; border:none; cursor:pointer;
-      font-weight:700; padding:10px 16px; border-radius:999px; text-decoration:none;
-      transition:background .18s;
-    }
+    .btn-primary{ background:var(--primary); color:#fff; border:none; cursor:pointer; font-weight:700;
+      padding:10px 16px; border-radius:999px; text-decoration:none; transition:background .18s; }
     .btn-primary:hover{ background:var(--primary-hover); }
-    .btn-ghost{
-      background:#eee; color:#333; border:none; padding:8px 14px;
-      border-radius:999px; cursor:pointer;
-    }
+    .btn-ghost{ background:#eee; color:#333; border:none; padding:8px 14px; border-radius:999px; cursor:pointer; }
 
-    .empty{
-      max-width:680px; margin:12px auto; background:#fff; border-radius:14px;
-      box-shadow:0 8px 24px rgba(0,0,0,.06); padding:24px; text-align:center;
-    }
+    .empty{ max-width:680px; margin:12px auto; background:#fff; border-radius:14px;
+      box-shadow:0 8px 24px rgba(0,0,0,.06); padding:24px; text-align:center; }
     .empty p{ margin:8px 0 16px; color:#555; }
+
+    /* Calendar block */
+    .cal-wrap{ max-width:1100px; margin:38px auto 0; }
+    .cal-card{ background:#fff; border-radius:18px; box-shadow:var(--card-shadow); padding:18px; }
+    .cal-header{ display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:8px; }
+    .cal-title{ font-weight:800; font-size:1.25rem; }
+    .cal-controls{ display:flex; gap:8px; }
+    .cal-btn{ background:#eee; border:none; padding:8px 12px; border-radius:10px; cursor:pointer; }
+    .cal-grid{ display:grid; grid-template-columns:repeat(7,1fr); gap:6px; margin-top:10px; }
+    .cal-dayname{ font-weight:700; font-size:.9rem; color:#666; text-align:center; padding:6px 0; }
+    .cal-cell{ border:1px solid #eee; border-radius:12px; min-height:90px; padding:8px; background:#fafafa; position:relative; }
+    .cal-cell.out{ opacity:.4; }
+    .cal-date{ font-size:.9rem; font-weight:700; color:#333; }
+    .ev-chip{ display:block; font-size:.78rem; margin-top:6px; padding:6px 8px; border-radius:9px;
+      background:#efefff; color:#2f2a8c; text-decoration:none; }
   </style>
 </head>
 <body>
@@ -94,13 +80,12 @@
 <main>
   <div class="flash">
     {% if messages %}
-      {% for message in messages %}
-        <div class="msg">{{ message }}</div>
-      {% endfor %}
+      {% for message in messages %}<div class="msg">{{ message }}</div>{% endfor %}
     {% endif %}
   </div>
 
   {% if tickets and tickets.exists %}
+    <!-- Ticket cards -->
     <section class="grid">
       {% for ev in tickets %}
         <article class="card">
@@ -110,20 +95,34 @@
             <div><b>Location:</b> {{ ev.location }}</div>
             <div><b>Status:</b> issued</div>
           </div>
-
           <div class="qr">
             <img alt="QR for {{ ev.title }}" src="{% url 'ticket_qr' ev.id %}">
           </div>
-
           <div class="actions">
             <a class="btn-primary" download="ticket-{{ ev.id }}.png" href="{% url 'ticket_qr' ev.id %}">Download PNG</a>
             <form method="post" action="{% url 'unclaim_event' ev.id %}">
-              {% csrf_token %}
-              <button type="submit" class="btn-ghost">Unclaim</button>
+              {% csrf_token %}<button type="submit" class="btn-ghost">Unclaim</button>
             </form>
           </div>
         </article>
       {% endfor %}
+    </section>
+
+    <!-- Calendar below tickets -->
+    <section class="cal-wrap">
+      <div class="cal-card">
+        <div class="cal-header">
+          <div class="cal-title" id="calTitle">Calendar</div>
+          <div class="cal-controls">
+            <button class="cal-btn" id="prevBtn">Prev</button>
+            <button class="cal-btn" id="todayBtn">Today</button>
+            <button class="cal-btn" id="nextBtn">Next</button>
+          </div>
+        </div>
+        <div class="cal-grid" id="calGrid">
+          <!-- weekday headers -->
+        </div>
+      </div>
     </section>
   {% else %}
     <div class="empty">
@@ -133,6 +132,118 @@
     </div>
   {% endif %}
 </main>
+
+{% if tickets and tickets.exists %}
+<script>
+  // 1) Collect your claimed events from the template into a JS array
+  const MY_EVENTS = [
+    {% for ev in tickets %}
+    {
+      id: {{ ev.id }},
+      title: {{ ev.title|escapejs|safe|json_script:"t"|slice:":0" }} "{{ ev.title|escapejs }}",
+      date: "{{ ev.date|date:'Y-m-d' }}",
+      time: "{{ ev.time }}",
+      location: "{{ ev.location|escapejs }}"
+    },
+    {% endfor %}
+  ];
+
+  // 2) Calendar renderer (no dependencies)
+  const grid = document.getElementById('calGrid');
+  const title = document.getElementById('calTitle');
+  const prevBtn = document.getElementById('prevBtn');
+  const nextBtn = document.getElementById('nextBtn');
+  const todayBtn = document.getElementById('todayBtn');
+
+  // Add weekday headers
+  const dayNames = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  function renderHeaders(){
+    grid.innerHTML = '';
+    for (const dn of dayNames){
+      const h = document.createElement('div');
+      h.className = 'cal-dayname';
+      h.textContent = dn;
+      grid.appendChild(h);
+    }
+  }
+
+  let view = new Date(); // current month view
+
+  function ymd(d){ return d.toISOString().slice(0,10); }
+
+  function eventsOn(dateStr){
+    return MY_EVENTS.filter(e => e.date === dateStr);
+  }
+
+  function render(){
+    renderHeaders();
+
+    const year = view.getFullYear();
+    const month = view.getMonth(); // 0..11
+
+    // Title
+    const monthName = view.toLocaleString(undefined, {month:'long', year:'numeric'});
+    title.textContent = monthName;
+
+    // First day and how many days in month
+    const first = new Date(year, month, 1);
+    const firstWeekday = first.getDay();
+    const daysInMonth = new Date(year, month+1, 0).getDate();
+
+    // Previous month's trailing days to fill start
+    const prevDays = firstWeekday;
+    const prevMonthDays = new Date(year, month, 0).getDate();
+
+    // Total cells = headers (7) + 42 body cells is a common pattern (6 weeks)
+    const totalCells = 42;
+
+    // Build 42 cells
+    for (let i=0; i<totalCells; i++){
+      const cell = document.createElement('div');
+      cell.className = 'cal-cell';
+
+      let cellDate;
+      if (i < prevDays){
+        const day = prevMonthDays - (prevDays - 1 - i);
+        cellDate = new Date(year, month-1, day);
+        cell.classList.add('out');
+      } else if (i >= prevDays + daysInMonth){
+        const day = i - (prevDays + daysInMonth) + 1;
+        cellDate = new Date(year, month+1, day);
+        cell.classList.add('out');
+      } else {
+        const day = i - prevDays + 1;
+        cellDate = new Date(year, month, day);
+      }
+
+      // Date label
+      const d = document.createElement('div');
+      d.className = 'cal-date';
+      d.textContent = cellDate.getDate();
+      cell.appendChild(d);
+
+      // Event chips (if any)
+      const iso = ymd(cellDate);
+      const list = eventsOn(iso);
+      for (const ev of list){
+        const a = document.createElement('a');
+        a.className = 'ev-chip';
+        a.href = "{% url 'studentdashboard' %}"; // you could point to a detail page later
+        a.textContent = ev.title + (ev.time ? ` • ${ev.time}` : '');
+        cell.appendChild(a);
+      }
+
+      grid.appendChild(cell);
+    }
+  }
+
+  prevBtn.onclick = () => { view = new Date(view.getFullYear(), view.getMonth()-1, 1); render(); };
+  nextBtn.onclick = () => { view = new Date(view.getFullYear(), view.getMonth()+1, 1); render(); };
+  todayBtn.onclick = () => { const now = new Date(); view = new Date(now.getFullYear(), now.getMonth(), 1); render(); };
+
+  render();
+</script>
+{% endif %}
 
 </body>
 </html>
