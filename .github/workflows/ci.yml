@@ -34,13 +34,14 @@ jobs:
       DB_PORT: 3306
       SECRET_KEY: dummykey
       DEBUG: True
+      DJANGO_SETTINGS_MODULE: SOEN-341-Campus-Events-Ticketing.settings
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
 
     - name: Set up Python
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5
       with:
         python-version: '3.11'
 
@@ -50,11 +51,15 @@ jobs:
         pip install -r requirements.txt
 
     - name: Wait for MySQL to be ready
-      run: sleep 20
+      run: |
+          echo "Waiting for MySQL to start..."
+          until mysqladmin ping -h 127.0.0.1 --silent; do
+            sleep 2
+          done
 
     - name: Run migrations
       run: python manage.py migrate --noinput
 
     - name: Run tests
       run: |
-        python manage.py test || true
+        python manage.py test
