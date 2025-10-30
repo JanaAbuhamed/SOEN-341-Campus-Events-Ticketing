@@ -30,6 +30,9 @@ urlpatterns = [
     path("edit-event/<int:event_id>/",   views.edit_event,   name="edit-event"),
     path("delete-event/<int:event_id>/", views.delete_event, name="delete-event"),
 
+    # CSV export route for organizers
+    path('event/<int:event_id>/export/', views.export_attendees_csv, name='export_event_csv'),
+
     # Ticket claim / unclaim / QR routes
     path("events/<int:event_id>/claim/",   api_views.claim_event,   name="claim_event"),
     path("events/<int:event_id>/unclaim/", api_views.unclaim_event, name="unclaim_event"),
