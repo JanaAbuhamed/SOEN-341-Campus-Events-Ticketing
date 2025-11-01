@@ -103,12 +103,18 @@ def admindashboard(request):
     students = User.objects.filter(role=0).order_by("created_at")
     organizers = User.objects.filter(role=1).order_by("name")
     events = Event.objects.all().select_related("organizer").order_by("-created_at")
+    total_students = User.objects.filter(role=0).count()
+    total_organizers = User.objects.filter(role=1).count()
+    total_events = Event.objects.count()
 
     return render(request, "admindashboard.html", {
         "tab": tab,
         "students": students,
         "organizers": organizers,
-        "events": events
+        "events": events,
+        'total_students': total_students,
+        'total_organizers': total_organizers,
+        'total_events': total_events,
     })
 
 @login_required

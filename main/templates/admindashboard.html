@@ -42,7 +42,83 @@
     /* checkbox column */
     th.chk, td.chk{width:28px}
     input[type="checkbox"]{transform:scale(1.1)}
-  </style>
+
+    /* Tabs container styling */
+    .tab-container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    /* Tab buttons */
+    .tabs {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 20px;
+      gap: 8px;
+    }
+
+    .tab-btn.active {
+      background: #5b6cff;
+      color: white;
+      border-color: #5b6cff;
+    }
+
+    /* Hide non-active tabs */
+    .tab-content {
+      display: none;
+      animation: fadeIn 0.2s ease;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+    /* Analytics section styling */
+    .analytics-container {
+      text-align: center;
+      padding: 30px;
+    }
+
+    .analytics-container h2 {
+      font-size: 28px;
+      margin-bottom: 20px;
+      color: #ffffff;
+    }
+
+    /* Grid for stat cards */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 20px;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    /* Individual stat card */
+    .stat-card {
+      background: #fff;
+      border-radius: 16px;
+      padding: 30px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .stat-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+    }
+
+    .stat-card h3 {
+      font-size: 18px;
+      color: #666;
+      margin-bottom: 10px;
+    }
+
+    .stat-value {
+      font-size: 36px;
+      font-weight: bold;
+      color: #5b6cff;
+    }
+      </style>
 </head>
 <body>
   <h1><b>Admin Dashboard</b></h1>
@@ -52,6 +128,7 @@
       <button class="tab-btn {% if tab == 'students' %}active{% endif %}" data-tab="students">Students</button>
       <button class="tab-btn {% if tab == 'organizers' %}active{% endif %}" data-tab="organizers">Organizers</button>
       <button class="tab-btn {% if tab == 'events' %}active{% endif %}" data-tab="events">Events</button>
+      <button class="tab-btn {% if tab == 'analytics' %}active{% endif %}" data-tab="analytics">Analytics</button>
     </div>
 
     <div class="actions-bar">
@@ -222,6 +299,27 @@
         </table>
       </div>
     </div>
+
+    <!-- Analytics -->
+     <div class="tab-content {% if tab == 'analytics' %}active{% endif %}" id="analytics">
+    <div class="analytics-container">
+    <h2>Dashboard Analytics</h2>
+    <div class="stats-grid">
+      <div class="stat-card">
+        <h3>Total Students</h3>
+        <p class="stat-value">{{ total_students }}</p>
+      </div>
+      <div class="stat-card">
+        <h3>Total Organizers</h3>
+        <p class="stat-value">{{ total_organizers }}</p>
+      </div>
+      <div class="stat-card">
+        <h3>Total Events</h3>
+        <p class="stat-value">{{ total_events }}</p>
+      </div>
+    </div>
+  </div>
+</div>
   </div>
 
   <!-- Create User Modal -->

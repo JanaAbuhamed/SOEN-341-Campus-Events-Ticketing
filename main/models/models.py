@@ -14,11 +14,11 @@ class UserManager(BaseUserManager):
         user.save(using=self._db)
 
         if role == 0:  # Student
-            group = Group.objects.get(name='Student')
+            group = Group.objects.get_or_create(name='Student')
         elif role == 1:  # Organizer
-            group = Group.objects.get(name='Organizer') 
+            group = Group.objects.get_or_create(name='Organizer') 
         elif role == 2:  # Admin
-            group = Group.objects.get(name='Administrator')
+            group = Group.objects.get_or_create(name='Administrator')
 
         return user
 
