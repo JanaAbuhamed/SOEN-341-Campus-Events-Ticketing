@@ -118,7 +118,7 @@
       font-weight: bold;
       color: #5b6cff;
     }
-      </style>
+    </style>
 </head>
 <body>
   <h1><b>Admin Dashboard</b></h1>
@@ -301,7 +301,7 @@
     </div>
 
     <!-- Analytics -->
-     <div class="tab-content {% if tab == 'analytics' %}active{% endif %}" id="analytics">
+    <div class="tab-content {% if tab == 'analytics' %}active{% endif %}" id="analytics">
     <div class="analytics-container">
     <h2>Dashboard Analytics</h2>
     <div class="stats-grid">
@@ -318,7 +318,10 @@
         <p class="stat-value">{{ total_events }}</p>
       </div>
     </div>
-  </div>
+
+    <h3>Participation Trend</h3>
+    <canvas id="claimTrendChart" width="600" height="300" style="background: white;"></canvas>
+    </div>
 </div>
   </div>
 
@@ -420,6 +423,7 @@
     </div>
   </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script>
     // Tab behavior & contextual buttons
     const btns = document.querySelectorAll('.tab-btn');
@@ -598,8 +602,42 @@
         syncBulkBars();
       }
     });
+    
+    document.addEventListener("DOMContentLoaded", () => {
+      const claimTrendURL = "{% url 'claim_trend_by_payment' %}";
+        fetch(claimTrendURL)
+        .then(response => response.json())
+        .then(data => {
+            const labels = data.map(item => item.date);
+            const counts = data.map(item => item.count);
+
+            const ctx = document.getElementById('claimTrendChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Ticket Claimed',
+                        data: counts,
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                        tension: 0.3
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { display: true, position: 'top' },
+                        tooltip: { mode: 'index', intersect: false }
+                    },
+                    scales: {
+                        x: { title: { display: true, text: 'Date' } },
+                        y: { title: { display: true, text: 'Participation Count' }, beginAtZero: true }
+                    }
+                }
+            });
+        });
+    });
   </script>
 </body>
 </html>
-
-
