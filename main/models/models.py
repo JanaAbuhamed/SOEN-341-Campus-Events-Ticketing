@@ -122,8 +122,8 @@ class Event(models.Model):
     User,
     through='Ticket',
     related_name='events_attending',
-    blank=True
-)
+    blank=True  
+    )
 
     
     organizer = models.ForeignKey(
@@ -140,35 +140,21 @@ class Event(models.Model):
         return self.capacity - self.attendees.count()
 
     
-def attendee_info(self):
-    """Return a list of dicts with attendee details including purchase date."""
-    tickets = Ticket.objects.filter(event=self)
-    return [
-        {
-            'full_name': ticket.user.name,
-            'email': ticket.user.email,
-            # Convert UTC to local time
-            'purchase_date': ticket.purchase_date.strftime("%Y-%m-%d %H:%M"),
-        }
-        for ticket in tickets
-    ]
-
-def __str__(self):
-        return self.title
-
-class SavedEvent(models.Model):
-    """
-    A student's saved/favourite events (one per user+event).
-    """
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="saved_events")
-    event = models.ForeignKey(Event, on_delete=models.CASCADE, related_name="saves")
-    created_at = models.DateTimeField(default=timezone.now)
-
-    class Meta:
-        unique_together = ("user", "event")
+    def attendee_info(self):
+        """Return a list of dicts with attendee details including purchase date."""
+        tickets = Ticket.objects.filter(event=self)
+        return [
+            {
+                'full_name': ticket.user.name,
+                'email': ticket.user.email,
+                # Convert UTC to local time
+                'purchase_date': ticket.purchase_date.strftime("%Y-%m-%d %H:%M"),
+            }
+            for ticket in tickets
+        ]
 
     def __str__(self):
-        return f"{self.user.email} → {self.event.title}"
+            return self.title
 
 
 # NEW – favourites / saved events + "remind me" flag
