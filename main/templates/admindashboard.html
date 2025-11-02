@@ -72,6 +72,7 @@
     .tab-content.active {
       display: block;
     }
+
     /* Analytics section styling */
     .analytics-container {
       text-align: center;
@@ -95,9 +96,9 @@
 
     /* Individual stat card */
     .stat-card {
-      background: #fff;
+      background: #ffffff;
       border-radius: 16px;
-      padding: 30px;
+      padding: 15px;
       box-shadow: 0 2px 6px rgba(0,0,0,0.1);
       transition: transform 0.2s ease, box-shadow 0.2s ease;
     }
@@ -118,8 +119,9 @@
       font-weight: bold;
       color: #5b6cff;
     }
+
     h3 {
-    color: #ffffff; /* black, or any hex/rgb color you like */
+    color: #ffffff; 
     }
     </style>
 </head>
@@ -312,24 +314,27 @@
         <h3>Total Students</h3>
         <p class="stat-value">{{ total_students }}</p>
       </div>
+
       <div class="stat-card">
         <h3>Total Organizers</h3>
         <p class="stat-value">{{ total_organizers }}</p>
       </div>
+
       <div class="stat-card">
         <h3>Total Events</h3>
         <p class="stat-value">{{ total_events }}</p>
         </div>
+
       <div class="stat-card">
         <h3>Total Claimed Tickets</h3>
         <p class="stat-value">{{ total_claimed_tickets }}</p>
+        </div>
       </div>
-    </div>
 
-    <h3>Participation Trend</h3>
-    <canvas id="claimTrendChart" width="600" height="300" style="background: white;"></canvas>
-    </div>
-</div>
+      <h2>Participation Trend</h2>
+       <canvas id="claimTrendChart" width="600" height="300" style="background: white;"></canvas>
+      </div>
+  </div>
   </div>
 
   <!-- Create User Modal -->
