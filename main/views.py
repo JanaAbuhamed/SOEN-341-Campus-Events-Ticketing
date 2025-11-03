@@ -6,6 +6,22 @@ from django.shortcuts import render, redirect, get_object_or_404
 from .forms import EventForm, OrganizerUpdateForm
 from .models import User, Event
 
+from rest_framework import viewsets
+# from main.models import User, Event
+from main.serializers import UserSerializer, EventSerializer
+from rest_framework.permissions import IsAuthenticated
+
+class UserViewSet(viewsets.ModelViewSet):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    # permission_classes = [...]  # optional
+
+class EventViewSet(viewsets.ModelViewSet):
+    queryset = Event.objects.all()
+    serializer_class = EventSerializer
+    permission_classes = [IsAuthenticated]  # restrict create to logged-in users
+
+
 
 @login_required
 def update_organizer_profile(request):

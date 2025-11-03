@@ -4,7 +4,26 @@ from . import views                              # organizer CRUD + organizer pr
 from main.api import views as api_views          # page views in main.api.views
 from main.api.qr_views import qr_png             # <-- use the real function name
 
+from django.urls import include
+from rest_framework.routers import DefaultRouter
+from main.views import UserViewSet, EventViewSet
+from django.contrib import admin
+
+
+router = DefaultRouter()
+router.register(r'users', UserViewSet, basename='user')
+router.register(r'events', EventViewSet, basename='event')
+
+
+
 urlpatterns = [
+    
+    # DRF router for API endpoints
+    path("api/", include(router.urls)), # this makes /api/users/ and /api/events/ available
+
+    path('admin/', admin.site.urls),
+    
+
     # Entry & auth pages
     path("",                    api_views.loginindex,     name="loginindex"),
     path("signup/",             api_views.signup,         name="signup"),

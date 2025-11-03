@@ -29,6 +29,7 @@ class UserManager(BaseUserManager):
         return user
 
 
+
 class User(AbstractBaseUser, PermissionsMixin):
     ROLE_CHOICES = [
         (0, "Student"),
@@ -62,6 +63,9 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def __str__(self):
         return f"{self.name} ({self.get_role_display()})"
+
+    class Meta:
+        app_label = 'main'
 
 # EVENT MODEL
 
@@ -121,5 +125,6 @@ class Event(models.Model):
     def __str__(self):
         return self.title
     
-
+    class Meta:
+        app_label = 'main'
 

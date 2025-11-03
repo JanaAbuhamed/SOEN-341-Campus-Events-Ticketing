@@ -1,12 +1,16 @@
+# main/tests/test_api.py
 from django.test import TestCase
 from rest_framework.test import APIClient
 from main.models import User, Event
 from datetime import date, time
 
+class SimpleTest(TestCase):
+    def test_basic_math(self):
+        self.assertEqual(1 + 1, 2)
+
 class UserAndEventAPITests(TestCase):
     def setUp(self):
         self.client = APIClient()
-        # Create an admin user (role=2)
         self.admin = User.objects.create_user(
             email="admin@example.com",
             name="Admin",
@@ -37,7 +41,6 @@ class UserAndEventAPITests(TestCase):
 
     def test_event_creation_by_organizer(self):
         """Test creating an event through the Event API"""
-        # Authenticate as organizer
         self.client.force_authenticate(user=self.organizer)
         data = {
             "title": "Music Fest",
