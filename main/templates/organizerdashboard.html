@@ -17,6 +17,7 @@
       <div class="topbar-actions">
         <a href="{% url 'update_organizer_profile' %}" class="btn ghost">Edit Profile</a>
         <a href="{% url 'organizer-analytics' %}" class="btn primary">📊 Analytics Dashboard</a>
+        <a href="{% url 'organizer_scan' %}" class="btn ghost">📷 Scan Tickets</a>
         <button id="openCreateEvent" class="btn primary">➕ Create Event</button>
       </div>
     </div>
@@ -24,67 +25,67 @@
 
   <main class="shell main-grid">
 
-<section class="card">
-  <div class="card-head">
-    <h2>My Events</h2>
-    <div class="sort-controls">
-      <span>Sort by:</span>
-      <a href="?sort=created_at" class="sort-btn {% if current_sort == 'created_at' %}active{% endif %}">
-        📅 Published Date
-      </a>
-      <a href="?sort=event_date" class="sort-btn {% if current_sort == 'event_date' %}active{% endif %}">
-        🗓️ Event Date
-      </a>
-      <a href="?sort=tickets_issued" class="sort-btn {% if current_sort == 'tickets_issued' %}active{% endif %}">
-        🎫 Tickets Issued
-      </a>
-    </div>
-  </div>
-  <div class="table-wrap">
-    <table class="table">
-      <thead>
-        <tr>
-          <th>ID</th>
-          <th>Event</th>
-          <th>Date</th>
-          <th>Time</th>
-          <th>Location</th>
-          <th>Attendees</th>
-          <th class="right">Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for event in approved_events %}
-          <tr>
-            <td>{{ event.id }}</td>
-            <td class="strong">{{ event.title }}</td>
-            <td>{{ event.date }}</td>
-            <td>{{ event.time }}</td>
-            <td>{{ event.location }}</td>
-            <td>{{ event.attendees.count }}</td>
-            <td class="right">
-              <a class="btn xs link" href="{% url 'edit-event' event.id %}">Edit</a>
-              <a class="btn xs danger" href="{% url 'delete-event' event.id %}"
-                 onclick="return confirm('Delete this event?');">Delete</a>
+    <section class="card">
+      <div class="card-head">
+        <h2>My Events</h2>
+        <div class="sort-controls">
+          <span>Sort by:</span>
+          <a href="?sort=created_at" class="sort-btn {% if current_sort == 'created_at' %}active{% endif %}">
+            📅 Published Date
+          </a>
+          <a href="?sort=event_date" class="sort-btn {% if current_sort == 'event_date' %}active{% endif %}">
+            🗓️ Event Date
+          </a>
+          <a href="?sort=tickets_issued" class="sort-btn {% if current_sort == 'tickets_issued' %}active{% endif %}">
+            🎫 Tickets Issued
+          </a>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Event</th>
+              <th>Date</th>
+              <th>Time</th>
+              <th>Location</th>
+              <th>Attendees</th>
+              <th class="right">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for event in approved_events %}
+              <tr>
+                <td>{{ event.id }}</td>
+                <td class="strong">{{ event.title }}</td>
+                <td>{{ event.date }}</td>
+                <td>{{ event.time }}</td>
+                <td>{{ event.location }}</td>
+                <td>{{ event.attendees.count }}</td>
+                <td class="right">
+                  <a class="btn xs link" href="{% url 'edit-event' event.id %}">Edit</a>
+                  <a class="btn xs danger" href="{% url 'delete-event' event.id %}"
+                     onclick="return confirm('Delete this event?');">Delete</a>
 
-              {% if event.attendees.count > 0 %}
-                <a class="btn xs ghost" href="{% url 'export_event_csv' event.id %}">
-                  ⬇️ Export CSV
-                </a>
-              {% else %}
-                <span class="btn xs disabled" style="opacity: 0.5; cursor: not-allowed;">
-                  No Attendees
-                </span>
-              {% endif %}
-            </td>
-          </tr>
-        {% empty %}
-          <tr><td colspan="7" class="empty">No approved events yet.</td></tr>
-        {% endfor %}
-      </tbody>
-    </table>
-  </div>
-</section>
+                  {% if event.attendees.count > 0 %}
+                    <a class="btn xs ghost" href="{% url 'export_event_csv' event.id %}">
+                      ⬇️ Export CSV
+                    </a>
+                  {% else %}
+                    <span class="btn xs disabled" style="opacity: 0.5; cursor: not-allowed;">
+                      No Attendees
+                    </span>
+                  {% endif %}
+                </td>
+              </tr>
+            {% empty %}
+              <tr><td colspan="7" class="empty">No approved events yet.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </section>
 
     <!-- PENDING -->
     <section class="card">
