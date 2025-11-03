@@ -54,30 +54,12 @@
   <div class="card">
     <!-- Top meta -->
     <div class="meta-grid">
-      <div class="item">
-        <b>Date</b>
-        <span>{{ event.date|date:"Y-m-d" }}</span>
-      </div>
-      <div class="item">
-        <b>Time</b>
-        <span>{{ event.time }}</span>
-      </div>
-      <div class="item">
-        <b>Location</b>
-        <span>{{ event.location }}</span>
-      </div>
-      <div class="item">
-        <b>Organizer</b>
-        <span>{{ event.organizer.name }}</span>
-      </div>
-      <div class="item">
-        <b>Category</b>
-        <span>{{ event.category }}</span>
-      </div>
-      <div class="item">
-        <b>Ticket type</b>
-        <span>{{ event.ticket_type|default:"free" }}</span>
-      </div>
+      <div class="item"><b>Date</b><span>{{ event.date|date:"Y-m-d" }}</span></div>
+      <div class="item"><b>Time</b><span>{{ event.time }}</span></div>
+      <div class="item"><b>Location</b><span>{{ event.location }}</span></div>
+      <div class="item"><b>Organizer</b><span>{{ event.organizer.name }}</span></div>
+      <div class="item"><b>Category</b><span>{{ event.category }}</span></div>
+      <div class="item"><b>Ticket type</b><span>{{ event.ticket_type|default:"free" }}</span></div>
     </div>
 
     <!-- Availability -->
@@ -110,14 +92,10 @@
       {% elif available <= 0 %}
         <span class="btn btn-disabled">Sold out</span>
       {% else %}
-        {% if event.ticket_type == "paid" %}
-          <a class="btn btn-primary" href="{% url 'checkout' event.id %}">Pay &amp; Claim</a>
-        {% else %}
-          <form method="post" action="{% url 'claim_event' event.id %}">
-            {% csrf_token %}
-            <button type="submit" class="btn btn-primary">Claim Ticket</button>
-          </form>
-        {% endif %}
+        <!-- Unified flow: always go to checkout (even if free) -->
+        <a class="btn btn-primary" href="{% url 'checkout' event.id %}">
+          {% if event.ticket_type == "paid" %}Pay &amp; Claim{% else %}Claim Ticket{% endif %}
+        </a>
       {% endif %}
 
       <!-- Save / Unsave -->
