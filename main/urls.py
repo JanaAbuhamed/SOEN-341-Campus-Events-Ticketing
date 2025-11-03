@@ -3,6 +3,7 @@ from django.urls import path
 from . import views                              # organizer CRUD + organizer profile
 from main.api import views as api_views          # page views in main.api.views
 from main.api.qr_views import qr_png             # QR image
+from .views import participation_trend
 
 urlpatterns = [
     # Public landing page (guests)
@@ -46,4 +47,7 @@ urlpatterns = [
     path("events/<int:event_id>/unclaim/",   api_views.unclaim_event, name="unclaim_event"),
     path("tickets/<int:event_id>/qr.png",    qr_png,                  name="ticket_qr"),
     path("events/<int:event_id>/checkout/",  api_views.checkout,      name="checkout"),
+
+    path("analytics/participation-trend/", participation_trend, name="participation_trend"),
+    path("analytics/claim-trend/", views.claim_trend_by_payment, name="claim_trend_by_payment"),
 ]

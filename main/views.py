@@ -3,11 +3,13 @@ from django.contrib import messages
 from django.db import models 
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, get_object_or_404
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
+from django.db.models import Count
+from django.db.models.functions import TruncDate
 import csv
 
 from .forms import EventForm, OrganizerUpdateForm
-from .models import User, Event, SavedEvent
+from .models import User, Event, SavedEvent, Payment
 
 
 @login_required
@@ -217,3 +219,27 @@ def export_attendees_csv(request, event_id):
         writer.writerow([ticket.user.name, ticket.user.email, ticket.purchase_date.strftime("%Y-%m-%d %H:%M")])
 
     return response
+
+@login_required
+def participation_trend(request):
+    data = (
+        SavedEvent.objects
+        .annotate(date=TruncDate("created_at"))
+        .values("date")
+        .annotate(count=Count("id"))
+        .order_by("date")
+    )
+    return JsonResponse(list(data), safe=False)
+
+@login_required
+def claim_trend_by_payment(request):
+    # Aggregate payments per day
+    qs = (
+        Payment.objects
+        .annotate(date=TruncDate('created_at'))  # or 'timestamp' field
+        .values('date')
+        .annotate(count=Count('id'))
+        .order_by('date')
+    )
+    data = [{"date": str(entry["date"]), "count": entry["count"]} for entry in qs]
+    return JsonResponse(data, safe=False)

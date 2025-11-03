@@ -19,7 +19,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from django.utils import timezone
 from ..forms import OrganizerSignupForm, PasswordUpdateForm, StudentSignupForm, UserUpdateForm
-from ..models import Event, User, SavedEvent
+from ..models import Event, User, SavedEvent, Payment
 from .serializers import EventCreateSerializer, EventSerializer, UserSerializer
 from .permissions import (
     CanCreateEvent, CanDeleteEvent, CanEditEvent, CanRegisterEvent, CanViewEvents, CanViewUsers
@@ -103,12 +103,20 @@ def admindashboard(request):
     students = User.objects.filter(role=0).order_by("created_at")
     organizers = User.objects.filter(role=1).order_by("name")
     events = Event.objects.all().select_related("organizer").order_by("-created_at")
+    total_students = User.objects.filter(role=0).count()
+    total_organizers = User.objects.filter(role=1).count()
+    total_events = Event.objects.count()
+    total_claimed_tickets = Payment.objects.filter(status="succeeded").count()
 
     return render(request, "admindashboard.html", {
         "tab": tab,
         "students": students,
         "organizers": organizers,
-        "events": events
+        "events": events,
+        'total_students': total_students,
+        'total_organizers': total_organizers,
+        'total_events': total_events,
+        "total_claimed_tickets": total_claimed_tickets,
     })
 
 @login_required
