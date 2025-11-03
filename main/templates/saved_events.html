@@ -1,0 +1,83 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Saved Events</title>
+  <style>
+    :root{ --grad-start:#7b5cff; --grad-end:#ff3cac; --primary:#5c5cff; --primary-hover:#6a6aff; --chip-bg:rgba(255,255,255,0.22); --chip-hover:rgba(255,255,255,0.36); }
+    body{ margin:0; font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; background:linear-gradient(135deg,var(--grad-start) 0%,var(--grad-end) 100%); color:#333; }
+    header{ text-align:center; padding:48px 16px 28px; color:#fff; }
+    header h1{ font-size:2.2rem; font-weight:800; margin:0 0 16px; }
+    .chipbar{ display:flex; justify-content:center; gap:14px; flex-wrap:wrap; }
+    .chipbar a{ background:var(--chip-bg); color:#fff; border-radius:999px; padding:10px 16px; text-decoration:none; font-weight:700; transition:background .2s; }
+    .chipbar a:hover{ background:var(--chip-hover); }
+
+    main{ background:#f7f7fa; min-height:calc(100vh - 220px); border-radius:24px 24px 0 0; padding:32px; }
+
+    .grid{ max-width:1100px; margin:0 auto; display:grid; grid-template-columns: repeat(auto-fill,minmax(280px,1fr)); gap:16px; }
+    .card{ background:#fff; border-radius:14px; box-shadow:0 8px 24px rgba(0,0,0,.06); padding:16px 18px; }
+    .title{ font-weight:800; margin:0 0 6px; }
+    .meta{ color:#666; font-size:.95rem; margin:0 0 12px; }
+    .actions{ display:flex; gap:8px; flex-wrap:wrap; }
+    .btn{ background:var(--primary); color:#fff; border:none; border-radius:999px; padding:8px 14px; font-weight:700; cursor:pointer; text-decoration:none; }
+    .btn:hover{ background:var(--primary-hover); }
+    .btn-secondary{ background:#eee; color:#333; }
+    .btn-disabled{ background:#ddd; color:#777; border-radius:999px; padding:8px 14px; font-weight:700; cursor:not-allowed; }
+    form{ display:inline; margin:0; }
+    .empty{ text-align:center; margin:40px 0; color:#666; }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Saved Events</h1>
+  <div class="chipbar">
+    <a href="{% url 'EventList' %}">Event Finder</a>
+    <a href="{% url 'studentdashboard' %}">Manage Tickets</a>
+    <a href="{% url 'update_profile' %}">Edit Profile</a>
+    <a href="{% url 'update_password' %}">Change Password</a>
+  </div>
+</header>
+
+<main>
+  {% if events %}
+    <div class="grid">
+      {% for e in events %}
+        <div class="card">
+          <div class="title">{{ e.title }}</div>
+          <div class="meta">
+            {{ e.date|date:"Y-m-d" }} · {{ e.time }} · {{ e.location }}<br>
+            Organizer: {{ e.organizer.name }}<br>
+            Category: {{ e.category }}<br>
+            Spots left: {{ e.capacity|add:"-0"|add:"-" }}{% with e.attendees.count as c %}{{ e.capacity|add:"-c" }}{% endwith %}
+          </div>
+          <div class="actions">
+            <a class="btn" href="{% url 'EventDetail' e.id %}">View</a>
+
+            <form method="post" action="{% url 'ToggleSaveEvent' e.id %}">
+              {% csrf_token %}
+              <input type="hidden" name="ref" value="detail">
+              <button type="submit" class="btn btn-secondary">Unsave</button>
+            </form>
+
+            {% if e.id in my_event_ids %}
+              <span class="btn-disabled">Claimed</span>
+            {% else %}
+              <form method="post" action="{% url 'claim_event' e.id %}">
+                {% csrf_token %}
+                <button type="submit" class="btn">Claim</button>
+              </form>
+            {% endif %}
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <p class="empty">You haven’t saved any events yet. Browse the <a href="{% url 'EventList' %}">Event Finder</a> and hit “Save”.</p>
+  {% endif %}
+</main>
+
+</body>
+</html>

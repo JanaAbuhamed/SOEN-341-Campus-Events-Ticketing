@@ -41,6 +41,8 @@
     <a href="{% url 'studentdashboard' %}">Manage Tickets</a>
     <a href="{% url 'update_profile' %}">Edit Profile</a>
     <a href="{% url 'update_password' %}">Change Password</a>
+    <a href="{% url 'saved_events' %}">Saved{% if saved_count %} ({{ saved_count }}){% endif %}</a>
+
   </div>
 </header>
 

@@ -401,7 +401,6 @@ def EventList(request):
     if getattr(request.user, "role", None) != 0:
         return HttpResponseForbidden("Student access required")
 
-    # Base queryset
     qs = (
         Event.objects.filter(status="approved")
         .select_related("organizer")
@@ -418,16 +417,15 @@ def EventList(request):
     if category:
         qs = qs.filter(category__iexact=category)
 
+    from django.utils.dateparse import parse_date
     if date_from:
         d = parse_date(date_from)
         if d:
             qs = qs.filter(date__gte=d)
-
     if date_to:
         d = parse_date(date_to)
         if d:
             qs = qs.filter(date__lte=d)
-
     if location:
         qs = qs.filter(location__icontains=location)
 
@@ -436,12 +434,12 @@ def EventList(request):
         qs = qs.order_by("date", "time", "-created_at")
     elif sort == "popularity":
         qs = qs.annotate(att_count=Count("attendees")).order_by("-att_count", "date", "time")
-    else:  # "published" (newest first)
+    else:  # "published"
         qs = qs.order_by("-created_at", "date", "time")
 
     events = qs
 
-    # For button states
+    # Button states
     my_event_ids = set(
         Event.objects.filter(attendees=request.user).values_list("id", flat=True)
     )
@@ -449,10 +447,11 @@ def EventList(request):
         saved_ids = set(
             SavedEvent.objects.filter(user=request.user).values_list("event_id", flat=True)
         )
+        saved_count = len(saved_ids)
     except Exception:
         saved_ids = set()
+        saved_count = 0
 
-    # Distinct categories for the dropdown
     categories = list(
         Event.objects.filter(status="approved").values_list("category", flat=True).distinct()
     )
@@ -472,10 +471,35 @@ def EventList(request):
             "events": events,
             "my_event_ids": my_event_ids,
             "saved_ids": saved_ids,
+            "saved_count": saved_count,  # <— for the “Saved (N)” badge
             "categories": categories,
             "current": current,
         },
     )
+@login_required
+def saved_events(request):
+    """
+    Page showing the current student's saved (favourite) events.
+    """
+    if getattr(request.user, "role", None) != 0:
+        return HttpResponseForbidden("Student access required")
+
+    # SavedEvent(event, user) -> fetch the related Events efficiently
+    saved_qs = (SavedEvent.objects
+                .filter(user=request.user)
+                .select_related("event", "event__organizer")
+                .order_by("event__date", "event__time"))
+
+    events = [se.event for se in saved_qs]
+    my_event_ids = set(Event.objects.filter(attendees=request.user).values_list("id", flat=True))
+    saved_ids = set(se.event_id for se in saved_qs)
+
+    return render(request, "saved_events.html", {
+        "events": events,
+        "my_event_ids": my_event_ids,
+        "saved_ids": saved_ids,
+    })
+
 
 # --- Event Detail (student) ---
 from django.utils import timezone

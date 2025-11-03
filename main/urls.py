@@ -10,7 +10,7 @@ urlpatterns = [
     path("",                    api_views.home,            name="home"),
 
     # Entry & auth pages
-    path("login/",              api_views.loginindex,      name="loginindex"),   # optional: keep old login index
+    path("login/",              api_views.loginindex,      name="loginindex"),
     path("signup/",             api_views.signup,          name="signup"),
     path("studentlogin/",       api_views.studentlogin,    name="studentlogin"),
     path("organizerlogin/",     api_views.organizerlogin,  name="organizerlogin"),
@@ -19,12 +19,13 @@ urlpatterns = [
     # Dashboards / pages
     path("studentdashboard/",   api_views.studentdashboard,  name="studentdashboard"),
     path("organizerdashboard/", views.organizer_dashboard,   name="organizerdashboard"),
-    path('organizer/analytics/', views.organizer_analytics, name='organizer-analytics'),
+    path("organizer/analytics/", views.organizer_analytics,  name="organizer-analytics"),
     path("admindashboard/",     api_views.admindashboard,    name="admindashboard"),
     path("organizerpending/",   api_views.organizerpending,  name="organizerpending"),
 
-    # Student event finder page
+    # Student event finder + saved
     path("eventlist/",          api_views.EventList,         name="EventList"),
+    path("saved-events/",       api_views.saved_events,      name="saved_events"),
 
     # Student event detail + save toggle
     path("events/<int:event_id>/",        api_views.EventDetail,      name="EventDetail"),
@@ -40,7 +41,7 @@ urlpatterns = [
     path("delete-event/<int:event_id>/", views.delete_event,          name="delete-event"),
 
     # CSV export route for organizers
-    path('event/<int:event_id>/export/', views.export_attendees_csv, name='export_event_csv'),
+    path("event/<int:event_id>/export/", views.export_attendees_csv,  name="export_event_csv"),
 
     # Ticket claim / unclaim / QR routes
     path("events/<int:event_id>/claim/",     api_views.claim_event,   name="claim_event"),
@@ -48,6 +49,7 @@ urlpatterns = [
     path("tickets/<int:event_id>/qr.png",    qr_png,                  name="ticket_qr"),
     path("events/<int:event_id>/checkout/",  api_views.checkout,      name="checkout"),
 
-    path("analytics/participation-trend/", participation_trend, name="participation_trend"),
-    path("analytics/claim-trend/", views.claim_trend_by_payment, name="claim_trend_by_payment"),
+    # Analytics (organizer)
+    path("analytics/participation-trend/", participation_trend,         name="participation_trend"),
+    path("analytics/claim-trend/",         views.claim_trend_by_payment, name="claim_trend_by_payment"),
 ]
