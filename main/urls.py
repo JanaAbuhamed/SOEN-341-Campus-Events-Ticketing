@@ -5,7 +5,25 @@ from main.api import views as api_views          # page views in main.api.views
 from main.api.qr_views import qr_png             # QR image
 from .views import participation_trend
 
+from django.urls import include
+from rest_framework.routers import DefaultRouter
+from main.views import UserViewSet, EventViewSet
+from django.contrib import admin
+
+
+router = DefaultRouter()
+router.register(r'users', UserViewSet, basename='user')
+router.register(r'events', EventViewSet, basename='event')
+
+
+
 urlpatterns = [
+    
+    # DRF router for API endpoints
+    path("api/", include(router.urls)), # this makes /api/users/ and /api/events/ available
+
+    path('admin/', admin.site.urls),
+    
     # Public landing page (guests)
     path("",                    api_views.home,            name="home"),
 

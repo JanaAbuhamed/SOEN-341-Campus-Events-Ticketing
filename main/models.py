@@ -1,8 +1,18 @@
-# main/models/models.py
+# main/models.py
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin, Group
 from django.utils import timezone
-from django.conf import settings  # NEW
+from django.conf import settings 
+
+class User_groups(models.Model):
+    user = models.ForeignKey('User', on_delete=models.CASCADE)
+    group_name = models.CharField(max_length=100)
+    
+    def __str__(self):
+        return f"{self.user.username} - {self.group_name}"
+
+    # class Meta:
+    #     app_label = 'main'
 
 class UserManager(BaseUserManager):
     def create_user(self, email, name, password=None, role=0, status=0):
@@ -28,6 +38,7 @@ class UserManager(BaseUserManager):
         user.is_superuser = True
         user.save(using=self._db)
         return user
+
 
 
 class User(AbstractBaseUser, PermissionsMixin):
@@ -64,6 +75,10 @@ class User(AbstractBaseUser, PermissionsMixin):
     def __str__(self):
         return f"{self.name} ({self.get_role_display()})"
 
+    # class Meta:
+    #     app_label = 'main'
+
+# EVENT MODEL
 #  TICKET MODEL
 
 class Ticket(models.Model):
@@ -138,6 +153,8 @@ class Event(models.Model):
         return self.capacity - self.attendees.count()
 
     
+    class Meta:
+        app_label = 'main'
     def attendee_info(self):
         """Return a list of dicts with attendee details including purchase date."""
         tickets = Ticket.objects.filter(event=self)
