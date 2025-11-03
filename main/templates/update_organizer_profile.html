@@ -1,22 +1,67 @@
 <!-- main/templates/update_organizer_profile.html -->
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Update Organizer Profile</title>
+  <link rel="stylesheet" href="{% static 'css/organizerdashboard.css' %}">
+</head>
+<body>
 
+  <!-- Topbar -->
+  <header class="topbar">
+    <div class="shell">
+      <h1>Update Profile</h1>
+      <div class="topbar-actions">
+        <a href="{% url 'organizerdashboard' %}" class="btn ghost">← Back to Dashboard</a>
+      </div>
+    </div>
+  </header>
 
-{% extends 'base.html' %}
+  <main class="shell">
+    <div class="card">
+      <div class="card-head">
+        <h2>Organizer Profile</h2>
+      </div>
+      
+      <div class="table-wrap">
+        <form method="POST">
+          {% csrf_token %}
+          
+          <div class="grid-2">
+            {% for field in form %}
+              <div class="field {% if field.name == 'email' or field.name == 'name' %}full{% endif %}">
+                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                {{ field }}
+                {% if field.help_text %}
+                  <small>{{ field.help_text }}</small>
+                {% endif %}
+                {% if field.errors %}
+                  <div class="error">
+                    {{ field.errors }}
+                  </div>
+                {% endif %}
+              </div>
+            {% endfor %}
+          </div>
+          
+          <div class="modal-foot">
+            <button type="submit" class="btn primary">Save Changes</button>
+          </div>
+        </form>
 
-{% block content %}
-<h2>Update Organizer Profile</h2>
+        {% if messages %}
+          <ul class="messages">
+            {% for message in messages %}
+              <li>{{ message }}</li>
+            {% endfor %}
+          </ul>
+        {% endif %}
+      </div>
+    </div>
+  </main>
 
-<form method="POST">
-  {% csrf_token %}
-  {{ form.as_p }}
-  <button type="submit" class="btn-primary">Save Changes</button>
-</form>s
-
-{% if messages %}
-  <ul>
-    {% for message in messages %}
-      <li>{{ message }}</li>
-    {% endfor %}
-  </ul>
-{% endif %}
-{% endblock %}
+</body>
+</html>

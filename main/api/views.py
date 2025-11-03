@@ -311,6 +311,7 @@ def admin_events_bulk(request):
 
     return JsonResponse({"error": "Unknown action"}, status=400)
 
+
 # -------------------------------
 # Sign up / student login
 # -------------------------------

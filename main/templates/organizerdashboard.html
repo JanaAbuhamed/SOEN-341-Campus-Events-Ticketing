@@ -16,6 +16,7 @@
       <h1>Organizer Dashboard</h1>
       <div class="topbar-actions">
         <a href="{% url 'update_organizer_profile' %}" class="btn ghost">Edit Profile</a>
+        <a href="{% url 'organizer-analytics' %}" class="btn primary">📊 Analytics Dashboard</a>
         <button id="openCreateEvent" class="btn primary">➕ Create Event</button>
       </div>
     </div>
@@ -23,10 +24,21 @@
 
   <main class="shell main-grid">
 
-<!-- MY EVENTS -->
 <section class="card">
   <div class="card-head">
     <h2>My Events</h2>
+    <div class="sort-controls">
+      <span>Sort by:</span>
+      <a href="?sort=created_at" class="sort-btn {% if current_sort == 'created_at' %}active{% endif %}">
+        📅 Published Date
+      </a>
+      <a href="?sort=event_date" class="sort-btn {% if current_sort == 'event_date' %}active{% endif %}">
+        🗓️ Event Date
+      </a>
+      <a href="?sort=tickets_issued" class="sort-btn {% if current_sort == 'tickets_issued' %}active{% endif %}">
+        🎫 Tickets Issued
+      </a>
+    </div>
   </div>
   <div class="table-wrap">
     <table class="table">
@@ -73,7 +85,6 @@
     </table>
   </div>
 </section>
-
 
     <!-- PENDING -->
     <section class="card">
