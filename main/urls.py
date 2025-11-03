@@ -18,6 +18,7 @@ urlpatterns = [
     # Dashboards / pages
     path("studentdashboard/",   api_views.studentdashboard,  name="studentdashboard"),
     path("organizerdashboard/", views.organizer_dashboard,   name="organizerdashboard"),
+    path('organizer/analytics/', views.organizer_analytics, name='organizer-analytics'),
     path("admindashboard/",     api_views.admindashboard,    name="admindashboard"),
     path("organizerpending/",   api_views.organizerpending,  name="organizerpending"),
 
