@@ -10,21 +10,22 @@
 </head>
 <body>
 
-  <!-- Optional: header/navbar -->
   <header>
     <h1>Campus Event Tickets</h1>
     {% if user.is_authenticated %}
       <p>Welcome, {{ user.name }}!</p>
+      <nav>
+        <a href="{% url 'EventList' %}">Event Finder</a> ·
+        <a href="{% url 'studentdashboard' %}">My Tickets</a> ·
+        <a href="{% url 'StudentCalendar' %}">Calendar</a>
+      </nav>
     {% endif %}
   </header>
 
-  <!-- Main content -->
   <main>
-    {% block content %}
-    {% endblock %}
+    {% block content %}{% endblock %}
   </main>
 
-  <!-- Optional: footer -->
   <footer>
     <p>&copy; 2025 Campus Event Tickets</p>
   </footer>

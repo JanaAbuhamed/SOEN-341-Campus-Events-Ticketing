@@ -1,0 +1,212 @@
+{% comment %} main/templates/organizeranalytics.html {% endcomment %}
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Analytics Dashboard</title>
+  <link rel="stylesheet" href="{% static 'css/organizerdashboard.css' %}">
+  <style>
+    .analytics-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+    .stat-card {
+      background: white;
+      padding: 1.5rem;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+    .stat-number {
+      font-size: 2rem;
+      font-weight: bold;
+      color: #2563eb;
+    }
+    .stat-label {
+      color: #6b7280;
+      font-size: 0.9rem;
+      margin-top: 0.5rem;
+    }
+    .progress-bar {
+      width: 100%;
+      height: 8px;
+      background: #e5e7eb;
+      border-radius: 4px;
+      margin: 1rem 0;
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      background: #2563eb;
+      border-radius: 4px;
+      transition: width 0.3s ease;
+    }
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 1.5rem;
+      color: #6b7280;
+      text-decoration: none;
+    }
+    .back-link:hover {
+      color: #374151;
+    }
+    .event-analytics-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .event-analytics-table th {
+      background: #f8fafc;
+      padding: 0.75rem;
+      text-align: left;
+      font-weight: 600;
+      border-bottom: 1px solid #e5e7eb;
+    }
+    .event-analytics-table td {
+      padding: 0.75rem;
+      border-bottom: 1px solid #f1f5f9;
+    }
+    .engagement-badge {
+      padding: 0.25rem 0.5rem;
+      border-radius: 12px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+    .engagement-high { background: #dcfce7; color: #166534; }
+    .engagement-medium { background: #fef3c7; color: #92400e; }
+    .engagement-low { background: #fee2e2; color: #991b1b; }
+  </style>
+</head>
+<body>
+
+  <!-- Topbar -->
+  <header class="topbar">
+    <div class="shell">
+      <h1>Analytics Dashboard</h1>
+      <div class="topbar-actions">
+        <a href="{% url 'organizerdashboard' %}" class="btn ghost">← Back to Dashboard</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="shell">
+    
+    <!-- Overview Statistics -->
+    <div class="card">
+      <div class="card-head">
+        <h2>Overview Statistics</h2>
+      </div>
+      <div class="card-body">
+        <div class="analytics-grid">
+          <div class="stat-card">
+            <div class="stat-number">{{ analytics.total_events }}</div>
+            <div class="stat-label">Total Events</div>
+          </div>
+          
+          <div class="stat-card">
+            <div class="stat-number">{{ analytics.approved_count }}</div>
+            <div class="stat-label">Approved Events</div>
+          </div>
+          
+          <div class="stat-card">
+            <div class="stat-number">{{ analytics.pending_count }}</div>
+            <div class="stat-label">Pending Events</div>
+          </div>
+          
+          <div class="stat-card">
+            <div class="stat-number">{{ analytics.rejected_count }}</div>
+            <div class="stat-label">Rejected Events</div>
+          </div>
+          
+          <div class="stat-card">
+            <div class="stat-number">{{ analytics.total_attendees }}</div>
+            <div class="stat-label">Total Attendees</div>
+          </div>
+          
+          <div class="stat-card">
+            <div class="stat-number">{{ analytics.overall_attendance_rate }}%</div>
+            <div class="stat-label">Overall Attendance Rate</div>
+            <div class="progress-bar">
+              <div class="progress-fill" style="width: {{ analytics.overall_attendance_rate }}%"></div>
+            </div>
+          </div>
+        
+          <!-- Saved Events Metric -->
+          <div class="stat-card">
+            <div class="stat-number">{{ analytics.total_saves }}</div>
+            <div class="stat-label">Total Saves</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <br>
+    <!-- Per-Event Analytics -->
+    <div class="card">
+      <div class="card-head">
+        <h2>Event Performance & Engagement</h2>
+      </div>
+      <div class="card-body">
+        {% if analytics.event_analytics %}
+          <div class="table-wrap">
+            <table class="event-analytics-table">
+              <thead>
+                <tr>
+                  <th>Event</th>
+                  <th>Date</th>
+                  <th>Attendees</th>
+                  <th>Capacity</th>
+                  <th>Attendance</th>
+                  <th>Saved</th>
+                  <th>Engagement</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for event_data in analytics.event_analytics %}
+                  <tr>
+                    <td class="strong">{{ event_data.event.title }}</td>
+                    <td>{{ event_data.event.date }}</td>
+                    <td>{{ event_data.attendees_count }}</td>
+                    <td>{{ event_data.event.capacity }}</td>
+                    <td>
+                      {{ event_data.attendance_rate }}%
+                      <div class="progress-bar" style="height: 4px; margin: 0.25rem 0;">
+                        <div class="progress-fill" style="width: {{ event_data.attendance_rate }}%"></div>
+                      </div>
+                    </td>
+                    <td>
+                      {{ event_data.saves_count }}
+                      {% if event_data.save_to_attendance_ratio > 0 %}
+                        <br><small style="color: #6b7280; font-size: 0.75rem;">
+                          {{ event_data.save_to_attendance_ratio }}% conversion
+                        </small>
+                      {% endif %}
+                    </td>
+                    <td>
+                      <span class="engagement-badge 
+                        {% if event_data.engagement_score >= 50 %}engagement-high
+                        {% elif event_data.engagement_score >= 20 %}engagement-medium
+                        {% else %}engagement-low{% endif %}">
+                        {{ event_data.engagement_score }}%
+                      </span>
+                    </td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        {% else %}
+          <p class="empty">No approved events with analytics data yet.</p>
+        {% endif %}
+      </div>
+    </div>
+
+  </main>
+
+</body>
+</html>

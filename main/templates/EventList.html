@@ -5,64 +5,31 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Event Finder</title>
-
   <style>
-    :root{
-      --grad-start:#7b5cff;
-      --grad-end:#ff3cac;
-      --primary:#5c5cff;
-      --primary-hover:#6a6aff;
-      --chip-bg:rgba(255,255,255,0.22);
-      --chip-hover:rgba(255,255,255,0.36);
-    }
-
-    body{
-      margin:0;
-      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-      background:linear-gradient(135deg,var(--grad-start) 0%,var(--grad-end) 100%);
-      color:#333;
-    }
-
+    :root{ --grad-start:#7b5cff; --grad-end:#ff3cac; --primary:#5c5cff; --primary-hover:#6a6aff; --chip-bg:rgba(255,255,255,0.22); --chip-hover:rgba(255,255,255,0.36); }
+    body{ margin:0; font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; background:linear-gradient(135deg,var(--grad-start) 0%,var(--grad-end) 100%); color:#333; }
     header{ text-align:center; padding:48px 16px 28px; color:#fff; }
     header h1{ font-size:2.4rem; font-weight:800; margin:0 0 16px; }
-
     .chipbar{ display:flex; justify-content:center; gap:14px; flex-wrap:wrap; }
-    .chipbar a{
-      background:var(--chip-bg); color:#fff; border-radius:999px; padding:10px 16px;
-      text-decoration:none; font-weight:700; transition:background .2s;
-    }
+    .chipbar a{ background:var(--chip-bg); color:#fff; border-radius:999px; padding:10px 16px; text-decoration:none; font-weight:700; transition:background .2s; }
     .chipbar a:hover{ background:var(--chip-hover); }
+    main{ background:#f7f7fa; min-height:calc(100vh - 220px); border-radius:24px 24px 0 0; padding:32px; }
 
-    main{
-      background:#f7f7fa; min-height:calc(100vh - 220px);
-      border-radius:24px 24px 0 0; padding:32px;
-    }
+    .search-box{ text-align:center; margin:12px 0 24px; }
+    .search-box input, .search-box select, .search-box button{ padding:10px 12px; border-radius:999px; border:1px solid #ccc; font-size:1rem; outline:none; }
+    .search-box input:focus, .search-box select:focus{ border-color:var(--primary); }
+    .search-box select{ margin:0 6px; }
+    .search-box button{ background:var(--primary); color:#fff; border:none; cursor:pointer; font-weight:700; }
+    .search-box button:hover{ background:var(--primary-hover); }
 
-    .search-box{ text-align:center; margin:24px 0 32px; }
-    .search-box input{
-      width:320px; padding:10px 16px; border-radius:999px; border:1px solid #ccc;
-      font-size:1rem; outline:none; transition:border .2s;
-    }
-    .search-box input:focus{ border-color:var(--primary); }
-
-    table{
-      width:100%; max-width:1100px; margin:0 auto; border-collapse:collapse; background:#fff;
-      border-radius:16px; box-shadow:0 8px 24px rgba(0,0,0,.05); overflow:hidden;
-    }
+    table{ width:100%; max-width:1100px; margin:0 auto; border-collapse:collapse; background:#fff; border-radius:16px; box-shadow:0 8px 24px rgba(0,0,0,.05); overflow:hidden; }
     th, td{ text-align:left; padding:14px 18px; border-bottom:1px solid #eee; }
     th{ background:#fafafa; font-weight:800; }
     tr:last-child td{ border-bottom:none; }
 
-    .btn-primary{
-      background:var(--primary); color:#fff; border:none; border-radius:999px; padding:8px 16px;
-      font-weight:700; cursor:pointer; text-decoration:none; transition:background .18s;
-    }
+    .btn-primary{ background:var(--primary); color:#fff; border:none; border-radius:999px; padding:8px 16px; font-weight:700; cursor:pointer; text-decoration:none; transition:background .18s; }
     .btn-primary:hover{ background:var(--primary-hover); }
-
-    .btn-disabled{
-      background:#ddd; color:#777; border-radius:999px; padding:8px 16px; font-weight:700; cursor:not-allowed;
-    }
-
+    .btn-disabled{ background:#ddd; color:#777; border-radius:999px; padding:8px 16px; font-weight:700; cursor:not-allowed; }
     form{ margin:0; display:inline; }
   </style>
 </head>
@@ -78,6 +45,26 @@
 </header>
 
 <main>
+  <!-- filter/sort bar -->
+  <form method="get" class="search-box" style="margin-top:0;">
+    <select name="category">
+      <option value="">All categories</option>
+      {% for c in categories %}
+        <option value="{{ c }}" {% if current.category == c %}selected{% endif %}>{{ c }}</option>
+      {% endfor %}
+    </select>
+    <input type="date" name="date_from" value="{{ current.date_from }}">
+    <input type="date" name="date_to"   value="{{ current.date_to }}">
+    <input type="text" name="location" placeholder="Location" value="{{ current.location }}">
+    <select name="sort">
+      <option value="published"  {% if current.sort == "published" %}selected{% endif %}>Newest</option>
+      <option value="event"      {% if current.sort == "event" %}selected{% endif %}>Event date</option>
+      <option value="popularity" {% if current.sort == "popularity" %}selected{% endif %}>Popularity</option>
+    </select>
+    <button type="submit">Apply</button>
+  </form>
+
+  <!-- client-side keyword search -->
   <div class="search-box">
     <input id="searchInput" type="text" placeholder="Search by name, organizer, or date…">
   </div>
@@ -98,18 +85,27 @@
       {% for event in events %}
         <tr>
           <td>{{ event.title }}</td>
-          <td>{{ event.organizer }}</td>
+          <td>{{ event.organizer.name }}</td>
           <td>{{ event.date|date:"Y-m-d" }}</td>
           <td>{{ event.time }}</td>
           <td>{{ event.category }}</td>
           <td>
+            <a class="btn-primary" href="{% url 'EventDetail' event.id %}" style="margin-right:8px;">View</a>
+
+            {% if user.is_authenticated %}
+              <form method="post" action="{% url 'ToggleSaveEvent' event.id %}" style="display:inline">
+                {% csrf_token %}
+                <button type="submit" class="btn-primary" style="margin-right:8px;">
+                  {% if saved_ids and event.id in saved_ids %}Unsave{% else %}Save{% endif %}
+                </button>
+              </form>
+            {% endif %}
+
             {% if event.id in my_event_ids %}
               <span class="btn-disabled">Claimed</span>
             {% else %}
-              <form method="post" action="{% url 'claim_event' event.id %}">
-                {% csrf_token %}
-                <button type="submit" class="btn-primary">Claim</button>
-              </form>
+              <!-- CHANGED: go to checkout first (simulated payment) -->
+              <a class="btn-primary" href="{% url 'checkout' event.id %}">Claim</a>
             {% endif %}
           </td>
         </tr>
