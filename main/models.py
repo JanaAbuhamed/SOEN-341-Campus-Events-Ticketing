@@ -1,8 +1,18 @@
-# main/models/models.py
+# main/models.py
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin, Group
 from django.utils import timezone
-from django.conf import settings  # NEW
+from django.conf import settings 
+
+class User_groups(models.Model):
+    user = models.ForeignKey('User', on_delete=models.CASCADE)
+    group_name = models.CharField(max_length=100)
+    
+    def __str__(self):
+        return f"{self.user.username} - {self.group_name}"
+
+    # class Meta:
+    #     app_label = 'main'
 
 class UserManager(BaseUserManager):
     def create_user(self, email, name, password=None, role=0, status=0):
@@ -65,8 +75,8 @@ class User(AbstractBaseUser, PermissionsMixin):
     def __str__(self):
         return f"{self.name} ({self.get_role_display()})"
 
-    class Meta:
-        app_label = 'main'
+    # class Meta:
+    #     app_label = 'main'
 
 # EVENT MODEL
 #  TICKET MODEL

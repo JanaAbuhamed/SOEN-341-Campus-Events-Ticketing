@@ -3,6 +3,8 @@ from django.test import TestCase
 from rest_framework.test import APIClient
 from main.models import User, Event
 from datetime import date, time
+from main.models import User_groups
+
 
 class SimpleTest(TestCase):
     def test_basic_math(self):
