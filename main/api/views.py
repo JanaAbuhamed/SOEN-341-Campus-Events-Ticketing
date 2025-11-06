@@ -17,11 +17,16 @@ from rest_framework import permissions, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
-from ..forms import (
-    OrganizerSignupForm,
-    PasswordUpdateForm,
-    StudentSignupForm,
-    UserUpdateForm,
+from ..forms import OrganizerSignupForm, PasswordUpdateForm, StudentSignupForm, UserUpdateForm
+from ..models import Event, SavedEvent, Ticket, User, Payment
+from .serializers import EventCreateSerializer, EventSerializer, UserSerializer
+from .permissions import (
+    CanCreateEvent,
+    CanDeleteEvent,
+    CanEditEvent,
+    CanRegisterEvent,
+    CanViewEvents,
+    CanViewUsers,
 )
 from ..models import Event, SavedEvent, Ticket, User
 from .permissions import (
@@ -33,6 +38,48 @@ from .permissions import (
     CanViewUsers,
 )
 from .serializers import EventCreateSerializer, EventSerializer, UserSerializer
+
+
+# -------------------------------
+# Small helper for safe ticket creation
+# -------------------------------
+
+def _generate_token() -> str:
+    # URL-safe, reasonably short; adjust size if you want longer codes
+    return secrets.token_urlsafe(16)
+
+def _ensure_ticket_claimed(event: Event, user: User) -> Ticket:
+    """
+    Get or create the through-model Ticket ensuring:
+      - qr_token is non-null
+      - claimed_at is set
+    Returns the Ticket object.
+    """
+    ticket, created = Ticket.objects.get_or_create(
+        event=event,
+        user=user,
+        defaults={
+            "qr_token": _generate_token(),
+            "claimed_at": timezone.now(),
+        },
+    )
+    # Repair older/blank rows if any
+    missing = False
+    if not ticket.qr_token:
+        ticket.qr_token = _generate_token()
+        missing = True
+    if not ticket.claimed_at:
+        ticket.claimed_at = timezone.now()
+        missing = True
+    if missing:
+        ticket.save(update_fields=["qr_token", "claimed_at"])
+    # If your model has a convenience method, call it too
+    if hasattr(ticket, "mark_claimed"):
+        ticket.mark_claimed()
+        # mark_claimed may set fields; persist safely
+        ticket.save()
+    return ticket
+
 
 
 # -------------------------------
@@ -185,11 +232,24 @@ def admindashboard(request):
     students = User.objects.filter(role=0).order_by("created_at")
     organizers = User.objects.filter(role=1).order_by("name")
     events = Event.objects.all().select_related("organizer").order_by("-created_at")
+    total_students = User.objects.filter(role=0).count()
+    total_organizers = User.objects.filter(role=1).count()
+    total_events = Event.objects.count()
+    total_claimed_tickets = Payment.objects.filter(status="succeeded").count()
 
     return render(
         request,
         "admindashboard.html",
-        {"tab": tab, "students": students, "organizers": organizers, "events": events},
+        {
+            "tab": tab,
+            "students": students,
+            "organizers": organizers,
+            "events": events,
+            "total_students": total_students,
+            "total_organizers": total_organizers,
+            "total_events": total_events,
+            "total_claimed_tickets": total_claimed_tickets,
+        },
     )
 
 
@@ -844,7 +904,6 @@ def checkout(request, event_id: int):
         return render(request, "checkout.html", {"event": event, "price": price})
 
     # Record payment
-    from ..models import Payment
     Payment.objects.update_or_create(
         user=request.user,
         event=event,

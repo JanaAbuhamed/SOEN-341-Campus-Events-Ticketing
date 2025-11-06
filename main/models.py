@@ -1,4 +1,4 @@
-# main/models/models.py
+# main/models.py
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin, Group
 from django.utils import timezone
@@ -6,28 +6,39 @@ from django.conf import settings
 import secrets
 
 
+class User_groups(models.Model):
+    user = models.ForeignKey('User', on_delete=models.CASCADE)
+    group_name = models.CharField(max_length=100)
+
+    def __str__(self):
+        return f"{self.user.username} - {self.group_name}"
+
+
 class UserManager(BaseUserManager):
     def create_user(self, email, name, password=None, role=0, status=0):
         if not email:
             raise ValueError("Users must have an email address")
+
         email = self.normalize_email(email)
         user = self.model(email=email, name=name, role=role, status=status)
         user.set_password(password)  # hashes password properly
         user.save(using=self._db)
 
-        # Attach group if present; don’t fail early in migrations
+        # Attach group; be tolerant so migrations don't fail
         try:
-            if role == 0:
-                group = Group.objects.get(name='Student')
-            elif role == 1:
-                group = Group.objects.get(name='Organizer')
-            elif role == 2:
-                group = Group.objects.get(name='Administrator')
+            if role == 0:       # Student
+                group, _ = Group.objects.get_or_create(name="Student")
+            elif role == 1:     # Organizer
+                group, _ = Group.objects.get_or_create(name="Organizer")
+            elif role == 2:     # Admin
+                group, _ = Group.objects.get_or_create(name="Administrator")
             else:
                 group = None
+
             if group:
                 user.groups.add(group)
-        except Group.DoesNotExist:
+        except Exception:
+            # If auth tables aren't migrated yet, don't crash user creation
             pass
 
         return user
@@ -154,7 +165,7 @@ class Event(models.Model):
         User,
         through='Ticket',
         related_name='events_attending',
-        blank=True
+        blank=True,
     )
 
     organizer = models.ForeignKey(
@@ -208,11 +219,11 @@ class Payment(models.Model):
         ("failed", "Failed"),
         ("pending", "Pending"),
     )
-    user      = models.ForeignKey("main.User", on_delete=models.CASCADE, related_name="payments")
-    event     = models.ForeignKey("main.Event", on_delete=models.CASCADE, related_name="payments")
-    amount    = models.DecimalField(max_digits=8, decimal_places=2, default=0)
-    status    = models.CharField(max_length=16, choices=STATUS_CHOICES, default="succeeded")
-    txn_id    = models.CharField(max_length=64, blank=True)  # fake transaction id
+    user       = models.ForeignKey("main.User", on_delete=models.CASCADE, related_name="payments")
+    event      = models.ForeignKey("main.Event", on_delete=models.CASCADE, related_name="payments")
+    amount     = models.DecimalField(max_digits=8, decimal_places=2, default=0)
+    status     = models.CharField(max_length=16, choices=STATUS_CHOICES, default="succeeded")
+    txn_id     = models.CharField(max_length=64, blank=True)  # fake transaction id
     created_at = models.DateTimeField(default=timezone.now)
 
     class Meta:

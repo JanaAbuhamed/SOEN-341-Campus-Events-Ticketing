@@ -130,6 +130,9 @@ else:
             "HOST": os.environ.get("MYSQL_HOST", "localhost"),
             "PORT": os.environ.get("MYSQL_PORT", "3306"),
             "OPTIONS": {"init_command": "SET sql_mode='STRICT_TRANS_TABLES'"},
+            "TEST": {
+                "NAME": "test_student_event",  # explicitly name the test DB
+            },
         }
     }
 
