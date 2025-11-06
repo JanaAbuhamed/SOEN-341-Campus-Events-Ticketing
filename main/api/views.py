@@ -839,7 +839,40 @@ def EventDetail(request, event_id: int):
     }
     return render(request, "event_detail.html", context)
 
+@login_required
+def SavedList(request):
+    """
+    Student-only page that lists all events this user has saved.
+    Shows newest upcoming first; also passes claimed/saved ids for button states.
+    """
+    if getattr(request.user, "role", None) != 0:
+        return HttpResponseForbidden("Student access required")
 
+    # Saved events for this user (only approved, upcoming first)
+    events = (
+        Event.objects
+        .filter(saved_by__user=request.user)  # reverse of SavedEvent.event related_name="saved_by"
+        .select_related("organizer")
+        .order_by("date", "time", "-created_at")
+    )
+
+    # Button states (reuse logic from EventList)
+    my_event_ids = set(
+        Event.objects.filter(attendees=request.user).values_list("id", flat=True)
+    )
+    saved_ids = set(
+        SavedEvent.objects.filter(user=request.user).values_list("event_id", flat=True)
+    )
+
+    return render(
+        request,
+        "saved_events.html",
+        {
+            "events": events,
+            "my_event_ids": my_event_ids,
+            "saved_ids": saved_ids,
+        },
+    )
 @login_required
 @require_POST
 @csrf_protect
