@@ -895,6 +895,8 @@ def ToggleSaveEvent(request, event_id: int):
     ref = request.POST.get("ref", "")
     if ref == "detail":
         return redirect("EventDetail", event_id=event.id)
+    if ref == "saved":
+        return redirect("SavedList")
     return redirect("EventList")
 
 

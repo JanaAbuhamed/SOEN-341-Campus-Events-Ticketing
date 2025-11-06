@@ -5,24 +5,96 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Saved Events</title>
-  <link rel="stylesheet" href="{% static 'css/studentcalendar.css' %}">{# optional if you have shared css #}
+  <link rel="stylesheet" href="{% static 'css/studentcalendar.css' %}">
   <style>
-    /* lightweight styles (reuse yours if you prefer) */
-    body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:#f7f7fa;color:#333}
-    header{background:linear-gradient(135deg,#7b5cff 0%,#ff3cac 100%);padding:56px 16px 24px;color:#fff;text-align:center}
-    header h1{margin:0 0 16px;font-size:2.2rem;font-weight:800}
-    .chipbar{display:flex;justify-content:center;gap:14px;flex-wrap:wrap}
-    .chipbar a{background:rgba(255,255,255,0.22);color:#fff;text-decoration:none;font-weight:700;padding:10px 16px;border-radius:999px}
-    main{max-width:1100px;margin:0 auto;padding:28px}
-    table{width:100%;border-collapse:separate;border-spacing:0 10px}
-    th,td{padding:14px 16px;background:#fff}
-    th{font-weight:800;text-align:left}
-    tr{box-shadow:0 10px 30px rgba(0,0,0,.06);border-radius:12px}
-    .pill{border:none;border-radius:999px;padding:8px 14px;cursor:pointer;font-weight:700}
-    .primary{background:#5c5cff;color:#fff}
-    .ghost{background:#eee}
-    .muted{background:#ddd;color:#666}
-    .empty{background:#fff;padding:24px;border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,.06);text-align:center}
+    body {
+      margin: 0;
+      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      background: #f7f7fa;
+      color: #333;
+    }
+    header {
+      background: linear-gradient(135deg, #7b5cff 0%, #ff3cac 100%);
+      padding: 56px 16px 24px;
+      color: #fff;
+      text-align: center;
+    }
+    header h1 {
+      margin: 0 0 16px;
+      font-size: 2.2rem;
+      font-weight: 800;
+    }
+    .chipbar {
+      display: flex;
+      justify-content: center;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+    .chipbar a {
+      background: rgba(255, 255, 255, 0.22);
+      color: #fff;
+      text-decoration: none;
+      font-weight: 700;
+      padding: 10px 16px;
+      border-radius: 999px;
+      transition: background 0.2s;
+    }
+    .chipbar a:hover {
+      background: rgba(255, 255, 255, 0.35);
+    }
+    main {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 28px;
+    }
+    table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0 10px;
+    }
+    th, td {
+      padding: 14px 16px;
+      background: #fff;
+    }
+    th {
+      font-weight: 800;
+      text-align: left;
+    }
+    tr {
+      box-shadow: 0 10px 30px rgba(0, 0, 0, .06);
+      border-radius: 12px;
+    }
+    .pill {
+      border: none;
+      border-radius: 999px;
+      padding: 8px 14px;
+      cursor: pointer;
+      font-weight: 700;
+    }
+    .primary {
+      background: #5c5cff;
+      color: #fff;
+      text-decoration: none;
+    }
+    .primary:hover {
+      background: #6a6aff;
+    }
+    .ghost {
+      background: #eee;
+      color: #333;
+      text-decoration: none;
+    }
+    .muted {
+      background: #ddd;
+      color: #666;
+    }
+    .empty {
+      background: #fff;
+      padding: 24px;
+      border-radius: 12px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, .06);
+      text-align: center;
+    }
   </style>
 </head>
 <body>
@@ -68,9 +140,10 @@
           <td>
             <a class="pill primary" href="{% url 'EventDetail' e.id %}">View</a>
 
+            <!-- ✅ Updated so Unsave redirects back to /saved/ -->
             <form method="post" action="{% url 'ToggleSaveEvent' e.id %}" style="display:inline">
               {% csrf_token %}
-              <input type="hidden" name="ref" value="list">
+              <input type="hidden" name="ref" value="saved">
               <button class="pill ghost" type="submit">Unsave</button>
             </form>
 

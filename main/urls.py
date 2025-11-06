@@ -1,4 +1,3 @@
-# main/urls.py
 from django.urls import path, include
 from django.contrib import admin
 from rest_framework.routers import DefaultRouter
@@ -7,7 +6,7 @@ from . import views  # organizer CRUD + organizer profile / analytics helpers
 from main.api import views as api_views           # page views (student/admin auth + pages)
 from main.api import qr_views                     # QR endpoints (scanner, public, APIs)
 
-# IMPORTANT: viewsets are defined in main/api/views.py, not main/views.py
+# IMPORTANT: viewsets are defined in main/api/views.py
 from main.api.views import UserViewSet, EventViewSet
 
 # Only keep these if they really exist in main/views.py
@@ -39,13 +38,16 @@ urlpatterns = [
     path("admindashboard/",     api_views.admindashboard,   name="admindashboard"),
     path("organizerpending/",   api_views.organizerpending, name="organizerpending"),
 
-    # Organizer analytics page (button in organizerdashboard.html)
+    # Organizer analytics page
     path("organizer/analytics/", views.organizer_analytics, name="organizer-analytics"),
 
     # Student event finder/detail/save
     path("eventlist/",                  api_views.EventList,       name="EventList"),
     path("events/<int:event_id>/",      api_views.EventDetail,     name="EventDetail"),
     path("events/<int:event_id>/save/", api_views.ToggleSaveEvent, name="ToggleSaveEvent"),
+
+    # ✅ Added: Saved events list
+    path("saved/", api_views.SavedList, name="SavedList"),
 
     # Student profile/password
     path("update-profile/",  api_views.update_profile,  name="update_profile"),
@@ -74,7 +76,7 @@ urlpatterns = [
     path("t/<str:qr_token>/",                qr_views.public_ticket_page,  name="public_ticket_page"),
     path("api/events/<int:event_id>/stats/", qr_views.event_stats_api,     name="event_stats_api"),
 
-    # Analytics endpoints (only if these functions exist)
+    # Analytics endpoints
     path("analytics/participation-trend/", participation_trend,    name="participation_trend"),
     path("analytics/claim-trend/",         claim_trend_by_payment, name="claim_trend_by_payment"),
 ]
