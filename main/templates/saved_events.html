@@ -1,0 +1,97 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Saved Events</title>
+  <link rel="stylesheet" href="{% static 'css/studentcalendar.css' %}">{# optional if you have shared css #}
+  <style>
+    /* lightweight styles (reuse yours if you prefer) */
+    body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:#f7f7fa;color:#333}
+    header{background:linear-gradient(135deg,#7b5cff 0%,#ff3cac 100%);padding:56px 16px 24px;color:#fff;text-align:center}
+    header h1{margin:0 0 16px;font-size:2.2rem;font-weight:800}
+    .chipbar{display:flex;justify-content:center;gap:14px;flex-wrap:wrap}
+    .chipbar a{background:rgba(255,255,255,0.22);color:#fff;text-decoration:none;font-weight:700;padding:10px 16px;border-radius:999px}
+    main{max-width:1100px;margin:0 auto;padding:28px}
+    table{width:100%;border-collapse:separate;border-spacing:0 10px}
+    th,td{padding:14px 16px;background:#fff}
+    th{font-weight:800;text-align:left}
+    tr{box-shadow:0 10px 30px rgba(0,0,0,.06);border-radius:12px}
+    .pill{border:none;border-radius:999px;padding:8px 14px;cursor:pointer;font-weight:700}
+    .primary{background:#5c5cff;color:#fff}
+    .ghost{background:#eee}
+    .muted{background:#ddd;color:#666}
+    .empty{background:#fff;padding:24px;border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,.06);text-align:center}
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Saved Events</h1>
+  <div class="chipbar">
+    <a href="{% url 'EventList' %}">Event Finder</a>
+    <a href="{% url 'SavedList' %}">Saved</a>
+    <a href="{% url 'studentdashboard' %}">Manage Tickets</a>
+    <a href="{% url 'update_profile' %}">Edit Profile</a>
+    <a href="{% url 'update_password' %}">Change Password</a>
+  </div>
+</header>
+
+<main>
+  {% if messages %}
+    {% for message in messages %}
+      <div class="empty" style="margin-bottom:16px">{{ message }}</div>
+    {% endfor %}
+  {% endif %}
+
+  {% if events %}
+    <table>
+      <thead>
+        <tr>
+          <th>Event Name</th>
+          <th>Organizer</th>
+          <th>Date</th>
+          <th>Time</th>
+          <th>Category</th>
+          <th style="width:280px">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for e in events %}
+        <tr>
+          <td>{{ e.title }}</td>
+          <td>{{ e.organizer.email }}</td>
+          <td>{{ e.date|date:"Y-m-d" }}</td>
+          <td>{{ e.time }}</td>
+          <td>{{ e.category }}</td>
+          <td>
+            <a class="pill primary" href="{% url 'EventDetail' e.id %}">View</a>
+
+            <form method="post" action="{% url 'ToggleSaveEvent' e.id %}" style="display:inline">
+              {% csrf_token %}
+              <input type="hidden" name="ref" value="list">
+              <button class="pill ghost" type="submit">Unsave</button>
+            </form>
+
+            {% if e.id in my_event_ids %}
+              <span class="pill muted">Claimed</span>
+            {% else %}
+              <a class="pill ghost" href="{% url 'checkout' e.id %}">Claim</a>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <div class="empty">
+      <h3>No saved events yet</h3>
+      <p>Go to the Event Finder and hit “Save” on any event you like.</p>
+      <a class="pill primary" href="{% url 'EventList' %}">Browse Events</a>
+    </div>
+  {% endif %}
+</main>
+
+</body>
+</html>

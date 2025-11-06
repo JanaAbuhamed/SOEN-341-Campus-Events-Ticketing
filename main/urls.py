@@ -68,4 +68,6 @@ urlpatterns = [
 
     path("analytics/participation-trend/", participation_trend, name="participation_trend"),
     path("analytics/claim-trend/", views.claim_trend_by_payment, name="claim_trend_by_payment"),
+    path("saved/", api_views.SavedList, name="SavedList"),
+
 ]
