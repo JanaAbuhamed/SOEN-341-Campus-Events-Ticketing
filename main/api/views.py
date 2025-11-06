@@ -1,29 +1,127 @@
-# main/api/views.py
+from decimal import Decimal
+import secrets
+
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, update_session_auth_hash
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import Group
-from django.http import JsonResponse, HttpResponseForbidden
-from django.shortcuts import get_object_or_404, redirect, render
-from django.views.decorators.csrf import csrf_protect, ensure_csrf_cookie
-from django.views.decorators.http import require_POST
-from django.utils.dateparse import parse_date
-from decimal import Decimal
-from django.views.decorators.http import require_http_methods
-
-from django.utils import timezone
-
 from django.db.models import Count
+from django.http import HttpResponseForbidden, JsonResponse
+from django.shortcuts import get_object_or_404, redirect, render
+from django.utils import timezone
+from django.utils.dateparse import parse_date
+from django.views.decorators.csrf import csrf_protect, ensure_csrf_cookie
+from django.views.decorators.http import require_POST, require_http_methods
+
 from rest_framework import permissions, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from django.utils import timezone
+
 from ..forms import OrganizerSignupForm, PasswordUpdateForm, StudentSignupForm, UserUpdateForm
-from ..models import Event, User, SavedEvent, Payment
+from ..models import Event, SavedEvent, Ticket, User, Payment
 from .serializers import EventCreateSerializer, EventSerializer, UserSerializer
 from .permissions import (
-    CanCreateEvent, CanDeleteEvent, CanEditEvent, CanRegisterEvent, CanViewEvents, CanViewUsers
+    CanCreateEvent,
+    CanDeleteEvent,
+    CanEditEvent,
+    CanRegisterEvent,
+    CanViewEvents,
+    CanViewUsers,
 )
+from ..models import Event, SavedEvent, Ticket, User
+from .permissions import (
+    CanCreateEvent,
+    CanDeleteEvent,
+    CanEditEvent,
+    CanRegisterEvent,
+    CanViewEvents,
+    CanViewUsers,
+)
+from .serializers import EventCreateSerializer, EventSerializer, UserSerializer
+
+
+# -------------------------------
+# Small helper for safe ticket creation
+# -------------------------------
+
+def _generate_token() -> str:
+    # URL-safe, reasonably short; adjust size if you want longer codes
+    return secrets.token_urlsafe(16)
+
+def _ensure_ticket_claimed(event: Event, user: User) -> Ticket:
+    """
+    Get or create the through-model Ticket ensuring:
+      - qr_token is non-null
+      - claimed_at is set
+    Returns the Ticket object.
+    """
+    ticket, created = Ticket.objects.get_or_create(
+        event=event,
+        user=user,
+        defaults={
+            "qr_token": _generate_token(),
+            "claimed_at": timezone.now(),
+        },
+    )
+    # Repair older/blank rows if any
+    missing = False
+    if not ticket.qr_token:
+        ticket.qr_token = _generate_token()
+        missing = True
+    if not ticket.claimed_at:
+        ticket.claimed_at = timezone.now()
+        missing = True
+    if missing:
+        ticket.save(update_fields=["qr_token", "claimed_at"])
+    # If your model has a convenience method, call it too
+    if hasattr(ticket, "mark_claimed"):
+        ticket.mark_claimed()
+        # mark_claimed may set fields; persist safely
+        ticket.save()
+    return ticket
+
+
+
+# -------------------------------
+# Small helper for safe ticket creation
+# -------------------------------
+
+def _generate_token() -> str:
+    # URL-safe, reasonably short; adjust size if you want longer codes
+    return secrets.token_urlsafe(16)
+
+def _ensure_ticket_claimed(event: Event, user: User) -> Ticket:
+    """
+    Get or create the through-model Ticket ensuring:
+      - qr_token is non-null
+      - claimed_at is set
+    Returns the Ticket object.
+    """
+    ticket, created = Ticket.objects.get_or_create(
+        event=event,
+        user=user,
+        defaults={
+            "qr_token": _generate_token(),
+            "claimed_at": timezone.now(),
+        },
+    )
+    # Repair older/blank rows if any
+    missing = False
+    if not ticket.qr_token:
+        ticket.qr_token = _generate_token()
+        missing = True
+    if not ticket.claimed_at:
+        ticket.claimed_at = timezone.now()
+        missing = True
+    if missing:
+        ticket.save(update_fields=["qr_token", "claimed_at"])
+    # If your model has a convenience method, call it too
+    if hasattr(ticket, "mark_claimed"):
+        ticket.mark_claimed()
+        # mark_claimed may set fields; persist safely
+        ticket.save()
+    return ticket
+
 
 # -------------------------------
 # Public pages / logins
@@ -31,6 +129,7 @@ from .permissions import (
 
 def loginindex(request):
     return render(request, "loginindex.html")
+
 
 @ensure_csrf_cookie
 @csrf_protect
@@ -41,26 +140,45 @@ def organizerlogin(request):
 
         qs = User.objects.filter(email=email, role=1)
         if not qs.exists():
-            return render(request, "organizerlogin.html",
-                          {"error": "No organizer account found for this email. Please sign up first.",
-                           "prefill_email": email}, status=200)
+            return render(
+                request,
+                "organizerlogin.html",
+                {
+                    "error": "No organizer account found for this email. Please sign up first.",
+                    "prefill_email": email,
+                },
+                status=200,
+            )
 
         org = qs.first()
         if org.status != 1:
-            return render(request, "organizerlogin.html",
-                          {"error": "Your organizer account is pending admin approval.",
-                           "prefill_email": email}, status=200)
+            return render(
+                request,
+                "organizerlogin.html",
+                {
+                    "error": "Your organizer account is pending admin approval.",
+                    "prefill_email": email,
+                },
+                status=200,
+            )
 
         user = authenticate(request, email=email, password=password)
         if user is None:
-            return render(request, "organizerlogin.html",
-                          {"error": "Incorrect password. Please try again.",
-                           "prefill_email": email}, status=200)
+            return render(
+                request,
+                "organizerlogin.html",
+                {
+                    "error": "Incorrect password. Please try again.",
+                    "prefill_email": email,
+                },
+                status=200,
+            )
 
         login(request, user)
         return redirect("organizerdashboard")
 
     return render(request, "organizerlogin.html")
+
 
 @ensure_csrf_cookie
 @csrf_protect
@@ -72,23 +190,34 @@ def adminlogin(request):
 
         qs = User.objects.filter(email=email, role=2)
         if not qs.exists():
-            return render(request, "adminlogin.html",
-                          {"error": "No admin account found for this email.",
-                           "prefill_email": identifier}, status=200)
+            return render(
+                request,
+                "adminlogin.html",
+                {"error": "No admin account found for this email.", "prefill_email": identifier},
+                status=200,
+            )
 
         user = authenticate(request, email=email, password=password)
         if user is None or user.role != 2:
-            return render(request, "adminlogin.html",
-                          {"error": "Incorrect password for this admin account.",
-                           "prefill_email": identifier}, status=200)
+            return render(
+                request,
+                "adminlogin.html",
+                {
+                    "error": "Incorrect password for this admin account.",
+                    "prefill_email": identifier,
+                },
+                status=200,
+            )
 
         login(request, user)
         return redirect("admindashboard")
 
     return render(request, "adminlogin.html")
 
+
 def organizerpending(request):
     return render(request, "organizer-pending.html")
+
 
 # -------------------------------
 # Admin dashboard + admin actions
@@ -108,16 +237,21 @@ def admindashboard(request):
     total_events = Event.objects.count()
     total_claimed_tickets = Payment.objects.filter(status="succeeded").count()
 
-    return render(request, "admindashboard.html", {
-        "tab": tab,
-        "students": students,
-        "organizers": organizers,
-        "events": events,
-        'total_students': total_students,
-        'total_organizers': total_organizers,
-        'total_events': total_events,
-        "total_claimed_tickets": total_claimed_tickets,
-    })
+    return render(
+        request,
+        "admindashboard.html",
+        {
+            "tab": tab,
+            "students": students,
+            "organizers": organizers,
+            "events": events,
+            "total_students": total_students,
+            "total_organizers": total_organizers,
+            "total_events": total_events,
+            "total_claimed_tickets": total_claimed_tickets,
+        },
+    )
+
 
 @login_required
 @csrf_protect
@@ -141,7 +275,9 @@ def admin_create_user(request):
         messages.error(request, "A user with this email already exists.")
         return redirect("/admindashboard/?tab=students")
 
-    user = User.objects.create_user(email=email, name=name, password=password, role=role, status=status_val)
+    user = User.objects.create_user(
+        email=email, name=name, password=password, role=role, status=status_val
+    )
     try:
         group_name = "Student" if role == 0 else "Organizer" if role == 1 else "Administrator"
         user.groups.add(Group.objects.get(name=group_name))
@@ -150,6 +286,7 @@ def admin_create_user(request):
 
     messages.success(request, "User created.")
     return redirect("/admindashboard/?tab=students")
+
 
 @login_required
 @csrf_protect
@@ -181,6 +318,7 @@ def admin_create_event(request):
     messages.success(request, "Event created.")
     return redirect("/admindashboard/?tab=events")
 
+
 @login_required
 @csrf_protect
 def admin_update_event_status(request, event_id: int):
@@ -202,6 +340,7 @@ def admin_update_event_status(request, event_id: int):
 
     messages.success(request, f"Event status set to {new_status}.")
     return redirect("/admindashboard/?tab=events")
+
 
 @login_required
 @csrf_protect
@@ -239,6 +378,7 @@ def admin_edit_event(request, event_id: int):
 
     return redirect("/admindashboard/?tab=events")
 
+
 @login_required
 @csrf_protect
 def admin_user_set_status_json(request, user_id: int):
@@ -258,6 +398,7 @@ def admin_user_set_status_json(request, user_id: int):
     user.status = new_status
     user.save(update_fields=["status"])
     return JsonResponse({"ok": True, "user_id": user.user_id, "status": user.status})
+
 
 @login_required
 @csrf_protect
@@ -283,6 +424,7 @@ def admin_users_bulk(request):
         return JsonResponse({"ok": True, "deleted": deleted_count})
 
     return JsonResponse({"error": "Unknown action"}, status=400)
+
 
 @login_required
 @csrf_protect
@@ -336,6 +478,7 @@ def signup(request):
         form = StudentSignupForm()
     return render(request, "signup.html", {"form": form})
 
+
 @ensure_csrf_cookie
 @csrf_protect
 def studentlogin(request):
@@ -346,10 +489,13 @@ def studentlogin(request):
         if user is not None and user.role == 0:
             login(request, user)
             return redirect("studentdashboard")
-        return render(request, "studentlogin.html",
-                      {"error": "Invalid credentials or not a student account",
-                       "prefill_email": email})
+        return render(
+            request,
+            "studentlogin.html",
+            {"error": "Invalid credentials or not a student account", "prefill_email": email},
+        )
     return render(request, "studentlogin.html")
+
 
 # -------------------------------
 # Student area
@@ -361,6 +507,7 @@ def studentdashboard(request):
         return HttpResponseForbidden("Student access required")
     tickets = Event.objects.filter(attendees=request.user).order_by("date", "time")
     return render(request, "studentdashboard.html", {"tickets": tickets})
+
 
 @login_required
 def update_profile(request):
@@ -374,6 +521,7 @@ def update_profile(request):
     else:
         form = UserUpdateForm(instance=user)
     return render(request, "update_profile.html", {"form": form})
+
 
 @login_required
 def update_password(request):
@@ -391,6 +539,7 @@ def update_password(request):
         form = PasswordUpdateForm(request.user)
     return render(request, "update_password.html", {"form": form})
 
+
 @login_required
 def EventList(request):
     """
@@ -401,20 +550,14 @@ def EventList(request):
     if getattr(request.user, "role", None) != 0:
         return HttpResponseForbidden("Student access required")
 
-    # Base queryset
-    qs = (
-        Event.objects.filter(status="approved")
-        .select_related("organizer")
-    )
+    qs = Event.objects.filter(status="approved").select_related("organizer")
 
-    # ---- Read query params
-    category   = (request.GET.get("category") or "").strip()
-    date_from  = (request.GET.get("date_from") or "").strip()
-    date_to    = (request.GET.get("date_to") or "").strip()
-    location   = (request.GET.get("location") or "").strip()
-    sort       = (request.GET.get("sort") or "published").strip()  # published | event | popularity
+    category = (request.GET.get("category") or "").strip()
+    date_from = (request.GET.get("date_from") or "").strip()
+    date_to = (request.GET.get("date_to") or "").strip()
+    location = (request.GET.get("location") or "").strip()
+    sort = (request.GET.get("sort") or "published").strip()  # published | event | popularity
 
-    # ---- Apply filters
     if category:
         qs = qs.filter(category__iexact=category)
 
@@ -431,28 +574,21 @@ def EventList(request):
     if location:
         qs = qs.filter(location__icontains=location)
 
-    # ---- Sorting
     if sort == "event":
         qs = qs.order_by("date", "time", "-created_at")
     elif sort == "popularity":
         qs = qs.annotate(att_count=Count("attendees")).order_by("-att_count", "date", "time")
-    else:  # "published" (newest first)
+    else:
         qs = qs.order_by("-created_at", "date", "time")
 
     events = qs
 
-    # For button states
-    my_event_ids = set(
-        Event.objects.filter(attendees=request.user).values_list("id", flat=True)
-    )
+    my_event_ids = set(Event.objects.filter(attendees=request.user).values_list("id", flat=True))
     try:
-        saved_ids = set(
-            SavedEvent.objects.filter(user=request.user).values_list("event_id", flat=True)
-        )
+        saved_ids = set(SavedEvent.objects.filter(user=request.user).values_list("event_id", flat=True))
     except Exception:
         saved_ids = set()
 
-    # Distinct categories for the dropdown
     categories = list(
         Event.objects.filter(status="approved").values_list("category", flat=True).distinct()
     )
@@ -477,8 +613,8 @@ def EventList(request):
         },
     )
 
+
 # --- Event Detail (student) ---
-from django.utils import timezone
 
 @login_required
 def event_detail(request, event_id: int):
@@ -486,11 +622,9 @@ def event_detail(request, event_id: int):
     Student-only event detail page.
     Shows title, description, date/time, location, organizer, capacity and spots left.
     """
-    # Only students
     if getattr(request.user, "role", None) != 0:
         return HttpResponseForbidden("Student access required")
 
-    # Only approved events are visible
     event = get_object_or_404(Event.objects.select_related("organizer"), id=event_id, status="approved")
 
     is_claimed = event.attendees.filter(pk=request.user.pk).exists()
@@ -504,6 +638,7 @@ def event_detail(request, event_id: int):
     }
     return render(request, "event_detail.html", context)
 
+
 @login_required
 @csrf_protect
 def claim_event(request, event_id):
@@ -513,6 +648,7 @@ def claim_event(request, event_id):
         return JsonResponse({"error": "Student access required"}, status=403)
 
     event = get_object_or_404(Event, id=event_id, status="approved")
+
     if event.attendees.count() >= event.capacity:
         messages.error(request, "Event is full.")
         return redirect("studentdashboard")
@@ -521,9 +657,12 @@ def claim_event(request, event_id):
         messages.info(request, "You already claimed this event.")
         return redirect("studentdashboard")
 
-    event.attendees.add(request.user)
+    # Create/repair the through Ticket with non-null qr_token
+    _ensure_ticket_claimed(event, request.user)
+
     messages.success(request, "Ticket claimed.")
     return redirect("studentdashboard")
+
 
 @login_required
 @csrf_protect
@@ -534,16 +673,19 @@ def unclaim_event(request, event_id):
         return JsonResponse({"error": "Student access required"}, status=403)
 
     event = get_object_or_404(Event, id=event_id)
-    if not event.attendees.filter(pk=request.user.pk).exists():
-        messages.info(request, "You hadn’t claimed this ticket.")
-        return redirect("studentdashboard")
 
-    event.attendees.remove(request.user)
-    messages.success(request, "Ticket unclaimed.")
+    # Delete the through row explicitly; this is equivalent to attendees.remove(...)
+    deleted, _ = Ticket.objects.filter(event=event, user=request.user).delete()
+    if deleted:
+        messages.success(request, "Ticket unclaimed.")
+    else:
+        messages.info(request, "You hadn’t claimed this ticket.")
+
     return redirect("studentdashboard")
 
+
 # -------------------------------
-# DRF viewsets (unchanged)
+# DRF viewsets
 # -------------------------------
 
 class UserViewSet(viewsets.ViewSet):
@@ -593,6 +735,7 @@ class UserViewSet(viewsets.ViewSet):
         except User.DoesNotExist:
             return Response({"error": "User not found"}, status=404)
 
+
 class EventViewSet(viewsets.ViewSet):
     permission_classes = [permissions.IsAuthenticated]
 
@@ -633,7 +776,7 @@ class EventViewSet(viewsets.ViewSet):
         if not e:
             return Response({"error": "Event not found"}, status=404)
         ser = EventSerializer(e, data=request.data)
-        if ser.is_valid():
+        if ser.is_valid():  # <-- fixed typo here
             ser.save()
             return Response(ser.data)
         return Response(ser.errors, status=400)
@@ -656,7 +799,8 @@ class EventViewSet(viewsets.ViewSet):
             return Response({"error": "Event is full"}, status=400)
         if request.user in e.attendees.all():
             return Response({"error": "Already registered"}, status=400)
-        e.attendees.add(request.user)
+
+        _ensure_ticket_claimed(e, request.user)  # create valid Ticket
         return Response({"message": "Successfully registered"})
 
     @action(detail=True, methods=["post"])
@@ -664,10 +808,11 @@ class EventViewSet(viewsets.ViewSet):
         e = Event.objects.filter(pk=pk).first()
         if not e:
             return Response({"error": "Event not found"}, status=404)
-        if request.user not in e.attendees.all():
+        deleted, _ = Ticket.objects.filter(event=e, user=request.user).delete()
+        if not deleted:
             return Response({"error": "Not registered"}, status=400)
-        e.attendees.remove(request.user)
         return Response({"message": "Successfully unregistered"})
+
 
 @login_required
 def EventDetail(request, event_id: int):
@@ -681,9 +826,7 @@ def EventDetail(request, event_id: int):
     event = get_object_or_404(Event.objects.select_related("organizer"), id=event_id, status="approved")
     is_claimed = event.attendees.filter(pk=request.user.pk).exists()
 
-    # Saved?
     try:
-        from ..models import SavedEvent
         is_saved = SavedEvent.objects.filter(user=request.user, event=event).exists()
     except Exception:
         is_saved = False
@@ -742,7 +885,6 @@ def ToggleSaveEvent(request, event_id: int):
 
     event = get_object_or_404(Event, id=event_id, status="approved")
 
-    from ..models import SavedEvent
     obj, created = SavedEvent.objects.get_or_create(user=request.user, event=event)
     if created:
         messages.success(request, "Event saved.")
@@ -750,11 +892,13 @@ def ToggleSaveEvent(request, event_id: int):
         obj.delete()
         messages.info(request, "Event removed from saved.")
 
-    # Return to the list or back to the detail page if a ref was provided
     ref = request.POST.get("ref", "")
     if ref == "detail":
         return redirect("EventDetail", event_id=event.id)
+    if ref == "saved":
+        return redirect("SavedList")
     return redirect("EventList")
+
 
 @login_required
 @require_http_methods(["GET", "POST"])
@@ -762,8 +906,6 @@ def ToggleSaveEvent(request, event_id: int):
 def checkout(request, event_id: int):
     """
     Simulated payment screen before claiming a ticket.
-    - GET: render simple card form
-    - POST: "process" payment, create Payment row, add attendee
     """
     if getattr(request.user, "role", None) != 0:
         return HttpResponseForbidden("Student access required")
@@ -780,28 +922,26 @@ def checkout(request, event_id: int):
         messages.error(request, "Event is full.")
         return redirect("EventList")
 
-    # Decide a price (free vs paid). If your Event has a price field, use it here.
-    # For now we simulate: paid if ticket_type == 'paid', else free (0.00).
     price = Decimal("0.00")
     if getattr(event, "ticket_type", "free") == "paid":
-        price = Decimal("10.00")  # demo price; change if you have event.price
+        price = Decimal("10.00")  # demo price
 
     if request.method == "GET":
         return render(request, "checkout.html", {"event": event, "price": price})
 
-    # POST: "process" payment (we just validate presence of card fields)
-    card = request.POST.get("card_number", "").replace(" ", "")
-    exp  = request.POST.get("expiry", "")
-    cvc  = request.POST.get("cvc", "")
+    # POST: pseudo-charge (only validate presence/length)
+    card = (request.POST.get("card_number", "") or "").replace(" ", "")
+    exp = request.POST.get("expiry", "") or ""
+    cvc = request.POST.get("cvc", "") or ""
 
     if not (card and exp and cvc and len(card) >= 12 and len(cvc) >= 3):
         messages.error(request, "Invalid card details. Please try again.")
         return render(request, "checkout.html", {"event": event, "price": price})
 
-    # Create/overwrite a Payment row then claim the ticket
-    from ..models import Payment
-    pay, _created = Payment.objects.update_or_create(
-        user=request.user, event=event,
+    # Record payment
+    Payment.objects.update_or_create(
+        user=request.user,
+        event=event,
         defaults={
             "amount": price,
             "status": "succeeded",
@@ -809,12 +949,17 @@ def checkout(request, event_id: int):
         },
     )
 
-    # Claim (add attendee)
-    event.attendees.add(request.user)
+    # Create a valid Ticket (non-null qr_token) and mark claimed
+    _ensure_ticket_claimed(event, request.user)
+
     messages.success(request, "Payment completed. Ticket claimed.")
     return redirect("studentdashboard")
 
-# main/api/views.py  (add this function anywhere among the simple page views)
+
+# -------------------------------
+# Public landing page
+# -------------------------------
+
 def home(request):
     """
     Public landing page (no login required).
@@ -823,9 +968,12 @@ def home(request):
     """
     today = timezone.now().date()
     events = (
-        Event.objects
-        .filter(status="approved", date__gte=today)
+        Event.objects.filter(status="approved", date__gte=today)
         .select_related("organizer")
-        .order_by("date", "time")[:20]   # show next 20 upcoming
+        .order_by("date", "time")[:20]
     )
     return render(request, "home.html", {"events": events})
+
+
+
+

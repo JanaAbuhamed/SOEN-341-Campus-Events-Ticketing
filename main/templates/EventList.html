@@ -104,7 +104,6 @@
             {% if event.id in my_event_ids %}
               <span class="btn-disabled">Claimed</span>
             {% else %}
-              <!-- CHANGED: go to checkout first (simulated payment) -->
               <a class="btn-primary" href="{% url 'checkout' event.id %}">Claim</a>
             {% endif %}
           </td>

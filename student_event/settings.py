@@ -1,26 +1,56 @@
 # student_event/settings.py
 from pathlib import Path
 import os
+from urllib.parse import urlparse
 
-# Authentication redirects (match your URL names)
-LOGIN_URL = 'loginindex'
-LOGIN_REDIRECT_URL = 'studentdashboard'
-
-# Custom user model
-AUTH_USER_MODEL = 'main.User'
-
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
+# ---------------------------------------------------------------------
+# Project base
+# ---------------------------------------------------------------------
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# SECURITY WARNING: keep the secret key used in production secret!
+# ---------------------------------------------------------------------
+# Auth
+# ---------------------------------------------------------------------
+LOGIN_URL = 'loginindex'
+LOGIN_REDIRECT_URL = 'studentdashboard'
+AUTH_USER_MODEL = 'main.User'
+
+# ---------------------------------------------------------------------
+# Security / Debug
+# ---------------------------------------------------------------------
 SECRET_KEY = 'django-insecure-c02l$+ss##*v!1r8tvy93yv4$va0ht6%tx*9n@rkw7$-&rkh0j'
+DEBUG = True  # keep True for dev; set False in production
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+# If you’re using a tunnel (Cloudflare/ngrok), put its full origin here, e.g.:
+#   PUBLIC_ORIGIN=https://abc123.trycloudflare.com
+PUBLIC_ORIGIN = os.environ.get("PUBLIC_ORIGIN", "").strip()
 
-ALLOWED_HOSTS = []
+def _origin_to_host(origin: str) -> str:
+    try:
+        return urlparse(origin).hostname or ""
+    except Exception:
+        return ""
 
-# Application definition
+_public_host = _origin_to_host(PUBLIC_ORIGIN)
+
+# Allow localhost, 127.0.0.1, and your tunnel host (if provided)
+ALLOWED_HOSTS = list(filter(None, [
+    "localhost",
+    "127.0.0.1",
+    _public_host,
+]))
+
+# When DEBUG=True, Django ignores ALLOWED_HOSTS checks on error pages,
+# but we keep it correct anyway. If you prefer a quick dev shortcut:
+# ALLOWED_HOSTS = ["*"]
+
+# Behind tunnels/reverse proxies, these help Django build correct absolute URLs
+USE_X_FORWARDED_HOST = True
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+
+# ---------------------------------------------------------------------
+# Installed apps / middleware
+# ---------------------------------------------------------------------
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -31,11 +61,6 @@ INSTALLED_APPS = [
     'main',
     'rest_framework',
     'corsheaders',
-]
-
-CSRF_TRUSTED_ORIGINS = [
-    'http://localhost:8000',
-    'http://127.0.0.1:8000',
 ]
 
 MIDDLEWARE = [
@@ -49,14 +74,12 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-CORS_ALLOW_ALL_ORIGINS = True
-
 ROOT_URLCONF = 'student_event.urls'
 
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],  # Using app templates (APP_DIRS=True)
+        'DIRS': [],  # using app templates (APP_DIRS=True)
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -71,15 +94,26 @@ TEMPLATES = [
 WSGI_APPLICATION = 'student_event.wsgi.application'
 
 # ---------------------------------------------------------------------
-# DATABASE CONFIGURATION
+# CORS / CSRF for public phone access
 # ---------------------------------------------------------------------
-# Use SQLite automatically inside GitHub Actions CI
-# Use MySQL locally and in production
+CORS_ALLOW_ALL_ORIGINS = True  # dev convenience
 
+# CSRF needs full origins (scheme + host). Include local + your PUBLIC_ORIGIN.
+CSRF_TRUSTED_ORIGINS = list(filter(None, [
+    'http://localhost:8000',
+    'http://127.0.0.1:8000',
+    # If you serve Django directly on HTTPS locally, add:
+    'https://localhost:8000',
+    'https://127.0.0.1:8000',
+    PUBLIC_ORIGIN if PUBLIC_ORIGIN else None,
+]))
+
+# ---------------------------------------------------------------------
+# Database (MySQL locally/prod, SQLite in CI)
+# ---------------------------------------------------------------------
 USE_SQLITE_FOR_CI = os.environ.get("GITHUB_ACTIONS") == "true" or os.environ.get("USE_SQLITE_FOR_CI") == "1"
 
 if USE_SQLITE_FOR_CI:
-    # GitHub Actions CI: use SQLite (no external DB needed)
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.sqlite3",
@@ -87,7 +121,6 @@ if USE_SQLITE_FOR_CI:
         }
     }
 else:
-    # Local / Production: use MySQL
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.mysql",
@@ -104,7 +137,7 @@ else:
     }
 
 # ---------------------------------------------------------------------
-# INTERNATIONALIZATION
+# I18N / TZ
 # ---------------------------------------------------------------------
 LANGUAGE_CODE = 'en-us'
 TIME_ZONE = 'UTC'
@@ -112,7 +145,7 @@ USE_I18N = True
 USE_TZ = True
 
 # ---------------------------------------------------------------------
-# STATIC FILES
+# Static files
 # ---------------------------------------------------------------------
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [
@@ -120,6 +153,6 @@ STATICFILES_DIRS = [
 ]
 
 # ---------------------------------------------------------------------
-# DEFAULT PRIMARY KEY FIELD TYPE
+# Default PK
 # ---------------------------------------------------------------------
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
