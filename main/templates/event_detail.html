@@ -92,9 +92,12 @@
       {% elif available <= 0 %}
         <span class="btn btn-disabled">Sold out</span>
       {% else %}
-        <!-- Unified flow: always go to checkout (even if free) -->
         <a class="btn btn-primary" href="{% url 'checkout' event.id %}">
-          {% if event.ticket_type == "paid" %}Pay &amp; Claim{% else %}Claim Ticket{% endif %}
+          {% if event.ticket_type != "free" %}
+            Pay &amp; Claim (Stripe test)
+          {% else %}
+            Claim Ticket
+          {% endif %}
         </a>
       {% endif %}
 
