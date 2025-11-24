@@ -1,5 +1,5 @@
+from django.contrib.auth import views as auth_views
 from django.urls import path, include
-from django.contrib import admin
 from rest_framework.routers import DefaultRouter
 
 from . import views  # organizer CRUD + organizer profile / analytics helpers
@@ -20,8 +20,6 @@ urlpatterns = [
     # DRF router
     path("api/", include(router.urls)),
 
-    path("admin/", admin.site.urls),
-
     # Public landing page
     path("", api_views.home, name="home"),
 
@@ -31,6 +29,7 @@ urlpatterns = [
     path("studentlogin/",   api_views.studentlogin,   name="studentlogin"),
     path("organizerlogin/", api_views.organizerlogin, name="organizerlogin"),
     path("adminlogin/",     api_views.adminlogin,     name="adminlogin"),
+    path("logout/", auth_views.LogoutView.as_view(next_page="home"), name="logout"),
 
     # Dashboards
     path("studentdashboard/",   api_views.studentdashboard, name="studentdashboard"),
@@ -46,7 +45,7 @@ urlpatterns = [
     path("events/<int:event_id>/",      api_views.EventDetail,     name="EventDetail"),
     path("events/<int:event_id>/save/", api_views.ToggleSaveEvent, name="ToggleSaveEvent"),
 
-    # ✅ Added: Saved events list
+    # Saved events list
     path("saved/", api_views.SavedList, name="SavedList"),
 
     # Student profile/password
@@ -70,7 +69,7 @@ urlpatterns = [
     path("tickets/<int:event_id>/qr.png", qr_views.qr_png, name="ticket_qr_png"),
     path("tickets/<int:event_id>/qr.svg", qr_views.qr_svg, name="ticket_qr_svg"),
 
-    # Scanner page + APIs + public ticket page + stats
+    # Scanner + Public ticket + stats
     path("organizer/scan/",                  qr_views.organizer_scan_page, name="organizer_scan"),
     path("api/qr/checkin/",                  qr_views.qr_checkin_api,      name="qr_checkin_api"),
     path("t/<str:qr_token>/",                qr_views.public_ticket_page,  name="public_ticket_page"),

@@ -69,14 +69,15 @@
 
 <header>
   <h1>My Tickets</h1>
-  <div class="chipbar">
+    <div class="chipbar">
     <a href="{% url 'EventList' %}">Event Finder</a>
     <a href="{% url 'studentdashboard' %}">Manage Tickets</a>
     <a href="{% url 'update_profile' %}">Edit Profile</a>
     <a href="{% url 'update_password' %}">Change Password</a>
     <a href="{% url 'SavedList' %}">Saved</a>
-
+    <a href="{% url 'logout' %}">Logout</a>
   </div>
+
 </header>
 
 <main>
