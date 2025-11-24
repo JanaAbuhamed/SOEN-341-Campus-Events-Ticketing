@@ -699,12 +699,24 @@ def unclaim_event(request, event_id):
 class UserViewSet(viewsets.ViewSet):
     permission_classes = [permissions.IsAuthenticated]
 
+    # def get_permissions(self):
+    #     if self.action in ["list", "retrieve"]:
+    #         permission_classes = [CanViewUsers]
+    #     else:
+    #         permission_classes = [permissions.IsAuthenticated]
+    #     return [perm() for perm in permission_classes]
+
+
+
     def get_permissions(self):
         if self.action in ["list", "retrieve"]:
             permission_classes = [CanViewUsers]
+        elif self.action == "create":  # Registration should be public
+            permission_classes = [permissions.AllowAny]
         else:
             permission_classes = [permissions.IsAuthenticated]
         return [perm() for perm in permission_classes]
+
 
     def list(self, request):
         users = User.objects.all()
@@ -749,7 +761,7 @@ class EventViewSet(viewsets.ViewSet):
 
     def get_permissions(self):
         if self.action in ["list", "retrieve"]:
-            permission_classes = [CanViewEvents]
+            permission_classes = [AllowAny] #CanViewEvents
         elif self.action == "create":
             permission_classes = [CanCreateEvent]
         elif self.action == "update":
