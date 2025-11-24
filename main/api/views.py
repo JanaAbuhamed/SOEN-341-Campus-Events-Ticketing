@@ -785,26 +785,26 @@ class EventViewSet(viewsets.ViewSet):
 # ------------------------------------------------------------------
 # Saved events + toggle
 # ------------------------------------------------------------------
-@login_required
-def EventDetail(request, event_id: int):
-    if getattr(request.user, "role", None) != 0:
-        return HttpResponseForbidden("Student access required")
+# @login_required
+# def EventDetail(request, event_id: int):
+#     if getattr(request.user, "role", None) != 0:
+#         return HttpResponseForbidden("Student access required")
 
-    event = get_object_or_404(Event.objects.select_related("organizer"), id=event_id, status="approved")
-    is_claimed = event.attendees.filter(pk=request.user.pk).exists()
+#     event = get_object_or_404(Event.objects.select_related("organizer"), id=event_id, status="approved")
+#     is_claimed = event.attendees.filter(pk=request.user.pk).exists()
 
-    try:
-        is_saved = SavedEvent.objects.filter(user=request.user, event=event).exists()
-    except Exception:
-        is_saved = False
+#     try:
+#         is_saved = SavedEvent.objects.filter(user=request.user, event=event).exists()
+#     except Exception:
+#         is_saved = False
 
-    context = {
-        "event": event,
-        "is_claimed": is_claimed,
-        "is_saved": is_saved,
-        "available": max(0, event.capacity - event.attendees.count()),
-    }
-    return render(request, "event_detail.html", context)
+#     context = {
+#         "event": event,
+#         "is_claimed": is_claimed,
+#         "is_saved": is_saved,
+#         "available": max(0, event.capacity - event.attendees.count()),
+#     }
+#     return render(request, "event_detail.html", context)
 
 
 @login_required
