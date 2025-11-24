@@ -10,7 +10,7 @@ This project is a Campus Events & Ticketing Web Application designed to centrali
 
 Students can browse and attend events, organizers can create and analyze events, and administrators oversee platform activity to ensure smooth and compliant operation. Built using Django for the backend and MySQL as the database, the application focuses on reliability, usability, and efficient event management.
 
-**FEATURES**
+## Features
 
 **Student Features:** 
 - Browse and explore all campus events 
