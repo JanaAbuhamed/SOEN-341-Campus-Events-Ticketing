@@ -1,5 +1,13 @@
+# main/api/views.py
 from decimal import Decimal
 import secrets
+
+from rest_framework.views import APIView
+from rest_framework.permissions import AllowAny
+from rest_framework.decorators import permission_classes
+
+from rest_framework import status
+
 
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, update_session_auth_hash
@@ -754,6 +762,8 @@ class EventViewSet(viewsets.ViewSet):
             permission_classes = [permissions.IsAuthenticated]
         return [perm() for perm in permission_classes]
 
+
+    # @permission_classes([AllowAny])
     def list(self, request):
         events = Event.objects.all()
         return Response(EventSerializer(events, many=True).data)
