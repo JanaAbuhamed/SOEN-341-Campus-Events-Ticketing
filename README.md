@@ -50,28 +50,33 @@ Students can browse and attend events, organizers can create and analyze events,
   
 ## Tech Stack
 Backend: Django (Python)
+
 Database: MySQL
+
 Frontend: HTML, CSS, JavaScript
+
 Authentication: Django auth system
+
 Version Control: Git & GitHub
+
 CI/CD: GitHub Actions (.github/workflows/ci.yml)
 
 ## Setup Instructions
-1. Clone the repo:
+1. Clone the repo:  
     git clone <repo-url>
     cd SOEN-341-CAMPUS-EVENTS-TICKETING
-2. Create and activate a virtual environment:
+2. Create and activate a virtual environment:  
     python -m venv venv
     source venv/bin/activate     # macOS/Linux
     venv\Scripts\activate        # Windows
-3. Install dependencies:
+3. Install dependencies:  
     pip install -r requirements.txt
-4. Run Migrations:
+4. Run Migrations:  
     python manage.py migrate
     python manage.py makemigrations
-5. Create a Superuser
+5. Create a Superuser  
     python manage.py createsuperuser
-6. Start the Development server:
+6. Start the Development server:  
     python manage.py runserver
 
 
