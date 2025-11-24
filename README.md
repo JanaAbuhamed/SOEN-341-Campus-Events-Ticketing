@@ -1,4 +1,4 @@
-# SOEN-341
+# UNITIX (SOEN-341 Project)
 Campus Events &amp; Ticketing Web App for SOEN 341 Project
 
 ## Objective
@@ -41,8 +41,12 @@ Backend: Python (or Java)
 Database: SQL
 
 ## Setup Instructions
+1. Clone the repo
+2. Install dependencies (npm install, pip install -r requirements.txt, etc.)
+3. Set up environment variables (.env file)
+4. Start backend server
 
-## Usage
+## System Architecture
 
 
 
