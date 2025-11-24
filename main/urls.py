@@ -40,7 +40,7 @@ urlpatterns = [
 
     # Student event finder/detail/save
     path("eventlist/",                  api_views.EventList,       name="EventList"),
-    path("events/<int:event_id>/",      api_views.EventDetail,     name="EventDetail"),
+    path("events/<int:event_id>/", api_views.event_detail, name="EventDetail"),
     path("events/<int:event_id>/save/", api_views.ToggleSaveEvent, name="ToggleSaveEvent"),
 
     # Saved events list

@@ -3,6 +3,8 @@ from pathlib import Path
 import os
 from urllib.parse import urlparse
 
+TEST_RUNNER = 'django.test.runner.DiscoverRunner'
+
 # ---------------------------------------------------------------------
 # Project base
 # ---------------------------------------------------------------------
@@ -153,6 +155,19 @@ STATICFILES_DIRS = [
 # ---------------------------------------------------------------------
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+TEST_DISCOVER_PATTERN = "test_*.py"
+
+# ---------------------------------------------------------------------
+# DRF Settings
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.AllowAny',  # For dev, open access
+    ],
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.BasicAuthentication',
+    ],
+}
 # ---------------------------------------------------------------------
 # Stripe test keys (mock API payments)
 # ---------------------------------------------------------------------

@@ -2,6 +2,13 @@
 from decimal import Decimal
 import secrets
 
+from rest_framework.views import APIView
+from rest_framework.permissions import AllowAny
+from rest_framework.decorators import permission_classes
+
+from rest_framework import status
+
+
 import stripe
 
 from django.conf import settings
@@ -638,12 +645,24 @@ def unclaim_event(request, event_id):
 class UserViewSet(viewsets.ViewSet):
     permission_classes = [permissions.IsAuthenticated]
 
+    # def get_permissions(self):
+    #     if self.action in ["list", "retrieve"]:
+    #         permission_classes = [CanViewUsers]
+    #     else:
+    #         permission_classes = [permissions.IsAuthenticated]
+    #     return [perm() for perm in permission_classes]
+
+
+
     def get_permissions(self):
         if self.action in ["list", "retrieve"]:
             permission_classes = [CanViewUsers]
+        elif self.action == "create":  # Registration should be public
+            permission_classes = [permissions.AllowAny]
         else:
             permission_classes = [permissions.IsAuthenticated]
         return [perm() for perm in permission_classes]
+
 
     def list(self, request):
         users = User.objects.all()
@@ -688,7 +707,7 @@ class EventViewSet(viewsets.ViewSet):
 
     def get_permissions(self):
         if self.action in ["list", "retrieve"]:
-            permission_classes = [CanViewEvents]
+            permission_classes = [AllowAny] #CanViewEvents  # AllowAny
         elif self.action == "create":
             permission_classes = [CanCreateEvent]
         elif self.action == "update":
@@ -701,6 +720,8 @@ class EventViewSet(viewsets.ViewSet):
             permission_classes = [permissions.IsAuthenticated]
         return [perm() for perm in permission_classes]
 
+
+    # @permission_classes([AllowAny])
     def list(self, request):
         events = Event.objects.all()
         return Response(EventSerializer(events, many=True).data)
@@ -764,26 +785,26 @@ class EventViewSet(viewsets.ViewSet):
 # ------------------------------------------------------------------
 # Saved events + toggle
 # ------------------------------------------------------------------
-@login_required
-def EventDetail(request, event_id: int):
-    if getattr(request.user, "role", None) != 0:
-        return HttpResponseForbidden("Student access required")
+# @login_required
+# def EventDetail(request, event_id: int):
+#     if getattr(request.user, "role", None) != 0:
+#         return HttpResponseForbidden("Student access required")
 
-    event = get_object_or_404(Event.objects.select_related("organizer"), id=event_id, status="approved")
-    is_claimed = event.attendees.filter(pk=request.user.pk).exists()
+#     event = get_object_or_404(Event.objects.select_related("organizer"), id=event_id, status="approved")
+#     is_claimed = event.attendees.filter(pk=request.user.pk).exists()
 
-    try:
-        is_saved = SavedEvent.objects.filter(user=request.user, event=event).exists()
-    except Exception:
-        is_saved = False
+#     try:
+#         is_saved = SavedEvent.objects.filter(user=request.user, event=event).exists()
+#     except Exception:
+#         is_saved = False
 
-    context = {
-        "event": event,
-        "is_claimed": is_claimed,
-        "is_saved": is_saved,
-        "available": max(0, event.capacity - event.attendees.count()),
-    }
-    return render(request, "event_detail.html", context)
+#     context = {
+#         "event": event,
+#         "is_claimed": is_claimed,
+#         "is_saved": is_saved,
+#         "available": max(0, event.capacity - event.attendees.count()),
+#     }
+#     return render(request, "event_detail.html", context)
 
 
 @login_required
