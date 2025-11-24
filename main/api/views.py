@@ -9,6 +9,9 @@ from rest_framework.decorators import permission_classes
 from rest_framework import status
 
 
+import stripe
+
+from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, update_session_auth_hash
 from django.contrib.auth.decorators import login_required
@@ -25,18 +28,13 @@ from rest_framework import permissions, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
-from ..forms import OrganizerSignupForm, PasswordUpdateForm, StudentSignupForm, UserUpdateForm
+from ..forms import (
+    OrganizerSignupForm,
+    PasswordUpdateForm,
+    StudentSignupForm,
+    UserUpdateForm,
+)
 from ..models import Event, SavedEvent, Ticket, User, Payment
-from .serializers import EventCreateSerializer, EventSerializer, UserSerializer
-from .permissions import (
-    CanCreateEvent,
-    CanDeleteEvent,
-    CanEditEvent,
-    CanRegisterEvent,
-    CanViewEvents,
-    CanViewUsers,
-)
-from ..models import Event, SavedEvent, Ticket, User
 from .permissions import (
     CanCreateEvent,
     CanDeleteEvent,
@@ -47,21 +45,24 @@ from .permissions import (
 )
 from .serializers import EventCreateSerializer, EventSerializer, UserSerializer
 
+# ------------------------------------------------------------------
+# Stripe config
+# ------------------------------------------------------------------
+stripe.api_key = settings.STRIPE_SECRET_KEY
+PRICE_PER_PAID_TICKET = Decimal("10.00")  # flat price for non-free tickets
 
-# -------------------------------
-# Small helper for safe ticket creation
-# -------------------------------
 
+# ------------------------------------------------------------------
+# Ticket helpers
+# ------------------------------------------------------------------
 def _generate_token() -> str:
-    # URL-safe, reasonably short; adjust size if you want longer codes
+    """Generate a short, URL-safe QR token."""
     return secrets.token_urlsafe(16)
+
 
 def _ensure_ticket_claimed(event: Event, user: User) -> Ticket:
     """
-    Get or create the through-model Ticket ensuring:
-      - qr_token is non-null
-      - claimed_at is set
-    Returns the Ticket object.
+    Get or create the Ticket ensuring qr_token + claimed_at are set.
     """
     ticket, created = Ticket.objects.get_or_create(
         event=event,
@@ -71,7 +72,7 @@ def _ensure_ticket_claimed(event: Event, user: User) -> Ticket:
             "claimed_at": timezone.now(),
         },
     )
-    # Repair older/blank rows if any
+
     missing = False
     if not ticket.qr_token:
         ticket.qr_token = _generate_token()
@@ -81,60 +82,17 @@ def _ensure_ticket_claimed(event: Event, user: User) -> Ticket:
         missing = True
     if missing:
         ticket.save(update_fields=["qr_token", "claimed_at"])
-    # If your model has a convenience method, call it too
+
     if hasattr(ticket, "mark_claimed"):
         ticket.mark_claimed()
-        # mark_claimed may set fields; persist safely
         ticket.save()
+
     return ticket
 
 
-
-# -------------------------------
-# Small helper for safe ticket creation
-# -------------------------------
-
-def _generate_token() -> str:
-    # URL-safe, reasonably short; adjust size if you want longer codes
-    return secrets.token_urlsafe(16)
-
-def _ensure_ticket_claimed(event: Event, user: User) -> Ticket:
-    """
-    Get or create the through-model Ticket ensuring:
-      - qr_token is non-null
-      - claimed_at is set
-    Returns the Ticket object.
-    """
-    ticket, created = Ticket.objects.get_or_create(
-        event=event,
-        user=user,
-        defaults={
-            "qr_token": _generate_token(),
-            "claimed_at": timezone.now(),
-        },
-    )
-    # Repair older/blank rows if any
-    missing = False
-    if not ticket.qr_token:
-        ticket.qr_token = _generate_token()
-        missing = True
-    if not ticket.claimed_at:
-        ticket.claimed_at = timezone.now()
-        missing = True
-    if missing:
-        ticket.save(update_fields=["qr_token", "claimed_at"])
-    # If your model has a convenience method, call it too
-    if hasattr(ticket, "mark_claimed"):
-        ticket.mark_claimed()
-        # mark_claimed may set fields; persist safely
-        ticket.save()
-    return ticket
-
-
-# -------------------------------
+# ------------------------------------------------------------------
 # Public pages / logins
-# -------------------------------
-
+# ------------------------------------------------------------------
 def loginindex(request):
     return render(request, "loginindex.html")
 
@@ -227,10 +185,9 @@ def organizerpending(request):
     return render(request, "organizer-pending.html")
 
 
-# -------------------------------
-# Admin dashboard + admin actions
-# -------------------------------
-
+# ------------------------------------------------------------------
+# Admin dashboard + actions
+# ------------------------------------------------------------------
 @login_required
 def admindashboard(request):
     if getattr(request.user, "role", None) != 2:
@@ -462,10 +419,9 @@ def admin_events_bulk(request):
     return JsonResponse({"error": "Unknown action"}, status=400)
 
 
-# -------------------------------
+# ------------------------------------------------------------------
 # Sign up / student login
-# -------------------------------
-
+# ------------------------------------------------------------------
 @ensure_csrf_cookie
 @csrf_protect
 def signup(request):
@@ -505,10 +461,9 @@ def studentlogin(request):
     return render(request, "studentlogin.html")
 
 
-# -------------------------------
+# ------------------------------------------------------------------
 # Student area
-# -------------------------------
-
+# ------------------------------------------------------------------
 @login_required
 def studentdashboard(request):
     if getattr(request.user, "role", None) != 0:
@@ -552,8 +507,6 @@ def update_password(request):
 def EventList(request):
     """
     Student event finder with filters & sorting.
-    Filters: category, date_from, date_to, location
-    Sort:    published (newest), event (date/time), popularity (attendee count)
     """
     if getattr(request.user, "role", None) != 0:
         return HttpResponseForbidden("Student access required")
@@ -564,7 +517,7 @@ def EventList(request):
     date_from = (request.GET.get("date_from") or "").strip()
     date_to = (request.GET.get("date_to") or "").strip()
     location = (request.GET.get("location") or "").strip()
-    sort = (request.GET.get("sort") or "published").strip()  # published | event | popularity
+    sort = (request.GET.get("sort") or "published").strip()
 
     if category:
         qs = qs.filter(category__iexact=category)
@@ -622,13 +575,10 @@ def EventList(request):
     )
 
 
-# --- Event Detail (student) ---
-
 @login_required
 def event_detail(request, event_id: int):
     """
     Student-only event detail page.
-    Shows title, description, date/time, location, organizer, capacity and spots left.
     """
     if getattr(request.user, "role", None) != 0:
         return HttpResponseForbidden("Student access required")
@@ -665,7 +615,6 @@ def claim_event(request, event_id):
         messages.info(request, "You already claimed this event.")
         return redirect("studentdashboard")
 
-    # Create/repair the through Ticket with non-null qr_token
     _ensure_ticket_claimed(event, request.user)
 
     messages.success(request, "Ticket claimed.")
@@ -681,8 +630,6 @@ def unclaim_event(request, event_id):
         return JsonResponse({"error": "Student access required"}, status=403)
 
     event = get_object_or_404(Event, id=event_id)
-
-    # Delete the through row explicitly; this is equivalent to attendees.remove(...)
     deleted, _ = Ticket.objects.filter(event=event, user=request.user).delete()
     if deleted:
         messages.success(request, "Ticket unclaimed.")
@@ -692,10 +639,9 @@ def unclaim_event(request, event_id):
     return redirect("studentdashboard")
 
 
-# -------------------------------
+# ------------------------------------------------------------------
 # DRF viewsets
-# -------------------------------
-
+# ------------------------------------------------------------------
 class UserViewSet(viewsets.ViewSet):
     permission_classes = [permissions.IsAuthenticated]
 
@@ -798,7 +744,7 @@ class EventViewSet(viewsets.ViewSet):
         if not e:
             return Response({"error": "Event not found"}, status=404)
         ser = EventSerializer(e, data=request.data)
-        if ser.is_valid():  # <-- fixed typo here
+        if ser.is_valid():
             ser.save()
             return Response(ser.data)
         return Response(ser.errors, status=400)
@@ -822,7 +768,7 @@ class EventViewSet(viewsets.ViewSet):
         if request.user in e.attendees.all():
             return Response({"error": "Already registered"}, status=400)
 
-        _ensure_ticket_claimed(e, request.user)  # create valid Ticket
+        _ensure_ticket_claimed(e, request.user)
         return Response({"message": "Successfully registered"})
 
     @action(detail=True, methods=["post"])
@@ -836,12 +782,11 @@ class EventViewSet(viewsets.ViewSet):
         return Response({"message": "Successfully unregistered"})
 
 
+# ------------------------------------------------------------------
+# Saved events + toggle
+# ------------------------------------------------------------------
 @login_required
 def EventDetail(request, event_id: int):
-    """
-    Student-facing event detail page.
-    Shows fields and allows claim or save toggle.
-    """
     if getattr(request.user, "role", None) != 0:
         return HttpResponseForbidden("Student access required")
 
@@ -861,24 +806,19 @@ def EventDetail(request, event_id: int):
     }
     return render(request, "event_detail.html", context)
 
+
 @login_required
 def SavedList(request):
-    """
-    Student-only page that lists all events this user has saved.
-    Shows newest upcoming first; also passes claimed/saved ids for button states.
-    """
     if getattr(request.user, "role", None) != 0:
         return HttpResponseForbidden("Student access required")
 
-    # Saved events for this user (only approved, upcoming first)
     events = (
         Event.objects
-        .filter(saved_by__user=request.user)  # reverse of SavedEvent.event related_name="saved_by"
+        .filter(saved_by__user=request.user)
         .select_related("organizer")
         .order_by("date", "time", "-created_at")
     )
 
-    # Button states (reuse logic from EventList)
     my_event_ids = set(
         Event.objects.filter(attendees=request.user).values_list("id", flat=True)
     )
@@ -895,13 +835,12 @@ def SavedList(request):
             "saved_ids": saved_ids,
         },
     )
+
+
 @login_required
 @require_POST
 @csrf_protect
 def ToggleSaveEvent(request, event_id: int):
-    """
-    Toggle save/unsave for a student.
-    """
     if getattr(request.user, "role", None) != 0:
         return JsonResponse({"error": "Student access required"}, status=403)
 
@@ -922,13 +861,13 @@ def ToggleSaveEvent(request, event_id: int):
     return redirect("EventList")
 
 
+# ------------------------------------------------------------------
+# Checkout (Stripe for paid tickets, simple for free)
+# ------------------------------------------------------------------
 @login_required
 @require_http_methods(["GET", "POST"])
 @csrf_protect
 def checkout(request, event_id: int):
-    """
-    Simulated payment screen before claiming a ticket.
-    """
     if getattr(request.user, "role", None) != 0:
         return HttpResponseForbidden("Student access required")
 
@@ -944,50 +883,96 @@ def checkout(request, event_id: int):
         messages.error(request, "Event is full.")
         return redirect("EventList")
 
-    price = Decimal("0.00")
-    if getattr(event, "ticket_type", "free") == "paid":
-        price = Decimal("10.00")  # demo price
+    is_paid = getattr(event, "ticket_type", "free") != "free"
+    price = PRICE_PER_PAID_TICKET if is_paid else Decimal("0.00")
 
     if request.method == "GET":
-        return render(request, "checkout.html", {"event": event, "price": price})
+        client_secret = None
+        if is_paid:
+            # Create a PaymentIntent in Stripe test mode
+            intent = stripe.PaymentIntent.create(
+                amount=int(price * 100),  # cents
+                currency="cad",
+                metadata={
+                    "user_id": str(request.user.pk),
+                    "event_id": str(event.pk),
+                },
+            )
+            client_secret = intent.client_secret
 
-    # POST: pseudo-charge (only validate presence/length)
-    card = (request.POST.get("card_number", "") or "").replace(" ", "")
-    exp = request.POST.get("expiry", "") or ""
-    cvc = request.POST.get("cvc", "") or ""
+        return render(
+            request,
+            "checkout.html",
+            {
+                "event": event,
+                "price": price,
+                "is_paid": is_paid,
+                "stripe_pk": settings.STRIPE_PUBLISHABLE_KEY,
+                "client_secret": client_secret,
+            },
+        )
 
-    if not (card and exp and cvc and len(card) >= 12 and len(cvc) >= 3):
-        messages.error(request, "Invalid card details. Please try again.")
-        return render(request, "checkout.html", {"event": event, "price": price})
+    # POST – finalize payment / claim ticket
+    if is_paid:
+        payment_intent_id = (request.POST.get("payment_intent_id") or "").strip()
+        if not payment_intent_id:
+            messages.error(request, "Payment failed: missing Stripe payment information.")
+            return redirect("checkout", event_id=event.id)
 
-    # Record payment
+        try:
+            intent = stripe.PaymentIntent.retrieve(payment_intent_id)
+        except stripe.error.StripeError:
+            messages.error(request, "Payment failed while talking to Stripe. Please try again.")
+            return redirect("checkout", event_id=event.id)
+
+        if intent.status != "succeeded":
+            messages.error(request, "Payment was not completed. Please try again.")
+            return redirect("checkout", event_id=event.id)
+
+        # Optional safety check on metadata
+        if (
+            intent.metadata.get("user_id") != str(request.user.pk)
+            or intent.metadata.get("event_id") != str(event.pk)
+        ):
+            messages.error(request, "Payment metadata mismatch.")
+            return redirect("checkout", event_id=event.id)
+
+        price = Decimal(intent.amount) / 100
+
+        Payment.objects.update_or_create(
+            user=request.user,
+            event=event,
+            defaults={
+                "amount": price,
+                "status": "succeeded",
+                "txn_id": intent.id,
+            },
+        )
+
+        _ensure_ticket_claimed(event, request.user)
+        messages.success(request, "Payment completed. Ticket claimed.")
+        return redirect("studentdashboard")
+
+    # Free event – no Stripe
     Payment.objects.update_or_create(
         user=request.user,
         event=event,
         defaults={
-            "amount": price,
+            "amount": Decimal("0.00"),
             "status": "succeeded",
-            "txn_id": f"SIM-{request.user.pk}-{event.pk}",
+            "txn_id": f"FREE-{request.user.pk}-{event.pk}",
         },
     )
 
-    # Create a valid Ticket (non-null qr_token) and mark claimed
     _ensure_ticket_claimed(event, request.user)
-
-    messages.success(request, "Payment completed. Ticket claimed.")
+    messages.success(request, "Ticket claimed (free event).")
     return redirect("studentdashboard")
 
 
-# -------------------------------
+# ------------------------------------------------------------------
 # Public landing page
-# -------------------------------
-
+# ------------------------------------------------------------------
 def home(request):
-    """
-    Public landing page (no login required).
-    Shows upcoming approved events and header with Login / Sign up buttons.
-    Guests who click 'View' are sent to login, then redirected back.
-    """
     today = timezone.now().date()
     events = (
         Event.objects.filter(status="approved", date__gte=today)
@@ -995,7 +980,3 @@ def home(request):
         .order_by("date", "time")[:20]
     )
     return render(request, "home.html", {"events": events})
-
-
-
-
