@@ -27,11 +27,13 @@ DEBUG = True  # keep True for dev; set False in production
 #   PUBLIC_ORIGIN=https://abc123.trycloudflare.com
 PUBLIC_ORIGIN = os.environ.get("PUBLIC_ORIGIN", "").strip()
 
+
 def _origin_to_host(origin: str) -> str:
     try:
         return urlparse(origin).hostname or ""
     except Exception:
         return ""
+
 
 _public_host = _origin_to_host(PUBLIC_ORIGIN)
 
@@ -41,10 +43,6 @@ ALLOWED_HOSTS = list(filter(None, [
     "127.0.0.1",
     _public_host,
 ]))
-
-# When DEBUG=True, Django ignores ALLOWED_HOSTS checks on error pages,
-# but we keep it correct anyway. If you prefer a quick dev shortcut:
-# ALLOWED_HOSTS = ["*"]
 
 # Behind tunnels/reverse proxies, these help Django build correct absolute URLs
 USE_X_FORWARDED_HOST = True
@@ -100,11 +98,9 @@ WSGI_APPLICATION = 'student_event.wsgi.application'
 # ---------------------------------------------------------------------
 CORS_ALLOW_ALL_ORIGINS = True  # dev convenience
 
-# CSRF needs full origins (scheme + host). Include local + your PUBLIC_ORIGIN.
 CSRF_TRUSTED_ORIGINS = list(filter(None, [
     'http://localhost:8000',
     'http://127.0.0.1:8000',
-    # If you serve Django directly on HTTPS locally, add:
     'https://localhost:8000',
     'https://127.0.0.1:8000',
     PUBLIC_ORIGIN if PUBLIC_ORIGIN else None,
@@ -133,7 +129,7 @@ else:
             "PORT": os.environ.get("MYSQL_PORT", "3306"),
             "OPTIONS": {"init_command": "SET sql_mode='STRICT_TRANS_TABLES'"},
             "TEST": {
-                "NAME": "test_student_event",  # explicitly name the test DB
+                "NAME": "test_student_event",
             },
         }
     }
@@ -172,3 +168,17 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.BasicAuthentication',
     ],
 }
+# ---------------------------------------------------------------------
+# Stripe test keys (mock API payments)
+# ---------------------------------------------------------------------
+# For a real project you’d move these to environment variables, but for
+# your course project we keep defaults so it “just works” after paste.
+STRIPE_PUBLISHABLE_KEY = os.environ.get(
+    "STRIPE_PUBLISHABLE_KEY",
+    "pk_test_51SVP6qDlKRJfGzqmYmRMyJcL50LDcEUbDnMSB50w3T1NUeVfYOkrxfRoRCUf1QnBFc3VoviUgBfb4Rrcp5cBl20H00x8eUVB6O",
+)
+
+STRIPE_SECRET_KEY = os.environ.get(
+    "STRIPE_SECRET_KEY",
+    "sk_test_51SVP6qDlKRJfGzqm9p9C2Ww89AWbaWjsRtzPdotvqTBHmNF4BCzEBRnY8ctl2O2ghvZi4vXvJxHPcJg1QYC6LDLd00UC0wxPN6",
+)

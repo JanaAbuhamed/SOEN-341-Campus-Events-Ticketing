@@ -1,16 +1,14 @@
+# main/urls.py
 from django.contrib.auth import views as auth_views
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 
-from . import views  # organizer CRUD + organizer profile / analytics helpers
-from main.api import views as api_views           # page views (student/admin auth + pages)
-from main.api import qr_views                     # QR endpoints (scanner, public, APIs)
+from . import views                      # organizer dashboard + analytics helpers
+from main.api import views as api_views  # auth + student/admin views
+from main.api import qr_views            # QR endpoints
 
-# IMPORTANT: viewsets are defined in main/api/views.py
 from main.api.views import UserViewSet, EventViewSet
-
-# Only keep these if they really exist in main/views.py
-from .views import participation_trend, claim_trend_by_payment  # noqa: F401
+from .views import participation_trend, claim_trend_by_payment  # analytics
 
 router = DefaultRouter()
 router.register(r"users", UserViewSet, basename="user")
