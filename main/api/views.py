@@ -707,7 +707,7 @@ class EventViewSet(viewsets.ViewSet):
 
     def get_permissions(self):
         if self.action in ["list", "retrieve"]:
-            permission_classes = [AllowAny] #CanViewEvents
+            permission_classes = [AllowAny] #CanViewEvents  # AllowAny
         elif self.action == "create":
             permission_classes = [CanCreateEvent]
         elif self.action == "update":
