@@ -66,23 +66,33 @@ CI/CD: GitHub Actions (.github/workflows/ci.yml)
     git clone <repo-url>
     cd SOEN-341-CAMPUS-EVENTS-TICKETING
 2. Create and activate a virtual environment:  
-    python -m venv venv
-    source venv/bin/activate     # macOS/Linux
-    venv\Scripts\activate        # Windows
+    python -m venv venv  
+    source venv/bin/activate     # macOS/Linux  
+    venv\Scripts\activate        # Windows  
 3. Install dependencies:  
-    pip install -r requirements.txt
+    pip install -r requirements.txt  
 4. Run Migrations:  
-    python manage.py migrate
-    python manage.py makemigrations
+    python manage.py migrate  
+    python manage.py makemigrations  
 5. Create a Superuser  
-    python manage.py createsuperuser
+    python manage.py createsuperuser  
 6. Start the Development server:  
-    python manage.py runserver
+    python manage.py runserver  
 
 
 ## System Architecture
 ![alt text](image.png)
 
 
+The **browser** represents the user interface and consists of HTML, CSS, and JavaScript. It sends HTTP GET and POST requests to the Django backend (for example, /login/).
 
+The **backend** follows Django’s MTV (Model–Template–View) architectural pattern:
+
+The _Model_ defines the data structure and interacts with the SQL database through Django’s ORM.
+
+The _View_ determines how data is presented to the user in HTML.
+
+The _Controller_ contains the application logic, processing user requests, retrieving or updating data through the Model, and rendering the appropriate Template in response.
+
+The **SQL database** stores and manages data across various tables such as Student user, Events, and others relevant to the application.
 
