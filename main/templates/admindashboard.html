@@ -121,12 +121,106 @@
     }
 
     h3 {
-    color: #ffffff; 
+      color: #ffffff; 
     }
-    </style>
+
+    /* Admin header + profile menu */
+    .admin-header{
+      position:relative;
+      max-width:1200px;
+      margin:24px auto 12px;
+      padding:0 16px;
+      color:#fff;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+    }
+    .profile-menu{
+      position:relative;
+      display:flex;
+      flex-direction:column;
+      align-items:flex-end;
+      gap:6px;
+      z-index:20;
+    }
+    .profile-avatar{
+      width:40px;
+      height:40px;
+      border-radius:50%;
+      background:#ffffff33;
+      backdrop-filter:blur(8px);
+      color:#fff;
+      font-weight:700;
+      font-size:1.1rem;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      border:none;
+      cursor:pointer;
+    }
+    .profile-avatar:hover{
+      background:#ffffff55;
+    }
+    .profile-dropdown{
+      display:none;
+      background:#fff;
+      color:#333;
+      border-radius:12px;
+      box-shadow:0 8px 24px rgba(0,0,0,.15);
+      padding:10px 14px;
+      min-width:170px;
+    }
+    .profile-dropdown.open{
+      display:block;
+    }
+    .profile-dropdown-header{
+      font-weight:700;
+      margin-bottom:6px;
+      font-size:.9rem;
+    }
+    .profile-dropdown a,
+    .profile-dropdown button{
+      display:block;
+      width:100%;
+      text-align:left;
+      border:none;
+      background:none;
+      padding:6px 0;
+      font-size:.9rem;
+      cursor:pointer;
+      color:#333;
+      text-decoration:none;
+    }
+    .profile-dropdown a:hover,
+    .profile-dropdown button:hover{
+      color:#5b6cff;
+    }
+  </style>
 </head>
 <body>
-  <h1><b>Admin Dashboard</b></h1>
+
+  <header class="admin-header">
+    <h1><b>Admin Dashboard</b></h1>
+
+    {% if user.is_authenticated %}
+    <div class="profile-menu">
+      <button id="profileAvatar" class="profile-avatar">
+        {{ user.name|default:user.email|first|upper }}
+      </button>
+      <div id="profileDropdown" class="profile-dropdown">
+        <div class="profile-dropdown-header">
+          {{ user.name|default:user.email }}
+        </div>
+        <a href="{% url 'update_profile' %}">Edit profile</a>
+        <a href="{% url 'update_password' %}">Change password</a>
+        <form method="post" action="{% url 'logout' %}">
+          {% csrf_token %}
+          <button type="submit">Logout</button>
+        </form>
+      </div>
+    </div>
+    {% endif %}
+  </header>
 
   <div class="tab-container">
     <div class="tabs">
@@ -307,34 +401,34 @@
 
     <!-- Analytics -->
     <div class="tab-content {% if tab == 'analytics' %}active{% endif %}" id="analytics">
-    <div class="analytics-container">
-    <h2>Dashboard Analytics</h2>
-    <div class="stats-grid">
-      <div class="stat-card">
-        <h3>Total Students</h3>
-        <p class="stat-value">{{ total_students }}</p>
-      </div>
+      <div class="analytics-container">
+        <h2>Dashboard Analytics</h2>
+        <div class="stats-grid">
+          <div class="stat-card">
+            <h3>Total Students</h3>
+            <p class="stat-value">{{ total_students }}</p>
+          </div>
 
-      <div class="stat-card">
-        <h3>Total Organizers</h3>
-        <p class="stat-value">{{ total_organizers }}</p>
-      </div>
+          <div class="stat-card">
+            <h3>Total Organizers</h3>
+            <p class="stat-value">{{ total_organizers }}</p>
+          </div>
 
-      <div class="stat-card">
-        <h3>Total Events</h3>
-        <p class="stat-value">{{ total_events }}</p>
+          <div class="stat-card">
+            <h3>Total Events</h3>
+            <p class="stat-value">{{ total_events }}</p>
+          </div>
+
+          <div class="stat-card">
+            <h3>Total Claimed Tickets</h3>
+            <p class="stat-value">{{ total_claimed_tickets }}</p>
+          </div>
         </div>
 
-      <div class="stat-card">
-        <h3>Total Claimed Tickets</h3>
-        <p class="stat-value">{{ total_claimed_tickets }}</p>
-        </div>
+        <h2>Participation Trend</h2>
+        <canvas id="claimTrendChart" width="600" height="300" style="background: white;"></canvas>
       </div>
-
-      <h2>Participation Trend</h2>
-       <canvas id="claimTrendChart" width="600" height="300" style="background: white;"></canvas>
-      </div>
-  </div>
+    </div>
   </div>
 
   <!-- Create User Modal -->
@@ -352,10 +446,18 @@
             <div class="field"><label>Email</label><input name="email" type="email" required></div>
             <div class="field"><label>Password</label><input name="password" type="password" required></div>
             <div class="field"><label>Role</label>
-              <select name="role"><option value="0">Student</option><option value="1">Organizer</option><option value="2">Admin</option></select>
+              <select name="role">
+                <option value="0">Student</option>
+                <option value="1">Organizer</option>
+                <option value="2">Admin</option>
+              </select>
             </div>
             <div class="field"><label>Status</label>
-              <select name="status"><option value="1" selected>Active</option><option value="0">Pending</option><option value="2">Suspended</option></select>
+              <select name="status">
+                <option value="1" selected>Active</option>
+                <option value="0">Pending</option>
+                <option value="2">Suspended</option>
+              </select>
             </div>
           </div>
           <div class="submit-row"><button class="pill-btn" type="submit">Create</button></div>
@@ -378,19 +480,32 @@
             <div class="field"><label>Title</label><input name="title" required></div>
             <div class="field"><label>Organizer</label>
               <select name="organizer_id" required>
-                {% for o in organizers %}<option value="{{ o.user_id }}">{{ o.name }} ({{ o.email }})</option>{% endfor %}
+                {% for o in organizers %}
+                  <option value="{{ o.user_id }}">{{ o.name }} ({{ o.email }})</option>
+                {% endfor %}
               </select>
             </div>
-            <div class="field" style="grid-column:1/-1"><label>Description</label><textarea name="description" rows="3"></textarea></div>
+            <div class="field" style="grid-column:1/-1">
+              <label>Description</label><textarea name="description" rows="3"></textarea>
+            </div>
             <div class="field"><label>Date</label><input name="date" type="date" required></div>
             <div class="field"><label>Time</label><input name="time" type="time" required></div>
             <div class="field"><label>Location</label><input name="location" required></div>
             <div class="field"><label>Capacity</label><input name="capacity" type="number" min="1" required></div>
             <div class="field"><label>Ticket Type</label>
-              <select name="ticket_type"><option value="free">Free</option><option value="general">General Admission</option><option value="vip">VIP</option></select>
+              <select name="ticket_type">
+                <option value="free">Free</option>
+                <option value="general">General Admission</option>
+                <option value="vip">VIP</option>
+              </select>
             </div>
             <div class="field"><label>Status</label>
-              <select name="status"><option value="pending">Pending Admin Review</option><option value="approved">Approved</option><option value="rejected">Rejected</option><option value="draft">Draft</option></select>
+              <select name="status">
+                <option value="pending">Pending Admin Review</option>
+                <option value="approved">Approved</option>
+                <option value="rejected">Rejected</option>
+                <option value="draft">Draft</option>
+              </select>
             </div>
           </div>
           <div class="submit-row"><button class="pill-btn" type="submit">Create</button></div>
@@ -399,7 +514,7 @@
     </div>
   </div>
 
-  <!-- Edit Event Modal (unchanged except used by AJAX too) -->
+  <!-- Edit Event Modal -->
   <div class="modal" id="modalEditEvent">
     <div class="modal-card">
       <div class="modal-head">
@@ -414,19 +529,32 @@
             <div class="field"><label>Title</label><input name="title" id="edit_title" required></div>
             <div class="field"><label>Organizer</label>
               <select name="organizer_id" id="edit_organizer_id" required>
-                {% for o in organizers %}<option value="{{ o.user_id }}">{{ o.name }} ({{ o.email }})</option>{% endfor %}
+                {% for o in organizers %}
+                  <option value="{{ o.user_id }}">{{ o.name }} ({{ o.email }})</option>
+                {% endfor %}
               </select>
             </div>
-            <div class="field" style="grid-column:1/-1"><label>Description</label><textarea name="description" id="edit_description" rows="3"></textarea></div>
+            <div class="field" style="grid-column:1/-1">
+              <label>Description</label><textarea name="description" id="edit_description" rows="3"></textarea>
+            </div>
             <div class="field"><label>Date</label><input name="date" id="edit_date" type="date" required></div>
             <div class="field"><label>Time</label><input name="time" id="edit_time" type="time" required></div>
             <div class="field"><label>Location</label><input name="location" id="edit_location" required></div>
             <div class="field"><label>Capacity</label><input name="capacity" id="edit_capacity" type="number" min="1" required></div>
             <div class="field"><label>Ticket Type</label>
-              <select name="ticket_type" id="edit_ticket_type"><option value="free">Free</option><option value="general">General Admission</option><option value="vip">VIP</option></select>
+              <select name="ticket_type" id="edit_ticket_type">
+                <option value="free">Free</option>
+                <option value="general">General Admission</option>
+                <option value="vip">VIP</option>
+              </select>
             </div>
             <div class="field"><label>Status</label>
-              <select name="status" id="edit_status"><option value="pending">Pending Admin Review</option><option value="approved">Approved</option><option value="rejected">Rejected</option><option value="draft">Draft</option></select>
+              <select name="status" id="edit_status">
+                <option value="pending">Pending Admin Review</option>
+                <option value="approved">Approved</option>
+                <option value="rejected">Rejected</option>
+                <option value="draft">Draft</option>
+              </select>
             </div>
           </div>
           <div class="submit-row"><button class="pill-btn" type="submit">Save</button></div>
@@ -610,46 +738,65 @@
             const tr = document.querySelector(`tr[data-type="event"][data-id="${id}"]`);
             if(tr){ tr.querySelector('td:nth-last-child(2)').innerHTML = html; tr.querySelector('input[data-row]').checked=false; }
           });
-        }else{ ids.forEach(id=> document.querySelector(`tr[data-type="event"][data-id="${id}"]`)?.remove()); }
+        }else{
+          ids.forEach(id=> document.querySelector(`tr[data-type="event"][data-id="${id}"]`)?.remove());
+        }
         syncBulkBars();
       }
     });
-    
+
     document.addEventListener("DOMContentLoaded", () => {
       const claimTrendURL = "{% url 'claim_trend_by_payment' %}";
-        fetch(claimTrendURL)
+      fetch(claimTrendURL)
         .then(response => response.json())
         .then(data => {
-            const labels = data.map(item => item.date);
-            const counts = data.map(item => item.count);
+          const labels = data.map(item => item.date);
+          const counts = data.map(item => item.count);
 
-            const ctx = document.getElementById('claimTrendChart').getContext('2d');
-            new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        label: 'Ticket Claimed',
-                        data: counts,
-                        borderColor: 'rgba(75, 192, 192, 1)',
-                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                        tension: 0.3
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    plugins: {
-                        legend: { display: true, position: 'top' },
-                        tooltip: { mode: 'index', intersect: false }
-                    },
-                    scales: {
-                        x: { title: { display: true, text: 'Date' } },
-                        y: { title: { display: true, text: 'Participation Count' }, beginAtZero: true }
-                    }
-                }
-            });
+          const ctx = document.getElementById('claimTrendChart').getContext('2d');
+          new Chart(ctx, {
+            type: 'line',
+            data: {
+              labels: labels,
+              datasets: [{
+                label: 'Ticket Claimed',
+                data: counts,
+                borderColor: 'rgba(75, 192, 192, 1)',
+                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                tension: 0.3
+              }]
+            },
+            options: {
+              responsive: true,
+              plugins: {
+                legend: { display: true, position: 'top' },
+                tooltip: { mode: 'index', intersect: false }
+              },
+              scales: {
+                x: { title: { display: true, text: 'Date' } },
+                y: { title: { display: true, text: 'Participation Count' }, beginAtZero: true }
+              }
+            }
+          });
         });
     });
+
+    // Profile dropdown toggle (admin)
+    const avatar = document.getElementById('profileAvatar');
+    const dropdown = document.getElementById('profileDropdown');
+
+    if (avatar && dropdown) {
+      avatar.addEventListener('click', (e) => {
+        e.stopPropagation();
+        dropdown.classList.toggle('open');
+      });
+
+      document.addEventListener('click', (e) => {
+        if (!dropdown.contains(e.target) && !avatar.contains(e.target)) {
+          dropdown.classList.remove('open');
+        }
+      });
+    }
   </script>
 </body>
 </html>

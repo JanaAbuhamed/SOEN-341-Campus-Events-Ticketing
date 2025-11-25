@@ -14,76 +14,308 @@
       --card-shadow:0 10px 30px rgba(0,0,0,.08);
     }
     *{box-sizing:border-box}
-    body{ margin:0; font-family:Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-      background:linear-gradient(135deg,var(--grad-start) 0%,var(--grad-end) 100%); color:#333; }
-    header{ text-align:center; padding:56px 16px 32px; color:#fff; }
-    header h1{ margin:0 0 18px; font-size:2.6rem; font-weight:800; }
-    .chipbar{ display:flex; justify-content:center; gap:14px; flex-wrap:wrap; }
-    .chipbar a{ background:var(--chip-bg); color:#fff; text-decoration:none; font-weight:700;
-      padding:10px 16px; border-radius:999px; transition:background .2s; }
+    body{
+      margin:0;
+      font-family:Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      background:linear-gradient(135deg,var(--grad-start) 0%,var(--grad-end) 100%);
+      color:#333;
+    }
+
+    /* Header + profile menu */
+    header{
+      text-align:center;
+      padding:56px 16px 32px;
+      color:#fff;
+      position:relative; /* so profile menu can sit in the corner */
+    }
+    header h1{
+      margin:0 0 18px;
+      font-size:2.6rem;
+      font-weight:800;
+    }
+    .chipbar{
+      display:flex;
+      justify-content:center;
+      gap:14px;
+      flex-wrap:wrap;
+    }
+    .chipbar a{
+      background:var(--chip-bg);
+      color:#fff;
+      text-decoration:none;
+      font-weight:700;
+      padding:10px 16px;
+      border-radius:999px;
+      transition:background .2s;
+    }
     .chipbar a:hover{ background:var(--chip-hover); }
 
-    main{ background:#f7f7fa; border-radius:24px 24px 0 0; min-height:calc(100vh - 220px);
-      padding:28px 22px 60px; }
+    /* Profile avatar + dropdown */
+    .profile-menu{
+      position:absolute;
+      top:20px;
+      right:24px;
+      display:flex;
+      flex-direction:column;
+      align-items:flex-end;
+      gap:6px;
+      z-index:20;
+    }
+    .profile-avatar{
+      width:40px;
+      height:40px;
+      border-radius:50%;
+      background:#ffffff33;
+      backdrop-filter:blur(8px);
+      color:#fff;
+      font-weight:700;
+      font-size:1.1rem;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      border:none;
+      cursor:pointer;
+    }
+    .profile-avatar:hover{
+      background:#ffffff55;
+    }
+    .profile-dropdown{
+      display:none;
+      background:#fff;
+      color:#333;
+      border-radius:12px;
+      box-shadow:0 8px 24px rgba(0,0,0,.15);
+      padding:10px 14px;
+      min-width:170px;
+    }
+    .profile-dropdown.open{
+      display:block;
+    }
+    .profile-dropdown-header{
+      font-weight:700;
+      margin-bottom:6px;
+      font-size:.9rem;
+    }
+    .profile-dropdown a,
+    .profile-dropdown button{
+      display:block;
+      width:100%;
+      text-align:left;
+      border:none;
+      background:none;
+      padding:6px 0;
+      font-size:.9rem;
+      cursor:pointer;
+      color:#333;
+      text-decoration:none;
+    }
+    .profile-dropdown a:hover,
+    .profile-dropdown button:hover{
+      color:var(--primary);
+    }
+
+    main{
+      background:#f7f7fa;
+      border-radius:24px 24px 0 0;
+      min-height:calc(100vh - 220px);
+      padding:28px 22px 60px;
+    }
 
     .flash{ max-width:1100px; margin:0 auto 18px; }
-    .flash .msg{ background:#fff; border-left:6px solid #36c26e; padding:10px 14px; border-radius:10px;
-      box-shadow:0 6px 18px rgba(0,0,0,.05); color:#1d3b29; }
+    .flash .msg{
+      background:#fff;
+      border-left:6px solid #36c26e;
+      padding:10px 14px;
+      border-radius:10px;
+      box-shadow:0 6px 18px rgba(0,0,0,.05);
+      color:#1d3b29;
+    }
 
     /* Ticket grid */
-    .grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(320px,1fr));
-      gap:22px; max-width:1100px; margin:0 auto; }
-    .card{ background:#fff; border-radius:18px; box-shadow:var(--card-shadow); padding:22px; }
-    .card h3{ margin:0 0 6px; font-size:1.25rem; }
-    .meta{ color:#555; font-size:.95rem; line-height:1.55; margin-bottom:8px; }
+    .grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fill,minmax(320px,1fr));
+      gap:22px;
+      max-width:1100px;
+      margin:0 auto;
+    }
+    .card{
+      background:#fff;
+      border-radius:18px;
+      box-shadow:var(--card-shadow);
+      padding:22px;
+    }
+    .card h3{
+      margin:0 0 6px;
+      font-size:1.25rem;
+    }
+    .meta{
+      color:#555;
+      font-size:.95rem;
+      line-height:1.55;
+      margin-bottom:8px;
+    }
     .meta b{ color:#222; }
-    .qr{ display:flex; justify-content:center; margin:14px 0 12px; min-height:160px; align-items:center; }
-    .qr img{ width:160px; height:160px; }
-    .actions{ display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
-    .btn-primary{ background:var(--primary); color:#fff; border:none; cursor:pointer; font-weight:700;
-      padding:10px 16px; border-radius:999px; text-decoration:none; transition:background .18s; }
+    .qr{
+      display:flex;
+      justify-content:center;
+      margin:14px 0 12px;
+      min-height:160px;
+      align-items:center;
+    }
+    .qr img{
+      width:160px;
+      height:160px;
+    }
+    .actions{
+      display:flex;
+      gap:10px;
+      align-items:center;
+      flex-wrap:wrap;
+    }
+    .btn-primary{
+      background:var(--primary);
+      color:#fff;
+      border:none;
+      cursor:pointer;
+      font-weight:700;
+      padding:10px 16px;
+      border-radius:999px;
+      text-decoration:none;
+      transition:background .18s;
+    }
     .btn-primary:hover{ background:var(--primary-hover); }
-    .btn-ghost{ background:#eee; color:#333; border:none; padding:8px 14px; border-radius:999px; cursor:pointer; }
+    .btn-ghost{
+      background:#eee;
+      color:#333;
+      border:none;
+      padding:8px 14px;
+      border-radius:999px;
+      cursor:pointer;
+    }
 
-    .empty{ max-width:680px; margin:12px auto; background:#fff; border-radius:14px;
-      box-shadow:0 8px 24px rgba(0,0,0,.06); padding:24px; text-align:center; }
-    .empty p{ margin:8px 0 16px; color:#555; }
+    .empty{
+      max-width:680px;
+      margin:12px auto;
+      background:#fff;
+      border-radius:14px;
+      box-shadow:0 8px 24px rgba(0,0,0,.06);
+      padding:24px;
+      text-align:center;
+    }
+    .empty p{
+      margin:8px 0 16px;
+      color:#555;
+    }
 
     /* Calendar block */
     .cal-wrap{ max-width:1100px; margin:38px auto 0; }
-    .cal-card{ background:#fff; border-radius:18px; box-shadow:var(--card-shadow); padding:18px; }
-    .cal-header{ display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:8px; }
-    .cal-title{ font-weight:800; font-size:1.25rem; }
+    .cal-card{
+      background:#fff;
+      border-radius:18px;
+      box-shadow:var(--card-shadow);
+      padding:18px;
+    }
+    .cal-header{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      margin-bottom:8px;
+    }
+    .cal-title{
+      font-weight:800;
+      font-size:1.25rem;
+    }
     .cal-controls{ display:flex; gap:8px; }
-    .cal-btn{ background:#eee; border:none; padding:8px 12px; border-radius:10px; cursor:pointer; }
-    .cal-grid{ display:grid; grid-template-columns:repeat(7,1fr); gap:6px; margin-top:10px; }
-    .cal-dayname{ font-weight:700; font-size:.9rem; color:#666; text-align:center; padding:6px 0; }
-    .cal-cell{ border:1px solid #eee; border-radius:12px; min-height:90px; padding:8px; background:#fafafa; position:relative; }
+    .cal-btn{
+      background:#eee;
+      border:none;
+      padding:8px 12px;
+      border-radius:10px;
+      cursor:pointer;
+    }
+    .cal-grid{
+      display:grid;
+      grid-template-columns:repeat(7,1fr);
+      gap:6px;
+      margin-top:10px;
+    }
+    .cal-dayname{
+      font-weight:700;
+      font-size:.9rem;
+      color:#666;
+      text-align:center;
+      padding:6px 0;
+    }
+    .cal-cell{
+      border:1px solid #eee;
+      border-radius:12px;
+      min-height:90px;
+      padding:8px;
+      background:#fafafa;
+      position:relative;
+    }
     .cal-cell.out{ opacity:.4; }
-    .cal-date{ font-size:.9rem; font-weight:700; color:#333; }
-    .ev-chip{ display:block; font-size:.78rem; margin-top:6px; padding:6px 8px; border-radius:9px;
-      background:#efefff; color:#2f2a8c; text-decoration:none; }
+    .cal-date{
+      font-size:.9rem;
+      font-weight:700;
+      color:#333;
+    }
+    .ev-chip{
+      display:block;
+      font-size:.78rem;
+      margin-top:6px;
+      padding:6px 8px;
+      border-radius:9px;
+      background:#efefff;
+      color:#2f2a8c;
+      text-decoration:none;
+    }
   </style>
 </head>
 <body>
 
 <header>
-  <h1>My Tickets</h1>
-    <div class="chipbar">
-    <a href="{% url 'EventList' %}">Event Finder</a>
-    <a href="{% url 'studentdashboard' %}">Manage Tickets</a>
-    <a href="{% url 'update_profile' %}">Edit Profile</a>
-    <a href="{% url 'update_password' %}">Change Password</a>
-    <a href="{% url 'SavedList' %}">Saved</a>
-    <a href="{% url 'logout' %}">Logout</a>
+  {% if user.is_authenticated %}
+  <div class="profile-menu">
+    <!-- Avatar with first letter of user's name/username -->
+    <button id="profileAvatar" class="profile-avatar">
+      {{ user.name|default:user.email|slice:":1"|upper }}
+
+    </button>
+
+    <div id="profileDropdown" class="profile-dropdown">
+  <div class="profile-dropdown-header">
+    {{ user.name|default:user.email }}
   </div>
+  <a href="{% url 'update_profile' %}">Edit profile</a>
+  <a href="{% url 'update_password' %}">Change password</a>
+  <form method="post" action="{% url 'logout' %}">
+    {% csrf_token %}
+    <button type="submit">Logout</button>
+  </form>
+</div>
+
+  </div>
+  {% endif %}
+
+  <h1>My Tickets</h1>
+  <div class="chipbar">
+  <a href="{% url 'EventList' %}">Event Finder</a>
+  <a href="{% url 'studentdashboard' %}">Manage Tickets</a>
+  <a href="{% url 'SavedList' %}">Saved</a>
+  <!-- Profile / Change password / Logout are in the profile dropdown -->
+</div>
 
 </header>
 
 <main>
   <div class="flash">
     {% if messages %}
-      {% for message in messages %}<div class="msg">{{ message }}</div>{% endfor %}
+      {% for message in messages %}
+        <div class="msg">{{ message }}</div>
+      {% endfor %}
     {% endif %}
   </div>
 
@@ -140,16 +372,37 @@
   {% endif %}
 </main>
 
+<!-- Profile dropdown script (always loaded) -->
+<script>
+  const avatar = document.getElementById('profileAvatar');
+  const dropdown = document.getElementById('profileDropdown');
+
+  if (avatar && dropdown) {
+    avatar.addEventListener('click', (e) => {
+      e.stopPropagation();
+      dropdown.classList.toggle('open');
+    });
+
+    document.addEventListener('click', (e) => {
+      if (!dropdown.contains(e.target) && !avatar.contains(e.target)) {
+        dropdown.classList.remove('open');
+      }
+    });
+  }
+</script>
+
 {% if tickets and tickets.exists %}
 <script>
   // Build array of your claimed events for the calendar
   const MY_EVENTS = [
     {% for ev in tickets %}
-      { id: {{ ev.id }},
+      {
+        id: {{ ev.id }},
         title: "{{ ev.title|escapejs }}",
         date: "{{ ev.date|date:'Y-m-d' }}",
         time: "{{ ev.time }}",
-        location: "{{ ev.location|escapejs }}" },
+        location: "{{ ev.location|escapejs }}"
+      },
     {% endfor %}
   ];
 
@@ -160,6 +413,7 @@
   const todayBtn = document.getElementById('todayBtn');
 
   const dayNames = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+
   function renderHeaders(){
     grid.innerHTML = '';
     for (const dn of dayNames){
@@ -228,7 +482,11 @@
 
   prevBtn.onclick = () => { view = new Date(view.getFullYear(), view.getMonth()-1, 1); render(); };
   nextBtn.onclick = () => { view = new Date(view.getFullYear(), view.getMonth()+1, 1); render(); };
-  todayBtn.onclick = () => { const now = new Date(); view = new Date(now.getFullYear(), now.getMonth(), 1); render(); };
+  todayBtn.onclick = () => {
+    const now = new Date();
+    view = new Date(now.getFullYear(), now.getMonth(), 1);
+    render();
+  };
 
   render();
 </script>

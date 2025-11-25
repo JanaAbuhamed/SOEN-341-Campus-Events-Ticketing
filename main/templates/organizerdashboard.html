@@ -7,15 +7,105 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Organizer Dashboard</title>
   <link rel="stylesheet" href="{% static 'css/organizerdashboard.css' %}">
+
+  <!-- Small inline styles for profile avatar/dropdown -->
+  <style>
+    .topbar{
+      position: relative;
+    }
+    .profile-menu{
+      position:absolute;
+      top:16px;
+      right:24px;
+      display:flex;
+      flex-direction:column;
+      align-items:flex-end;
+      gap:6px;
+      z-index:20;
+    }
+    .profile-avatar{
+      width:40px;
+      height:40px;
+      border-radius:50%;
+      background:#ffffff33;
+      backdrop-filter:blur(8px);
+      color:#fff;
+      font-weight:700;
+      font-size:1.1rem;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      border:none;
+      cursor:pointer;
+    }
+    .profile-avatar:hover{
+      background:#ffffff55;
+    }
+    .profile-dropdown{
+      display:none;
+      background:#fff;
+      color:#333;
+      border-radius:12px;
+      box-shadow:0 8px 24px rgba(0,0,0,.15);
+      padding:10px 14px;
+      min-width:170px;
+    }
+    .profile-dropdown.open{
+      display:block;
+    }
+    .profile-dropdown-header{
+      font-weight:700;
+      margin-bottom:6px;
+      font-size:.9rem;
+    }
+    .profile-dropdown a,
+    .profile-dropdown button{
+      display:block;
+      width:100%;
+      text-align:left;
+      border:none;
+      background:none;
+      padding:6px 0;
+      font-size:.9rem;
+      cursor:pointer;
+      color:#333;
+      text-decoration:none;
+    }
+    .profile-dropdown a:hover,
+    .profile-dropdown button:hover{
+      color:#5b6cff;
+    }
+  </style>
 </head>
 <body>
 
   <!-- Topbar -->
   <header class="topbar">
     <div class="shell">
+
+      {% if user.is_authenticated %}
+      <div class="profile-menu">
+        <button id="profileAvatar" class="profile-avatar">
+          {{ user.name|default:user.email|slice:":1"|upper }}
+        </button>
+
+        <div id="profileDropdown" class="profile-dropdown">
+          <div class="profile-dropdown-header">
+            {{ user.name|default:user.email }}
+          </div>
+          <a href="{% url 'update_organizer_profile' %}">Edit profile</a>
+          <a href="{% url 'update_password' %}">Change password</a>
+          <form method="post" action="{% url 'logout' %}">
+            {% csrf_token %}
+            <button type="submit">Logout</button>
+          </form>
+        </div>
+      </div>
+      {% endif %}
+
       <h1>Organizer Dashboard</h1>
       <div class="topbar-actions">
-        <a href="{% url 'update_organizer_profile' %}" class="btn ghost">Edit Profile</a>
+        <!-- Edit profile moved into dropdown -->
         <a href="{% url 'organizer-analytics' %}" class="btn primary">📊 Analytics Dashboard</a>
         <a href="{% url 'organizer_scan' %}" class="btn ghost">📷 Scan Tickets</a>
         <button id="openCreateEvent" class="btn primary">➕ Create Event</button>
@@ -227,6 +317,23 @@
     closeEls.forEach(el => el.addEventListener('click', close));
     modal.addEventListener('click', (e) => { if (e.target === modal) close(); });
     document.addEventListener('keydown', (e) => { if (e.key === 'Escape') close(); });
+
+    // Profile dropdown toggle
+    const avatar = document.getElementById('profileAvatar');
+    const dropdown = document.getElementById('profileDropdown');
+
+    if (avatar && dropdown) {
+      avatar.addEventListener('click', (e) => {
+        e.stopPropagation();
+        dropdown.classList.toggle('open');
+      });
+
+      document.addEventListener('click', (e) => {
+        if (!dropdown.contains(e.target) && !avatar.contains(e.target)) {
+          dropdown.classList.remove('open');
+        }
+      });
+    }
   </script>
 </body>
 </html>
