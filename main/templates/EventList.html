@@ -170,6 +170,7 @@
       </div>
 
       <a href="{% url 'update_profile' %}">Profile</a>
+      <a href="{% url 'update_password' %}">Change password</a>
 
       <form method="post" action="{% url 'logout' %}">
         {% csrf_token %}
