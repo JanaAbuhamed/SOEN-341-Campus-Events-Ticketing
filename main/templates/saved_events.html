@@ -18,6 +18,7 @@
       padding: 56px 16px 24px;
       color: #fff;
       text-align: center;
+      position: relative; /* needed for avatar in corner */
     }
     header h1 {
       margin: 0 0 16px;
@@ -95,11 +96,96 @@
       box-shadow: 0 10px 30px rgba(0, 0, 0, .06);
       text-align: center;
     }
+
+    /* -------- PROFILE AVATAR + DROPDOWN -------- */
+    .profile-menu{
+      position:absolute;
+      top:20px;
+      right:24px;
+      display:flex;
+      flex-direction:column;
+      align-items:flex-end;
+      z-index:20;
+    }
+    .profile-avatar{
+      width:40px;
+      height:40px;
+      border-radius:50%;
+      background:#ffffff33;
+      backdrop-filter:blur(8px);
+      color:#fff;
+      font-weight:700;
+      font-size:1.1rem;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      border:none;
+      cursor:pointer;
+    }
+    .profile-avatar:hover{
+      background:#ffffff55;
+    }
+    .profile-dropdown{
+      display:none;
+      background:#fff;
+      color:#333;
+      border-radius:12px;
+      box-shadow:0 8px 24px rgba(0,0,0,.15);
+      padding:10px 14px;
+      min-width:170px;
+      margin-top:8px;
+    }
+    .profile-dropdown.open{
+      display:block;
+    }
+    .profile-dropdown-header{
+      font-weight:700;
+      margin-bottom:6px;
+      font-size:.9rem;
+    }
+    .profile-dropdown a,
+    .profile-dropdown button{
+      display:block;
+      width:100%;
+      text-align:left;
+      border:none;
+      background:none;
+      padding:6px 0;
+      font-size:.9rem;
+      cursor:pointer;
+      color:#333;
+      text-decoration:none;
+    }
+    .profile-dropdown a:hover,
+    .profile-dropdown button:hover{
+      color:#5c5cff;
+    }
+    /* -------- END PROFILE CSS -------- */
   </style>
 </head>
 <body>
 
 <header>
+
+  {% if user.is_authenticated %}
+  <div class="profile-menu">
+    <button id="profileAvatar" class="profile-avatar">
+      {{ user.name|default:user.email|slice:":1"|upper }}
+    </button>
+
+    <div id="profileDropdown" class="profile-dropdown">
+      <div class="profile-dropdown-header">
+        {{ user.name|default:user.email }}
+      </div>
+      <a href="{% url 'update_profile' %}">Profile</a>
+      <form method="post" action="{% url 'logout' %}">
+        {% csrf_token %}
+        <button type="submit">Logout</button>
+      </form>
+    </div>
+  </div>
+  {% endif %}
+
   <h1>Saved Events</h1>
   <div class="chipbar">
     <a href="{% url 'EventList' %}">Event Finder</a>
@@ -140,7 +226,7 @@
           <td>
             <a class="pill primary" href="{% url 'EventDetail' e.id %}">View</a>
 
-            <!-- ✅ Updated so Unsave redirects back to /saved/ -->
+            <!-- Unsave redirects back to /saved/ -->
             <form method="post" action="{% url 'ToggleSaveEvent' e.id %}" style="display:inline">
               {% csrf_token %}
               <input type="hidden" name="ref" value="saved">
@@ -165,6 +251,24 @@
     </div>
   {% endif %}
 </main>
+
+<script>
+  const avatar = document.getElementById("profileAvatar");
+  const dropdown = document.getElementById("profileDropdown");
+
+  if (avatar && dropdown) {
+    avatar.addEventListener("click", (e) => {
+      e.stopPropagation();
+      dropdown.classList.toggle("open");
+    });
+
+    document.addEventListener("click", (e) => {
+      if (!avatar.contains(e.target) && !dropdown.contains(e.target)) {
+        dropdown.classList.remove("open");
+      }
+    });
+  }
+</script>
 
 </body>
 </html>
