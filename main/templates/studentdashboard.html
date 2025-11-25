@@ -286,28 +286,28 @@
     </button>
 
     <div id="profileDropdown" class="profile-dropdown">
-      <div class="profile-dropdown-header">
-        {{ user.name|default:user.email }}
+  <div class="profile-dropdown-header">
+    {{ user.name|default:user.email }}
+  </div>
+  <a href="{% url 'update_profile' %}">Edit profile</a>
+  <a href="{% url 'update_password' %}">Change password</a>
+  <form method="post" action="{% url 'logout' %}">
+    {% csrf_token %}
+    <button type="submit">Logout</button>
+  </form>
+</div>
 
-      </div>
-      <a href="{% url 'update_profile' %}">Profile</a>
-      <form method="post" action="{% url 'logout' %}">
-        {% csrf_token %}
-        <button type="submit">Logout</button>
-      </form>
-    </div>
   </div>
   {% endif %}
 
   <h1>My Tickets</h1>
   <div class="chipbar">
-    <a href="{% url 'EventList' %}">Event Finder</a>
-    <a href="{% url 'studentdashboard' %}">Manage Tickets</a>
-    <a href="{% url 'update_profile' %}">Edit Profile</a>
-    <a href="{% url 'update_password' %}">Change Password</a>
-    <a href="{% url 'SavedList' %}">Saved</a>
-    <!-- Logout moved into profile dropdown -->
-  </div>
+  <a href="{% url 'EventList' %}">Event Finder</a>
+  <a href="{% url 'studentdashboard' %}">Manage Tickets</a>
+  <a href="{% url 'SavedList' %}">Saved</a>
+  <!-- Profile / Change password / Logout are in the profile dropdown -->
+</div>
+
 </header>
 
 <main>
