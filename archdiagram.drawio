@@ -1,0 +1,105 @@
+<mxfile host="65bd71144e">
+    <diagram id="HsuQ85oZn1DufWT-NeQy" name="Page-1">
+        <mxGraphModel dx="1146" dy="779" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                <mxCell id="4" value="Client Layer (html/js/css)" style="swimlane;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" parent="1" vertex="1">
+                    <mxGeometry x="80" y="70" width="680" height="130" as="geometry"/>
+                </mxCell>
+                <mxCell id="18" value="Template" style="rounded=1;whiteSpace=wrap;html=1;" parent="4" vertex="1">
+                    <mxGeometry x="120" y="40" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="28" value="Forms" style="rounded=1;whiteSpace=wrap;html=1;" parent="4" vertex="1">
+                    <mxGeometry x="440" y="40" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="5" value="API Layer" style="swimlane;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" parent="1" vertex="1">
+                    <mxGeometry x="80" y="410" width="680" height="140" as="geometry"/>
+                </mxCell>
+                <mxCell id="25" value="User API" style="rounded=1;whiteSpace=wrap;html=1;" parent="5" vertex="1">
+                    <mxGeometry x="120" y="50" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="26" value="Event API" style="rounded=1;whiteSpace=wrap;html=1;" parent="5" vertex="1">
+                    <mxGeometry x="285" y="50" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="32" value="Payment API" style="rounded=1;whiteSpace=wrap;html=1;" parent="5" vertex="1">
+                    <mxGeometry x="440" y="50" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="14" value="Ticketing W&lt;span style=&quot;color: rgb(63, 63, 63); background-color: transparent;&quot;&gt;ebsite Architecture&lt;/span&gt;" style="text;strokeColor=none;fillColor=none;html=1;fontSize=24;fontStyle=1;verticalAlign=middle;align=center;" parent="1" vertex="1">
+                    <mxGeometry x="350" y="10" width="100" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="15" value="Data Layer (SQL)" style="swimlane;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" parent="1" vertex="1">
+                    <mxGeometry x="80" y="600" width="680" height="140" as="geometry"/>
+                </mxCell>
+                <mxCell id="19" value="Users" style="rounded=1;whiteSpace=wrap;html=1;" parent="15" vertex="1">
+                    <mxGeometry x="135" y="50" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="21" value="Events List" style="rounded=1;whiteSpace=wrap;html=1;" parent="15" vertex="1">
+                    <mxGeometry x="285" y="50" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="22" value="Event Claims" style="rounded=1;whiteSpace=wrap;html=1;" parent="15" vertex="1">
+                    <mxGeometry x="435" y="50" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="29" value="views" style="swimlane;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" parent="1" vertex="1">
+                    <mxGeometry x="80" y="240" width="680" height="130" as="geometry"/>
+                </mxCell>
+                <mxCell id="30" value="User view" style="rounded=1;whiteSpace=wrap;html=1;" parent="29" vertex="1">
+                    <mxGeometry x="120" y="40" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="31" value="Event view" style="rounded=1;whiteSpace=wrap;html=1;" parent="29" vertex="1">
+                    <mxGeometry x="440" y="40" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="33" value="User dashboard" style="edgeStyle=none;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" parent="1" source="18" target="30" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="34" value="Login data" style="edgeStyle=none;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" parent="1" source="28" target="30" edge="1">
+                    <mxGeometry x="0.2777" y="-10" relative="1" as="geometry">
+                        <mxPoint as="offset"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="35" value="Event list" style="edgeStyle=none;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" parent="1" source="18" target="31" edge="1">
+                    <mxGeometry x="0.2332" y="8" relative="1" as="geometry">
+                        <mxPoint as="offset"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="38" value="Auth request" style="edgeStyle=none;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" parent="1" source="30" target="25" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="39" style="edgeStyle=none;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" parent="1" source="31" target="26" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="47" value="Event request" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" parent="39" vertex="1" connectable="0">
+                    <mxGeometry x="0.03" y="-1" relative="1" as="geometry">
+                        <mxPoint as="offset"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="40" style="edgeStyle=none;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" parent="1" source="31" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="580" y="460" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="48" value="Ticket request" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" parent="40" vertex="1" connectable="0">
+                    <mxGeometry x="-0.0038" y="2" relative="1" as="geometry">
+                        <mxPoint as="offset"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="43" style="edgeStyle=none;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" parent="1" source="26" target="21" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="44" style="edgeStyle=none;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" parent="1" source="25" target="19" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="51" style="edgeStyle=none;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" parent="1" source="32" target="22" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="575" y="640" as="sourcePoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="52" value="Payment confirmation" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" parent="51" vertex="1" connectable="0">
+                    <mxGeometry x="-0.2" y="-1" relative="1" as="geometry">
+                        <mxPoint x="3" y="2" as="offset"/>
+                    </mxGeometry>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+</mxfile>
