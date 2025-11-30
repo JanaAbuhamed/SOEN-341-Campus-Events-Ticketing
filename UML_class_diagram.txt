@@ -1,0 +1,101 @@
+@startuml
+title Student Event - Class Diagram
+
+'===============================
+' BASE USER CLASS
+'===============================
+class User {
+    +id: int
+    +name: string
+    +email: string
+    +password: string
+    --
+    +login()
+    +logout()
+    +updateProfile()
+}
+
+class Student {
+    --
+    +saveEvent()
+    +claimEvent()
+}
+
+class Organizer {
+    --
+    +createEvent()
+    +updateEvent()
+    +scanQRCode()
+}
+
+class Admin {
+    --
+    +manageUsers()
+    +approveEvents()
+    +rejectEvents()
+    +createEvent()
+    +updateEvent()
+}
+
+User <|-- Student
+User <|-- Organizer
+User <|-- Admin
+
+'===============================
+' EVENT SYSTEM
+'===============================
+class Event {
+    +id: int
+    +title: string
+    +organizer: string
+    +description: string
+    +date: Date
+    +location: string
+    +capacity: int
+    +fee: float
+    --
+}
+
+'===============================
+' REGISTRATION
+'===============================
+class Registration {
+    +id: int
+    +studentId: int
+    +eventId: int
+    +timestamp: DateTime
+    +status: RegistrationStatus
+    --
+    +unclaim()
+}
+
+Student "1" --> "*" Registration
+Event   "1" --> "*" Registration
+
+'===============================
+' PAYMENTS
+'===============================
+class Payment {
+    +id: int
+    +studentId: int
+    +eventId: int
+    +amount: float
+    +status: PaymentStatus
+    +paymentDate: Date
+    --
+    +process(): bool
+    +refund(): bool
+}
+
+Student "1" --> "*" Payment
+Event   "1" --> "*" Payment
+Payment "1" --> "1" Registration
+
+'===============================
+' USER EVENT RELATIONSHIP
+'===============================
+Student "1" --> "*" Event
+Organizer "1" --> "*" Event
+Admin "1" --> "*" Event
+
+@enduml
