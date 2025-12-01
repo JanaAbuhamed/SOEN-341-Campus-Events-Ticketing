@@ -1,0 +1,136 @@
+F401 [*] `rest_framework.views.APIView` imported but unused
+ --> main\api\views.py:5:34
+  |
+3 | import secrets
+4 |
+5 | from rest_framework.views import APIView
+  |                                  ^^^^^^^
+6 | from rest_framework.permissions import AllowAny
+7 | from rest_framework.decorators import permission_classes
+  |
+help: Remove unused import: `rest_framework.views.APIView`
+
+F401 [*] `rest_framework.decorators.permission_classes` imported but unused
+ --> main\api\views.py:7:39
+  |
+5 | from rest_framework.views import APIView
+6 | from rest_framework.permissions import AllowAny
+7 | from rest_framework.decorators import permission_classes
+  |                                       ^^^^^^^^^^^^^^^^^^
+8 |
+9 | from rest_framework import status
+  |
+help: Remove unused import: `rest_framework.decorators.permission_classes`
+
+F401 [*] `rest_framework.status` imported but unused
+ --> main\api\views.py:9:28
+  |
+7 | from rest_framework.decorators import permission_classes
+8 |
+9 | from rest_framework import status
+  |                            ^^^^^^
+  |
+help: Remove unused import: `rest_framework.status`
+
+F401 [*] `.permissions.CanViewEvents` imported but unused
+  --> main\api\views.py:43:5
+   |
+41 |     CanEditEvent,
+42 |     CanRegisterEvent,
+43 |     CanViewEvents,
+   |     ^^^^^^^^^^^^^
+44 |     CanViewUsers,
+45 | )
+   |
+help: Remove unused import: `.permissions.CanViewEvents`
+
+F811 Redefinition of unused `permission_classes` from line 7
+   --> main\api\views.py:646:5
+    |
+644 | # ------------------------------------------------------------------
+645 | class UserViewSet(viewsets.ViewSet):
+646 |     permission_classes = [permissions.IsAuthenticated]
+    |     ^^^^^^^^^^^^^^^^^^ `permission_classes` redefined here
+647 |
+648 |     # def get_permissions(self):
+    |
+   ::: main\api\views.py:7:39
+    |
+  5 | from rest_framework.views import APIView
+  6 | from rest_framework.permissions import AllowAny
+  7 | from rest_framework.decorators import permission_classes
+    |                                       ------------------ previous definition of `permission_classes` here
+  8 |
+  9 | from rest_framework import status
+    |
+help: Remove definition: `permission_classes`
+
+F811 Redefinition of unused `permission_classes` from line 7
+   --> main\api\views.py:706:5
+    |
+705 | class EventViewSet(viewsets.ViewSet):
+706 |     permission_classes = [permissions.IsAuthenticated]
+    |     ^^^^^^^^^^^^^^^^^^ `permission_classes` redefined here
+707 |
+708 |     def get_permissions(self):
+    |
+   ::: main\api\views.py:7:39
+    |
+  5 | from rest_framework.views import APIView
+  6 | from rest_framework.permissions import AllowAny
+  7 | from rest_framework.decorators import permission_classes
+    |                                       ------------------ previous definition of `permission_classes` here
+  8 |
+  9 | from rest_framework import status
+    |
+help: Remove definition: `permission_classes`
+
+F401 [*] `django.contrib.auth.forms.AuthenticationForm` imported but unused
+ --> main\forms.py:5:57
+  |
+3 | from django.contrib.auth import password_validation
+4 | from django.contrib.auth.hashers import check_password
+5 | from django.contrib.auth.forms import UserCreationForm, AuthenticationForm, PasswordChangeForm, UserChangeForm
+  |                                                         ^^^^^^^^^^^^^^^^^^
+6 |
+7 | class OrganizerUpdateForm(forms.ModelForm):
+  |
+help: Remove unused import
+
+F401 [*] `django.contrib.auth.forms.PasswordChangeForm` imported but unused
+ --> main\forms.py:5:77
+  |
+3 | from django.contrib.auth import password_validation
+4 | from django.contrib.auth.hashers import check_password
+5 | from django.contrib.auth.forms import UserCreationForm, AuthenticationForm, PasswordChangeForm, UserChangeForm
+  |                                                                             ^^^^^^^^^^^^^^^^^^
+6 |
+7 | class OrganizerUpdateForm(forms.ModelForm):
+  |
+help: Remove unused import
+
+F401 [*] `django.contrib.auth.forms.UserChangeForm` imported but unused
+ --> main\forms.py:5:97
+  |
+3 | from django.contrib.auth import password_validation
+4 | from django.contrib.auth.hashers import check_password
+5 | from django.contrib.auth.forms import UserCreationForm, AuthenticationForm, PasswordChangeForm, UserChangeForm
+  |                                                                                                 ^^^^^^^^^^^^^^
+6 |
+7 | class OrganizerUpdateForm(forms.ModelForm):
+  |
+help: Remove unused import
+
+F401 [*] `django.conf.settings` imported but unused
+ --> main\models.py:5:25
+  |
+3 | from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin, Group
+4 | from django.utils import timezone
+5 | from django.conf import settings
+  |                         ^^^^^^^^
+6 | import secrets
+  |
+help: Remove unused import: `django.conf.settings`
+
+Found 10 errors.
+[*] 8 fixable with the `--fix` option.

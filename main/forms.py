@@ -2,7 +2,7 @@ from django import forms
 from main.models import User, Event
 from django.contrib.auth import password_validation
 from django.contrib.auth.hashers import check_password
-from django.contrib.auth.forms import UserCreationForm, AuthenticationForm, PasswordChangeForm, UserChangeForm
+from django.contrib.auth.forms import UserCreationForm
 
 class OrganizerUpdateForm(forms.ModelForm):
     class Meta:

@@ -2,11 +2,8 @@
 from decimal import Decimal
 import secrets
 
-from rest_framework.views import APIView
 from rest_framework.permissions import AllowAny
-from rest_framework.decorators import permission_classes
 
-from rest_framework import status
 
 
 import stripe
@@ -40,7 +37,6 @@ from .permissions import (
     CanDeleteEvent,
     CanEditEvent,
     CanRegisterEvent,
-    CanViewEvents,
     CanViewUsers,
 )
 from .serializers import EventCreateSerializer, EventSerializer, UserSerializer
