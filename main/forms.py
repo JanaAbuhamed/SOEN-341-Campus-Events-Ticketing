@@ -4,13 +4,14 @@ from django.contrib.auth import password_validation
 from django.contrib.auth.hashers import check_password
 from django.contrib.auth.forms import UserCreationForm
 
+
 class OrganizerUpdateForm(forms.ModelForm):
     class Meta:
         model = User
-        fields = ['name', 'email']  
+        fields = ["name", "email"]
 
     def clean_email(self):
-        email = self.cleaned_data.get('email')
+        email = self.cleaned_data.get("email")
         if User.objects.exclude(pk=self.instance.pk).filter(email=email).exists():
             raise forms.ValidationError("This email is already in use.")
         return email
@@ -19,10 +20,10 @@ class OrganizerUpdateForm(forms.ModelForm):
 class UserUpdateForm(forms.ModelForm):
     class Meta:
         model = User
-        fields = ['name', 'email']  # Add more fields if needed
+        fields = ["name", "email"]  # Add more fields if needed
 
     def clean_email(self):
-        email = self.cleaned_data.get('email')
+        email = self.cleaned_data.get("email")
         if User.objects.exclude(pk=self.instance.pk).filter(email=email).exists():
             raise forms.ValidationError("This email is already in use.")
         return email
@@ -32,16 +33,16 @@ class UserUpdateForm(forms.ModelForm):
 class PasswordUpdateForm(forms.Form):
     current_password = forms.CharField(
         label="Current Password",
-        widget=forms.PasswordInput(attrs={'class': 'form-control'})
+        widget=forms.PasswordInput(attrs={"class": "form-control"}),
     )
     new_password = forms.CharField(
         label="New Password",
-        widget=forms.PasswordInput(attrs={'class': 'form-control'}),
-        help_text=password_validation.password_validators_help_text_html()
+        widget=forms.PasswordInput(attrs={"class": "form-control"}),
+        help_text=password_validation.password_validators_help_text_html(),
     )
     confirm_password = forms.CharField(
         label="Confirm New Password",
-        widget=forms.PasswordInput(attrs={'class': 'form-control'})
+        widget=forms.PasswordInput(attrs={"class": "form-control"}),
     )
 
     def __init__(self, user, *args, **kwargs):
@@ -49,15 +50,15 @@ class PasswordUpdateForm(forms.Form):
         self.user = user
 
     def clean_current_password(self):
-        current_password = self.cleaned_data.get('current_password')
+        current_password = self.cleaned_data.get("current_password")
         if not check_password(current_password, self.user.password):
             raise forms.ValidationError("Your current password is incorrect.")
         return current_password
 
     def clean(self):
         cleaned_data = super().clean()
-        new_password = cleaned_data.get('new_password')
-        confirm_password = cleaned_data.get('confirm_password')
+        new_password = cleaned_data.get("new_password")
+        confirm_password = cleaned_data.get("confirm_password")
 
         if new_password and confirm_password and new_password != confirm_password:
             raise forms.ValidationError("New passwords do not match.")
@@ -68,48 +69,55 @@ class PasswordUpdateForm(forms.Form):
 
 
 class BaseUserCreationForm(UserCreationForm):
-    name = forms.CharField(max_length=50, required=True, widget=forms.TextInput(attrs={
-        'placeholder': 'Name',
-        'class': 'form-input'
-    }))
-    email = forms.EmailField(required=True, widget=forms.EmailInput(attrs={
-        'placeholder': 'Email address', 
-        'class': 'form-input'
-    }))
-    password1 = forms.CharField(widget=forms.PasswordInput(attrs={
-        'placeholder': 'Password',
-        'class': 'form-input'
-    }))
-    password2 = forms.CharField(widget=forms.PasswordInput(attrs={
-        'placeholder': 'Confirm Password',
-        'class': 'form-input'
-    }))
+    name = forms.CharField(
+        max_length=50,
+        required=True,
+        widget=forms.TextInput(attrs={"placeholder": "Name", "class": "form-input"}),
+    )
+    email = forms.EmailField(
+        required=True,
+        widget=forms.EmailInput(
+            attrs={"placeholder": "Email address", "class": "form-input"}
+        ),
+    )
+    password1 = forms.CharField(
+        widget=forms.PasswordInput(
+            attrs={"placeholder": "Password", "class": "form-input"}
+        )
+    )
+    password2 = forms.CharField(
+        widget=forms.PasswordInput(
+            attrs={"placeholder": "Confirm Password", "class": "form-input"}
+        )
+    )
 
     class Meta:
         model = User
-        fields = ('name', 'email', 'password1', 'password2')
+        fields = ("name", "email", "password1", "password2")
+
 
 class StudentSignupForm(BaseUserCreationForm):
     def save(self, commit=True):
         # Use your custom UserManager instead of default save
         user = User.objects.create_user(
-            email=self.cleaned_data['email'],
-            name=self.cleaned_data['name'],
-            password=self.cleaned_data['password1'],  # Use password1 for confirmation
+            email=self.cleaned_data["email"],
+            name=self.cleaned_data["name"],
+            password=self.cleaned_data["password1"],  # Use password1 for confirmation
             role=0,  # Student
-            status=1  # Active immediately
+            status=1,  # Active immediately
         )
         return user
+
 
 class OrganizerSignupForm(BaseUserCreationForm):
     def save(self, commit=True):
         # Use your custom UserManager instead of default save
         user = User.objects.create_user(
-            email=self.cleaned_data['email'],
-            name=self.cleaned_data['name'],
-            password=self.cleaned_data['password1'],  # Use password1 for confirmation
+            email=self.cleaned_data["email"],
+            name=self.cleaned_data["name"],
+            password=self.cleaned_data["password1"],  # Use password1 for confirmation
             role=1,  # Organizer
-            status=0  # Pending approval
+            status=0,  # Pending approval
         )
         return user
 
@@ -117,6 +125,4 @@ class OrganizerSignupForm(BaseUserCreationForm):
 class EventForm(forms.ModelForm):
     class Meta:
         model = Event
-        fields = ['title', 'description', 'date', 'time', 'location', 'capacity']
-
-
+        fields = ["title", "description", "date", "time", "location", "capacity"]

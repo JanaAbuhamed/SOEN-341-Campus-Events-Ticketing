@@ -5,7 +5,6 @@ import secrets
 from rest_framework.permissions import AllowAny
 
 
-
 import stripe
 
 from django.conf import settings
@@ -155,7 +154,10 @@ def adminlogin(request):
             return render(
                 request,
                 "adminlogin.html",
-                {"error": "No admin account found for this email.", "prefill_email": identifier},
+                {
+                    "error": "No admin account found for this email.",
+                    "prefill_email": identifier,
+                },
                 status=200,
             )
 
@@ -240,7 +242,9 @@ def admin_create_user(request):
         email=email, name=name, password=password, role=role, status=status_val
     )
     try:
-        group_name = "Student" if role == 0 else "Organizer" if role == 1 else "Administrator"
+        group_name = (
+            "Student" if role == 0 else "Organizer" if role == 1 else "Administrator"
+        )
         user.groups.add(Group.objects.get(name=group_name))
     except Group.DoesNotExist:
         pass
@@ -271,7 +275,9 @@ def admin_create_event(request):
         "status": request.POST.get("status", "pending"),
     }
 
-    if not all([data["title"], data["date"], data["time"], data["location"], data["capacity"]]):
+    if not all(
+        [data["title"], data["date"], data["time"], data["location"], data["capacity"]]
+    ):
         messages.error(request, "Please fill all required fields.")
         return redirect("/admindashboard/?tab=events")
 
@@ -423,17 +429,25 @@ def admin_events_bulk(request):
 def signup(request):
     if request.method == "POST":
         role = request.POST.get("role")
-        form = StudentSignupForm(request.POST) if role == "student" else OrganizerSignupForm(request.POST)
+        form = (
+            StudentSignupForm(request.POST)
+            if role == "student"
+            else OrganizerSignupForm(request.POST)
+        )
         if form.is_valid():
             user = form.save()
             try:
-                group = Group.objects.get(name="Student" if role == "student" else "Organizer")
+                group = Group.objects.get(
+                    name="Student" if role == "student" else "Organizer"
+                )
                 user.groups.add(group)
             except Group.DoesNotExist:
                 pass
             login(request, user)
             request.session["user_role"] = role
-            return redirect("studentdashboard" if role == "student" else "organizerpending")
+            return redirect(
+                "studentdashboard" if role == "student" else "organizerpending"
+            )
     else:
         form = StudentSignupForm()
     return render(request, "signup.html", {"form": form})
@@ -452,7 +466,10 @@ def studentlogin(request):
         return render(
             request,
             "studentlogin.html",
-            {"error": "Invalid credentials or not a student account", "prefill_email": email},
+            {
+                "error": "Invalid credentials or not a student account",
+                "prefill_email": email,
+            },
         )
     return render(request, "studentlogin.html")
 
@@ -534,20 +551,30 @@ def EventList(request):
     if sort == "event":
         qs = qs.order_by("date", "time", "-created_at")
     elif sort == "popularity":
-        qs = qs.annotate(att_count=Count("attendees")).order_by("-att_count", "date", "time")
+        qs = qs.annotate(att_count=Count("attendees")).order_by(
+            "-att_count", "date", "time"
+        )
     else:
         qs = qs.order_by("-created_at", "date", "time")
 
     events = qs
 
-    my_event_ids = set(Event.objects.filter(attendees=request.user).values_list("id", flat=True))
+    my_event_ids = set(
+        Event.objects.filter(attendees=request.user).values_list("id", flat=True)
+    )
     try:
-        saved_ids = set(SavedEvent.objects.filter(user=request.user).values_list("event_id", flat=True))
+        saved_ids = set(
+            SavedEvent.objects.filter(user=request.user).values_list(
+                "event_id", flat=True
+            )
+        )
     except Exception:
         saved_ids = set()
 
     categories = list(
-        Event.objects.filter(status="approved").values_list("category", flat=True).distinct()
+        Event.objects.filter(status="approved")
+        .values_list("category", flat=True)
+        .distinct()
     )
 
     current = {
@@ -579,7 +606,9 @@ def event_detail(request, event_id: int):
     if getattr(request.user, "role", None) != 0:
         return HttpResponseForbidden("Student access required")
 
-    event = get_object_or_404(Event.objects.select_related("organizer"), id=event_id, status="approved")
+    event = get_object_or_404(
+        Event.objects.select_related("organizer"), id=event_id, status="approved"
+    )
 
     is_claimed = event.attendees.filter(pk=request.user.pk).exists()
     spots_left = max(event.capacity - event.attendees.count(), 0)
@@ -648,8 +677,6 @@ class UserViewSet(viewsets.ViewSet):
     #         permission_classes = [permissions.IsAuthenticated]
     #     return [perm() for perm in permission_classes]
 
-
-
     def get_permissions(self):
         if self.action in ["list", "retrieve"]:
             permission_classes = [CanViewUsers]
@@ -658,7 +685,6 @@ class UserViewSet(viewsets.ViewSet):
         else:
             permission_classes = [permissions.IsAuthenticated]
         return [perm() for perm in permission_classes]
-
 
     def list(self, request):
         users = User.objects.all()
@@ -703,7 +729,7 @@ class EventViewSet(viewsets.ViewSet):
 
     def get_permissions(self):
         if self.action in ["list", "retrieve"]:
-            permission_classes = [AllowAny] #CanViewEvents  # AllowAny
+            permission_classes = [AllowAny]  # CanViewEvents  # AllowAny
         elif self.action == "create":
             permission_classes = [CanCreateEvent]
         elif self.action == "update":
@@ -715,7 +741,6 @@ class EventViewSet(viewsets.ViewSet):
         else:
             permission_classes = [permissions.IsAuthenticated]
         return [perm() for perm in permission_classes]
-
 
     # @permission_classes([AllowAny])
     def list(self, request):
@@ -809,8 +834,7 @@ def SavedList(request):
         return HttpResponseForbidden("Student access required")
 
     events = (
-        Event.objects
-        .filter(saved_by__user=request.user)
+        Event.objects.filter(saved_by__user=request.user)
         .select_related("organizer")
         .order_by("date", "time", "-created_at")
     )
@@ -912,13 +936,17 @@ def checkout(request, event_id: int):
     if is_paid:
         payment_intent_id = (request.POST.get("payment_intent_id") or "").strip()
         if not payment_intent_id:
-            messages.error(request, "Payment failed: missing Stripe payment information.")
+            messages.error(
+                request, "Payment failed: missing Stripe payment information."
+            )
             return redirect("checkout", event_id=event.id)
 
         try:
             intent = stripe.PaymentIntent.retrieve(payment_intent_id)
         except stripe.error.StripeError:
-            messages.error(request, "Payment failed while talking to Stripe. Please try again.")
+            messages.error(
+                request, "Payment failed while talking to Stripe. Please try again."
+            )
             return redirect("checkout", event_id=event.id)
 
         if intent.status != "succeeded":
@@ -926,10 +954,9 @@ def checkout(request, event_id: int):
             return redirect("checkout", event_id=event.id)
 
         # Optional safety check on metadata
-        if (
-            intent.metadata.get("user_id") != str(request.user.pk)
-            or intent.metadata.get("event_id") != str(event.pk)
-        ):
+        if intent.metadata.get("user_id") != str(
+            request.user.pk
+        ) or intent.metadata.get("event_id") != str(event.pk):
             messages.error(request, "Payment metadata mismatch.")
             return redirect("checkout", event_id=event.id)
 

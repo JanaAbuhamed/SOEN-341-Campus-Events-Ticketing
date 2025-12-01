@@ -7,94 +7,261 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
     dependencies = [
-        ('auth', '0012_alter_user_first_name_max_length'),
+        ("auth", "0012_alter_user_first_name_max_length"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='User',
+            name="User",
             fields=[
-                ('last_login', models.DateTimeField(blank=True, null=True, verbose_name='last login')),
-                ('is_superuser', models.BooleanField(default=False, help_text='Designates that this user has all permissions without explicitly assigning them.', verbose_name='superuser status')),
-                ('user_id', models.AutoField(primary_key=True, serialize=False)),
-                ('name', models.CharField(max_length=50)),
-                ('email', models.EmailField(max_length=50, unique=True)),
-                ('password', models.CharField(max_length=128)),
-                ('role', models.IntegerField(choices=[(0, 'Student'), (1, 'Organizer'), (2, 'Admin')], default=0)),
-                ('status', models.IntegerField(choices=[(0, 'Pending'), (1, 'Active'), (2, 'Suspended')], default=0)),
-                ('created_at', models.DateTimeField(default=django.utils.timezone.now)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
-                ('is_active', models.BooleanField(default=True)),
-                ('is_staff', models.BooleanField(default=False)),
-                ('groups', models.ManyToManyField(blank=True, help_text='The groups this user belongs to. A user will get all permissions granted to each of their groups.', related_name='user_set', related_query_name='user', to='auth.group', verbose_name='groups')),
-                ('user_permissions', models.ManyToManyField(blank=True, help_text='Specific permissions for this user.', related_name='user_set', related_query_name='user', to='auth.permission', verbose_name='user permissions')),
+                (
+                    "last_login",
+                    models.DateTimeField(
+                        blank=True, null=True, verbose_name="last login"
+                    ),
+                ),
+                (
+                    "is_superuser",
+                    models.BooleanField(
+                        default=False,
+                        help_text="Designates that this user has all permissions without explicitly assigning them.",
+                        verbose_name="superuser status",
+                    ),
+                ),
+                ("user_id", models.AutoField(primary_key=True, serialize=False)),
+                ("name", models.CharField(max_length=50)),
+                ("email", models.EmailField(max_length=50, unique=True)),
+                ("password", models.CharField(max_length=128)),
+                (
+                    "role",
+                    models.IntegerField(
+                        choices=[(0, "Student"), (1, "Organizer"), (2, "Admin")],
+                        default=0,
+                    ),
+                ),
+                (
+                    "status",
+                    models.IntegerField(
+                        choices=[(0, "Pending"), (1, "Active"), (2, "Suspended")],
+                        default=0,
+                    ),
+                ),
+                ("created_at", models.DateTimeField(default=django.utils.timezone.now)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
+                ("is_active", models.BooleanField(default=True)),
+                ("is_staff", models.BooleanField(default=False)),
+                (
+                    "groups",
+                    models.ManyToManyField(
+                        blank=True,
+                        help_text="The groups this user belongs to. A user will get all permissions granted to each of their groups.",
+                        related_name="user_set",
+                        related_query_name="user",
+                        to="auth.group",
+                        verbose_name="groups",
+                    ),
+                ),
+                (
+                    "user_permissions",
+                    models.ManyToManyField(
+                        blank=True,
+                        help_text="Specific permissions for this user.",
+                        related_name="user_set",
+                        related_query_name="user",
+                        to="auth.permission",
+                        verbose_name="user permissions",
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='Event',
+            name="Event",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('title', models.CharField(max_length=200)),
-                ('description', models.TextField()),
-                ('date', models.DateField()),
-                ('time', models.TimeField()),
-                ('location', models.CharField(max_length=200)),
-                ('capacity', models.PositiveIntegerField()),
-                ('category', models.CharField(blank=True, default='', max_length=100)),
-                ('ticket_type', models.CharField(choices=[('free', 'Free'), ('general', 'General Admission'), ('vip', 'VIP')], default='free', max_length=20)),
-                ('status', models.CharField(choices=[('draft', 'Draft'), ('pending', 'Pending Admin Review'), ('approved', 'Approved'), ('rejected', 'Rejected')], default='draft', max_length=20)),
-                ('created_at', models.DateTimeField(default=django.utils.timezone.now)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
-                ('organizer', models.ForeignKey(limit_choices_to={'role': 1}, on_delete=django.db.models.deletion.CASCADE, related_name='organized_events', to=settings.AUTH_USER_MODEL)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("title", models.CharField(max_length=200)),
+                ("description", models.TextField()),
+                ("date", models.DateField()),
+                ("time", models.TimeField()),
+                ("location", models.CharField(max_length=200)),
+                ("capacity", models.PositiveIntegerField()),
+                ("category", models.CharField(blank=True, default="", max_length=100)),
+                (
+                    "ticket_type",
+                    models.CharField(
+                        choices=[
+                            ("free", "Free"),
+                            ("general", "General Admission"),
+                            ("vip", "VIP"),
+                        ],
+                        default="free",
+                        max_length=20,
+                    ),
+                ),
+                (
+                    "status",
+                    models.CharField(
+                        choices=[
+                            ("draft", "Draft"),
+                            ("pending", "Pending Admin Review"),
+                            ("approved", "Approved"),
+                            ("rejected", "Rejected"),
+                        ],
+                        default="draft",
+                        max_length=20,
+                    ),
+                ),
+                ("created_at", models.DateTimeField(default=django.utils.timezone.now)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
+                (
+                    "organizer",
+                    models.ForeignKey(
+                        limit_choices_to={"role": 1},
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="organized_events",
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='Ticket',
+            name="Ticket",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('purchase_date', models.DateTimeField(default=django.utils.timezone.now)),
-                ('event', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='main.event')),
-                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "purchase_date",
+                    models.DateTimeField(default=django.utils.timezone.now),
+                ),
+                (
+                    "event",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE, to="main.event"
+                    ),
+                ),
+                (
+                    "user",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
             options={
-                'unique_together': {('event', 'user')},
+                "unique_together": {("event", "user")},
             },
         ),
         migrations.AddField(
-            model_name='event',
-            name='attendees',
-            field=models.ManyToManyField(blank=True, related_name='events_attending', through='main.Ticket', to=settings.AUTH_USER_MODEL),
+            model_name="event",
+            name="attendees",
+            field=models.ManyToManyField(
+                blank=True,
+                related_name="events_attending",
+                through="main.Ticket",
+                to=settings.AUTH_USER_MODEL,
+            ),
         ),
         migrations.CreateModel(
-            name='Payment',
+            name="Payment",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('amount', models.DecimalField(decimal_places=2, default=0, max_digits=8)),
-                ('status', models.CharField(choices=[('succeeded', 'Succeeded'), ('failed', 'Failed'), ('pending', 'Pending')], default='succeeded', max_length=16)),
-                ('txn_id', models.CharField(blank=True, max_length=64)),
-                ('created_at', models.DateTimeField(default=django.utils.timezone.now)),
-                ('event', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='payments', to='main.event')),
-                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='payments', to=settings.AUTH_USER_MODEL)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "amount",
+                    models.DecimalField(decimal_places=2, default=0, max_digits=8),
+                ),
+                (
+                    "status",
+                    models.CharField(
+                        choices=[
+                            ("succeeded", "Succeeded"),
+                            ("failed", "Failed"),
+                            ("pending", "Pending"),
+                        ],
+                        default="succeeded",
+                        max_length=16,
+                    ),
+                ),
+                ("txn_id", models.CharField(blank=True, max_length=64)),
+                ("created_at", models.DateTimeField(default=django.utils.timezone.now)),
+                (
+                    "event",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="payments",
+                        to="main.event",
+                    ),
+                ),
+                (
+                    "user",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="payments",
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
             options={
-                'unique_together': {('user', 'event')},
+                "unique_together": {("user", "event")},
             },
         ),
         migrations.CreateModel(
-            name='SavedEvent',
+            name="SavedEvent",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('remind_me', models.BooleanField(default=False)),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('event', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='saved_by', to='main.event')),
-                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='saved_events', to=settings.AUTH_USER_MODEL)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("remind_me", models.BooleanField(default=False)),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                (
+                    "event",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="saved_by",
+                        to="main.event",
+                    ),
+                ),
+                (
+                    "user",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="saved_events",
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
             options={
-                'unique_together': {('user', 'event')},
+                "unique_together": {("user", "event")},
             },
         ),
     ]

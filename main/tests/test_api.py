@@ -1,4 +1,3 @@
-
 from django.test import TestCase
 from rest_framework.test import APIClient
 from datetime import date, time
@@ -9,7 +8,6 @@ from main.models import User, Event
 # BASIC TESTS
 # --------------------------
 class TestSimple(TestCase):
-
     # Test 1: Basic math operation works
     def test_basic_math(self):
         self.assertEqual(2 + 2, 4)
@@ -23,7 +21,6 @@ class TestSimple(TestCase):
 # USER MODEL TESTS
 # --------------------------
 class TestUserModel(TestCase):
-
     # Test 3: Creating a user with valid data
     def test_create_user(self):
         user = User.objects.create_user(
@@ -31,7 +28,7 @@ class TestUserModel(TestCase):
             name="Test User",
             password="pass123",
             role=0,
-            status=1
+            status=1,
         )
         self.assertEqual(user.email, "test@example.com")
 
@@ -39,11 +36,7 @@ class TestUserModel(TestCase):
     def test_create_user_missing_email(self):
         with self.assertRaises(Exception):
             User.objects.create_user(
-                email="",
-                name="No Email",
-                password="pass",
-                role=0,
-                status=1
+                email="", name="No Email", password="pass", role=0, status=1
             )
 
     # Test 5: Password hashing works
@@ -53,7 +46,7 @@ class TestUserModel(TestCase):
             name="Hash User",
             password="mypassword",
             role=0,
-            status=1
+            status=1,
         )
         self.assertNotEqual(user.password, "mypassword")  # should be hashed
 
@@ -62,14 +55,13 @@ class TestUserModel(TestCase):
 # EVENT MODEL TESTS
 # --------------------------
 class TestEventModel(TestCase):
-
     def setUp(self):
         self.user = User.objects.create_user(
             email="event@test.com",
             name="Event Tester",
             password="pass123",
             role=1,
-            status=1
+            status=1,
         )
 
     # Test 6: Creating an event successfully
@@ -107,7 +99,6 @@ class TestEventModel(TestCase):
 # API TESTS (No permission complexity)
 # --------------------------
 class TestUserAndEventAPI(TestCase):
-
     def setUp(self):
         self.client = APIClient()
         self.admin = User.objects.create_user(
@@ -115,14 +106,14 @@ class TestUserAndEventAPI(TestCase):
             name="Admin",
             password="adminpass",
             role=2,
-            status=1
+            status=1,
         )
         self.organizer = User.objects.create_user(
             email="organizer@example.com",
             name="Organizer",
             password="organizerpass",
             role=1,
-            status=1
+            status=1,
         )
 
     # Test 8: Registering a new user via API
@@ -132,7 +123,7 @@ class TestUserAndEventAPI(TestCase):
             "name": "Student",
             "password": "studypass",
             "role": 0,
-            "status": 1
+            "status": 1,
         }
         res = self.client.post("/api/users/", data, format="json")
         self.assertEqual(res.status_code, 201)
@@ -140,18 +131,14 @@ class TestUserAndEventAPI(TestCase):
     # Test 9: Registering a duplicate user should fail (400)
     def test_duplicate_user_registration_fails(self):
         User.objects.create_user(
-            email="exists@example.com",
-            name="Old",
-            password="123",
-            role=0,
-            status=1
+            email="exists@example.com", name="Old", password="123", role=0, status=1
         )
         data = {
             "email": "exists@example.com",
             "name": "New",
             "password": "abc",
             "role": 0,
-            "status": 1
+            "status": 1,
         }
         res = self.client.post("/api/users/", data, format="json")
         self.assertEqual(res.status_code, 400)

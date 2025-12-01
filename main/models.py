@@ -1,12 +1,17 @@
 # main/models.py
 from django.db import models
-from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin, Group
+from django.contrib.auth.models import (
+    AbstractBaseUser,
+    BaseUserManager,
+    PermissionsMixin,
+    Group,
+)
 from django.utils import timezone
 import secrets
 
 
 class User_groups(models.Model):
-    user = models.ForeignKey('User', on_delete=models.CASCADE)
+    user = models.ForeignKey("User", on_delete=models.CASCADE)
     group_name = models.CharField(max_length=100)
 
     def __str__(self):
@@ -25,11 +30,11 @@ class UserManager(BaseUserManager):
 
         # Attach group; be tolerant so migrations don't fail
         try:
-            if role == 0:       # Student
+            if role == 0:  # Student
                 group, _ = Group.objects.get_or_create(name="Student")
-            elif role == 1:     # Organizer
+            elif role == 1:  # Organizer
                 group, _ = Group.objects.get_or_create(name="Organizer")
-            elif role == 2:     # Admin
+            elif role == 2:  # Admin
                 group, _ = Group.objects.get_or_create(name="Administrator")
             else:
                 group = None
@@ -43,7 +48,9 @@ class UserManager(BaseUserManager):
         return user
 
     def create_superuser(self, email, name, password=None):
-        user = self.create_user(email=email, name=name, password=password, role=2, status=1)
+        user = self.create_user(
+            email=email, name=name, password=password, role=2, status=1
+        )
         user.is_staff = True
         user.is_superuser = True
         user.save(using=self._db)
@@ -66,7 +73,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     user_id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=50)
     email = models.EmailField(max_length=50, unique=True)
-    password = models.CharField(max_length=128)   # 128 for password hashes
+    password = models.CharField(max_length=128)  # 128 for password hashes
     role = models.IntegerField(choices=ROLE_CHOICES, default=0)
     status = models.IntegerField(choices=STATUS_CHOICES, default=0)
     created_at = models.DateTimeField(default=timezone.now)
@@ -89,12 +96,14 @@ class User(AbstractBaseUser, PermissionsMixin):
 # TICKET MODEL
 # -------------------
 class Ticket(models.Model):
-    event = models.ForeignKey('Event', on_delete=models.CASCADE)
+    event = models.ForeignKey("Event", on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     purchase_date = models.DateTimeField(default=timezone.now)
 
     # === QR / Scan / Check-in fields (nullable to avoid breaking teammates) ===
-    qr_token = models.CharField(max_length=64, unique=True, null=True, blank=True, db_index=True)
+    qr_token = models.CharField(
+        max_length=64, unique=True, null=True, blank=True, db_index=True
+    )
     claimed_at = models.DateTimeField(null=True, blank=True)
     first_scanned_at = models.DateTimeField(null=True, blank=True)
     last_scanned_at = models.DateTimeField(null=True, blank=True)
@@ -102,7 +111,10 @@ class Ticket(models.Model):
     checked_in_at = models.DateTimeField(null=True, blank=True)
 
     class Meta:
-        unique_together = ('event', 'user')  # each user can only have 1 ticket per event
+        unique_together = (
+            "event",
+            "user",
+        )  # each user can only have 1 ticket per event
 
     def __str__(self):
         return f"{self.user.name} - {self.event.title}"
@@ -135,16 +147,16 @@ class Ticket(models.Model):
 # -------------------
 class Event(models.Model):
     TICKET_TYPES = [
-        ('free', 'Free'),
-        ('general', 'General Admission'),
-        ('vip', 'VIP'),
+        ("free", "Free"),
+        ("general", "General Admission"),
+        ("vip", "VIP"),
     ]
 
     EVENT_STATUS = [
-        ('draft', 'Draft'),
-        ('pending', 'Pending Admin Review'),
-        ('approved', 'Approved'),
-        ('rejected', 'Rejected'),
+        ("draft", "Draft"),
+        ("pending", "Pending Admin Review"),
+        ("approved", "Approved"),
+        ("rejected", "Rejected"),
     ]
 
     title = models.CharField(max_length=200)
@@ -157,13 +169,13 @@ class Event(models.Model):
     # Optional – used for student filtering
     category = models.CharField(max_length=100, blank=True, default="")
 
-    ticket_type = models.CharField(max_length=20, choices=TICKET_TYPES, default='free')
-    status = models.CharField(max_length=20, choices=EVENT_STATUS, default='draft')
+    ticket_type = models.CharField(max_length=20, choices=TICKET_TYPES, default="free")
+    status = models.CharField(max_length=20, choices=EVENT_STATUS, default="draft")
 
     attendees = models.ManyToManyField(
         User,
-        through='Ticket',
-        related_name='events_attending',
+        through="Ticket",
+        related_name="events_attending",
         blank=True,
     )
 
@@ -171,7 +183,7 @@ class Event(models.Model):
         User,
         on_delete=models.CASCADE,
         related_name="organized_events",
-        limit_choices_to={'role': 1}
+        limit_choices_to={"role": 1},
     )
 
     created_at = models.DateTimeField(default=timezone.now)
@@ -185,9 +197,9 @@ class Event(models.Model):
         tickets = Ticket.objects.filter(event=self).select_related("user")
         return [
             {
-                'full_name': t.user.name,
-                'email': t.user.email,
-                'purchase_date': t.purchase_date.strftime("%Y-%m-%d %H:%M"),
+                "full_name": t.user.name,
+                "email": t.user.email,
+                "purchase_date": t.purchase_date.strftime("%Y-%m-%d %H:%M"),
             }
             for t in tickets
         ]
@@ -200,7 +212,9 @@ class Event(models.Model):
 # SAVED EVENT (deduplicated – single definition)
 # -------------------
 class SavedEvent(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="saved_events")
+    user = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="saved_events"
+    )
     event = models.ForeignKey(Event, on_delete=models.CASCADE, related_name="saved_by")
     remind_me = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -218,11 +232,17 @@ class Payment(models.Model):
         ("failed", "Failed"),
         ("pending", "Pending"),
     )
-    user       = models.ForeignKey("main.User", on_delete=models.CASCADE, related_name="payments")
-    event      = models.ForeignKey("main.Event", on_delete=models.CASCADE, related_name="payments")
-    amount     = models.DecimalField(max_digits=8, decimal_places=2, default=0)
-    status     = models.CharField(max_length=16, choices=STATUS_CHOICES, default="succeeded")
-    txn_id     = models.CharField(max_length=64, blank=True)  # fake transaction id
+    user = models.ForeignKey(
+        "main.User", on_delete=models.CASCADE, related_name="payments"
+    )
+    event = models.ForeignKey(
+        "main.Event", on_delete=models.CASCADE, related_name="payments"
+    )
+    amount = models.DecimalField(max_digits=8, decimal_places=2, default=0)
+    status = models.CharField(
+        max_length=16, choices=STATUS_CHOICES, default="succeeded"
+    )
+    txn_id = models.CharField(max_length=64, blank=True)  # fake transaction id
     created_at = models.DateTimeField(default=timezone.now)
 
     class Meta:

@@ -88,16 +88,15 @@ def public_ticket_page(request, qr_token: str):
     and render a minimal HTML ticket view (no login required).
     """
     ticket = (
-        Ticket.objects
-        .select_related("event", "user")
-        .filter(qr_token=qr_token)
-        .first()
+        Ticket.objects.select_related("event", "user").filter(qr_token=qr_token).first()
     )
     if not ticket:
         return render(request, "public_ticket_invalid.html", status=404)
 
     now = timezone.now()
-    if not ticket.last_scanned_at or (now - ticket.last_scanned_at) > timedelta(seconds=3):
+    if not ticket.last_scanned_at or (now - ticket.last_scanned_at) > timedelta(
+        seconds=3
+    ):
         ticket.record_scan()
         ticket.save(update_fields=["first_scanned_at", "last_scanned_at", "scan_count"])
 
@@ -130,10 +129,7 @@ def qr_checkin_api(request):
         token = raw.replace("token=", "").strip()
 
     ticket = (
-        Ticket.objects
-        .select_related("event", "user")
-        .filter(qr_token=token)
-        .first()
+        Ticket.objects.select_related("event", "user").filter(qr_token=token).first()
     )
     if not ticket:
         return JsonResponse({"ok": False, "message": "Invalid ticket"}, status=404)
@@ -147,19 +143,21 @@ def qr_checkin_api(request):
         ticket.mark_checked_in()
         ticket.save(update_fields=["checked_in_at"])
 
-    return JsonResponse({
-        "ok": True,
-        "event_id": ticket.event.id,
-        "event_title": ticket.event.title,
-        "user_id": ticket.user.user_id,
-        "student_name": ticket.user.name,
-        "claimed_at": ticket.claimed_at,
-        "first_scanned_at": ticket.first_scanned_at,
-        "last_scanned_at": ticket.last_scanned_at,
-        "scan_count": ticket.scan_count,
-        "checked_in_at": ticket.checked_in_at,
-        "already_checked_in": already_checked,
-    })
+    return JsonResponse(
+        {
+            "ok": True,
+            "event_id": ticket.event.id,
+            "event_title": ticket.event.title,
+            "user_id": ticket.user.user_id,
+            "student_name": ticket.user.name,
+            "claimed_at": ticket.claimed_at,
+            "first_scanned_at": ticket.first_scanned_at,
+            "last_scanned_at": ticket.last_scanned_at,
+            "scan_count": ticket.scan_count,
+            "checked_in_at": ticket.checked_in_at,
+            "already_checked_in": already_checked,
+        }
+    )
 
 
 # ---------- Event stats for organizer/admin dashboards ----------
@@ -183,31 +181,33 @@ def event_stats_api(request, event_id: int):
 
     first_scan = (
         qs.exclude(first_scanned_at__isnull=True)
-          .order_by("first_scanned_at")
-          .values_list("first_scanned_at", flat=True)
-          .first()
+        .order_by("first_scanned_at")
+        .values_list("first_scanned_at", flat=True)
+        .first()
     )
     last_scan = (
         qs.exclude(last_scanned_at__isnull=True)
-          .order_by("-last_scanned_at")
-          .values_list("last_scanned_at", flat=True)
-          .first()
+        .order_by("-last_scanned_at")
+        .values_list("last_scanned_at", flat=True)
+        .first()
     )
 
-    return JsonResponse({
-        "event_id": event.id,
-        "claimed": claimed,
-        "scanned": scanned,
-        "checked_in": checked_in,
-        "first_scan_at": first_scan,
-        "last_scan_at": last_scan,
-        "capacity": event.capacity,
-    })
+    return JsonResponse(
+        {
+            "event_id": event.id,
+            "claimed": claimed,
+            "scanned": scanned,
+            "checked_in": checked_in,
+            "first_scan_at": first_scan,
+            "last_scan_at": last_scan,
+            "capacity": event.capacity,
+        }
+    )
 
 
 # ---------- Organizer scan page (camera) ----------
 @login_required
-@ensure_csrf_cookie   # <-- NEW: guarantees csrftoken cookie on this page
+@ensure_csrf_cookie  # <-- NEW: guarantees csrftoken cookie on this page
 def organizer_scan_page(request):
     role = getattr(request.user, "role", None)
     if role not in (1, 2):

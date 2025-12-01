@@ -1,9 +1,10 @@
 # main/migrations/0007_ticket_checked_in_at_ticket_claimed_at_and_more.py
 from django.db import migrations, models
 
+
 class Migration(migrations.Migration):
     dependencies = [
-        ("main", "0001_initial"),   # ← was 0006_merge_..., which doesn't exist here
+        ("main", "0001_initial"),  # ← was 0006_merge_..., which doesn't exist here
     ]
 
     operations = [
@@ -30,7 +31,9 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="ticket",
             name="qr_token",
-            field=models.CharField(max_length=64, unique=True, null=True, blank=True, db_index=True),
+            field=models.CharField(
+                max_length=64, unique=True, null=True, blank=True, db_index=True
+            ),
         ),
         migrations.AddField(
             model_name="ticket",
