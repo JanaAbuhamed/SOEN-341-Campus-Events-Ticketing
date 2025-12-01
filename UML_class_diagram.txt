@@ -57,20 +57,19 @@ class Event {
 }
 
 '===============================
-' REGISTRATION
+' Ticket Claim
 '===============================
-class Registration {
+class TicketClaim {
     +id: int
     +studentId: int
     +eventId: int
     +timestamp: DateTime
-    +status: RegistrationStatus
     --
+    generateQRCode()
     +unclaim()
 }
 
-Student "1" --> "*" Registration
-Event   "1" --> "*" Registration
+Student "1" --> "*" TicketClaim
 
 '===============================
 ' PAYMENTS
@@ -83,13 +82,11 @@ class Payment {
     +status: PaymentStatus
     +paymentDate: Date
     --
-    +process(): bool
+    +processPayment(): bool
     +refund(): bool
 }
 
-Student "1" --> "*" Payment
-Event   "1" --> "*" Payment
-Payment "1" --> "1" Registration
+Payment "1" <--> "1" TicketClaim
 
 '===============================
 ' USER EVENT RELATIONSHIP
