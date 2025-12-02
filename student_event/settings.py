@@ -3,7 +3,7 @@ from pathlib import Path
 import os
 from urllib.parse import urlparse
 
-TEST_RUNNER = 'django.test.runner.DiscoverRunner'
+TEST_RUNNER = "django.test.runner.DiscoverRunner"
 
 # ---------------------------------------------------------------------
 # Project base
@@ -13,14 +13,14 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # ---------------------------------------------------------------------
 # Auth
 # ---------------------------------------------------------------------
-LOGIN_URL = 'loginindex'
-LOGIN_REDIRECT_URL = 'studentdashboard'
-AUTH_USER_MODEL = 'main.User'
+LOGIN_URL = "loginindex"
+LOGIN_REDIRECT_URL = "studentdashboard"
+AUTH_USER_MODEL = "main.User"
 
 # ---------------------------------------------------------------------
 # Security / Debug
 # ---------------------------------------------------------------------
-SECRET_KEY = 'django-insecure-c02l$+ss##*v!1r8tvy93yv4$va0ht6%tx*9n@rkw7$-&rkh0j'
+SECRET_KEY = "django-insecure-c02l$+ss##*v!1r8tvy93yv4$va0ht6%tx*9n@rkw7$-&rkh0j"
 DEBUG = True  # keep True for dev; set False in production
 
 # If you’re using a tunnel (Cloudflare/ngrok), put its full origin here, e.g.:
@@ -38,11 +38,16 @@ def _origin_to_host(origin: str) -> str:
 _public_host = _origin_to_host(PUBLIC_ORIGIN)
 
 # Allow localhost, 127.0.0.1, and your tunnel host (if provided)
-ALLOWED_HOSTS = list(filter(None, [
-    "localhost",
-    "127.0.0.1",
-    _public_host,
-]))
+ALLOWED_HOSTS = list(
+    filter(
+        None,
+        [
+            "localhost",
+            "127.0.0.1",
+            _public_host,
+        ],
+    )
+)
 
 # Behind tunnels/reverse proxies, these help Django build correct absolute URLs
 USE_X_FORWARDED_HOST = True
@@ -52,64 +57,72 @@ SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 # Installed apps / middleware
 # ---------------------------------------------------------------------
 INSTALLED_APPS = [
-    'django.contrib.admin',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
-    'main',
-    'rest_framework',
-    'corsheaders',
+    "django.contrib.admin",
+    "django.contrib.auth",
+    "django.contrib.contenttypes",
+    "django.contrib.sessions",
+    "django.contrib.messages",
+    "django.contrib.staticfiles",
+    "main",
+    "rest_framework",
+    "corsheaders",
 ]
 
 MIDDLEWARE = [
-    'django.middleware.security.SecurityMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    'corsheaders.middleware.CorsMiddleware',
-    'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    "django.middleware.security.SecurityMiddleware",
+    "django.contrib.sessions.middleware.SessionMiddleware",
+    "corsheaders.middleware.CorsMiddleware",
+    "django.middleware.common.CommonMiddleware",
+    "django.middleware.csrf.CsrfViewMiddleware",
+    "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "django.contrib.messages.middleware.MessageMiddleware",
+    "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
-ROOT_URLCONF = 'student_event.urls'
+ROOT_URLCONF = "student_event.urls"
 
 TEMPLATES = [
     {
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],  # using app templates (APP_DIRS=True)
-        'APP_DIRS': True,
-        'OPTIONS': {
-            'context_processors': [
-                'django.template.context_processors.request',
-                'django.contrib.auth.context_processors.auth',
-                'django.contrib.messages.context_processors.messages',
+        "BACKEND": "django.template.backends.django.DjangoTemplates",
+        "DIRS": [],  # using app templates (APP_DIRS=True)
+        "APP_DIRS": True,
+        "OPTIONS": {
+            "context_processors": [
+                "django.template.context_processors.request",
+                "django.contrib.auth.context_processors.auth",
+                "django.contrib.messages.context_processors.messages",
             ],
         },
     },
 ]
 
-WSGI_APPLICATION = 'student_event.wsgi.application'
+WSGI_APPLICATION = "student_event.wsgi.application"
 
 # ---------------------------------------------------------------------
 # CORS / CSRF for public phone access
 # ---------------------------------------------------------------------
 CORS_ALLOW_ALL_ORIGINS = True  # dev convenience
 
-CSRF_TRUSTED_ORIGINS = list(filter(None, [
-    'http://localhost:8000',
-    'http://127.0.0.1:8000',
-    'https://localhost:8000',
-    'https://127.0.0.1:8000',
-    PUBLIC_ORIGIN if PUBLIC_ORIGIN else None,
-]))
+CSRF_TRUSTED_ORIGINS = list(
+    filter(
+        None,
+        [
+            "http://localhost:8000",
+            "http://127.0.0.1:8000",
+            "https://localhost:8000",
+            "https://127.0.0.1:8000",
+            PUBLIC_ORIGIN if PUBLIC_ORIGIN else None,
+        ],
+    )
+)
 
 # ---------------------------------------------------------------------
 # Database (MySQL locally/prod, SQLite in CI)
 # ---------------------------------------------------------------------
-USE_SQLITE_FOR_CI = os.environ.get("GITHUB_ACTIONS") == "true" or os.environ.get("USE_SQLITE_FOR_CI") == "1"
+USE_SQLITE_FOR_CI = (
+    os.environ.get("GITHUB_ACTIONS") == "true"
+    or os.environ.get("USE_SQLITE_FOR_CI") == "1"
+)
 
 if USE_SQLITE_FOR_CI:
     DATABASES = {
@@ -137,35 +150,35 @@ else:
 # ---------------------------------------------------------------------
 # I18N / TZ
 # ---------------------------------------------------------------------
-LANGUAGE_CODE = 'en-us'
-TIME_ZONE = 'UTC'
+LANGUAGE_CODE = "en-us"
+TIME_ZONE = "UTC"
 USE_I18N = True
 USE_TZ = True
 
 # ---------------------------------------------------------------------
 # Static files
 # ---------------------------------------------------------------------
-STATIC_URL = '/static/'
+STATIC_URL = "/static/"
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'main', 'static'),
+    os.path.join(BASE_DIR, "main", "static"),
 ]
 
 # ---------------------------------------------------------------------
 # Default PK
 # ---------------------------------------------------------------------
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 TEST_DISCOVER_PATTERN = "test_*.py"
 
 # ---------------------------------------------------------------------
 # DRF Settings
 REST_FRAMEWORK = {
-    'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.AllowAny',  # For dev, open access
+    "DEFAULT_PERMISSION_CLASSES": [
+        "rest_framework.permissions.AllowAny",  # For dev, open access
     ],
-    'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework.authentication.SessionAuthentication',
-        'rest_framework.authentication.BasicAuthentication',
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "rest_framework.authentication.SessionAuthentication",
+        "rest_framework.authentication.BasicAuthentication",
     ],
 }
 # ---------------------------------------------------------------------
