@@ -1,5 +1,6 @@
 # UNITIX (SOEN-341 Project)
-Campus Events &amp; Ticketing Web App for SOEN 341 Project
+Campus Events &amp; Ticketing Web App 
+SOEN 341
 
 ## Objective
 
